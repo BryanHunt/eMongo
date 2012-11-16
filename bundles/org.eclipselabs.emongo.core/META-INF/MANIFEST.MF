@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: MongoDB Services API
+Bundle-SymbolicName: org.eclipselabs.emongo.core
+Bundle-Version: 1.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-Vendor: EclipseLabs
+Import-Package: com.mongodb;version="2.9.3"
+Export-Package: org.eclipselabs.emongo

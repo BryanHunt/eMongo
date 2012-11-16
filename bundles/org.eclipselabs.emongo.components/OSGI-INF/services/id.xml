@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="configure" configuration-policy="require" immediate="true" name="org.eclipselabs.emongo.idFactory">
+   <implementation class="org.eclipselabs.emongo.components.MongoIdFactoryComponent"/>
+   <reference bind="bindDatabaseLocator" cardinality="1..1" interface="org.eclipselabs.emongo.DatabaseLocator" name="DatabaseLocator" policy="static"/>
+   <service>
+      <provide interface="org.eclipselabs.emongo.MongoIdFactory"/>
+   </service>
+</scr:component>

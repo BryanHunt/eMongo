@@ -1,0 +1,5 @@
+package org.eclipselabs.emongo.components.junit
+
+#eMongo Suite
+
+- "DatabaseAuthenticationProviderComponent"

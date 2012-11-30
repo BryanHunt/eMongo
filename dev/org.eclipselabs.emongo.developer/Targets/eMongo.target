@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<?pde version="3.8"?><target name="eMongo" sequenceNumber="3">
+<?pde version="3.8"?>
+
+<target name="eMongo" sequenceNumber="6">
 <locations>
 <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.equinox.sdk.feature.group" version="3.8.0.v20120522-1841-7M7fA78g5_y-g-jtHxcd5k8q8lFR"/>
@@ -7,8 +9,16 @@
 <repository location="http://download.eclipse.org/releases/juno"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
-<unit id="org.jnario.feature.group" version="0.3.0.201211121450"/>
+<unit id="org.jnario.feature.group" version="0.3.0.201211300028"/>
 <repository location="http://www.jnario.org/updates/snapshot/"/>
+</location>
+<location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
+<unit id="org.eclipselabs.eunit.junit.utils.feature.feature.group" version="1.0.0.201211292339"/>
+<repository location="http://bryanhunt.github.com/eUnit/releases/1.0.0/"/>
+</location>
+<location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
+<unit id="org.hamcrest.feature.feature.group" version="1.3.0.201211292357"/>
+<repository location="http://bryanhunt.github.com/3rd-party-libs/"/>
 </location>
 </locations>
 </target>

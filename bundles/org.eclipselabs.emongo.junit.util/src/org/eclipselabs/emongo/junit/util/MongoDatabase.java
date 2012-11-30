@@ -17,9 +17,7 @@ import static org.junit.Assert.assertThat;
 
 import org.eclipse.emf.common.util.URI;
 import org.eclipselabs.emongo.DatabaseLocator;
-import org.eclipselabs.emongo.junit.util.bundle.Activator;
-import org.junit.rules.ExternalResource;
-import org.osgi.util.tracker.ServiceTracker;
+import org.eclipselabs.eunit.junit.utils.ServiceLocator;
 
 import com.mongodb.DB;
 
@@ -36,7 +34,7 @@ import com.mongodb.DB;
  * @author bhunt
  * 
  */
-public class MongoDatabase extends ExternalResource
+public class MongoDatabase extends ServiceLocator<DatabaseLocator>
 {
 	/**
 	 * Connects to the "junit" database on localhost:27017
@@ -96,6 +94,7 @@ public class MongoDatabase extends ExternalResource
 
 	public MongoDatabase(String hostname, int port, String database, DatabaseLocator dbLocator)
 	{
+		super(DatabaseLocator.class);
 		baseURI = URI.createURI("mongodb://" + hostname + (port == 27017 ? "" : ":" + port) + "/" + database);
 		databaseLocator = dbLocator;
 	}
@@ -135,37 +134,18 @@ public class MongoDatabase extends ExternalResource
 		return db;
 	}
 
-	/**
-	 * Provides access to the MongoLocatorService OSGi service
-	 * 
-	 * @return the MongoDB OSGi service
-	 */
-	public DatabaseLocator getMongoDBService()
-	{
-		return databaseLocator;
-	}
-
 	@Override
 	protected void before() throws Throwable
 	{
 		super.before();
-
-		if (databaseLocator == null)
-		{
-			ServiceTracker<DatabaseLocator, DatabaseLocator> mongoServiceTracker = new ServiceTracker<DatabaseLocator, DatabaseLocator>(Activator.getBundleContext(), DatabaseLocator.class, null);
-			mongoServiceTracker.open();
-			databaseLocator = mongoServiceTracker.waitForService(1000);
-		}
-
-		assertThat("Failed to get the IDatabaseLocator service", databaseLocator, is(notNullValue()));
-		db = databaseLocator.getDatabase(baseURI.toString());
+		db = getService().getDatabase(baseURI.toString());
 		assertThat("No database configured for: " + baseURI.toString(), db, is(notNullValue()));
 	}
 
 	@Override
 	protected void after()
 	{
-		if (databaseLocator != null)
+		if (getService() != null)
 		{
 			try
 			{
@@ -183,6 +163,15 @@ public class MongoDatabase extends ExternalResource
 		}
 
 		super.after();
+	}
+
+	@Override
+	protected DatabaseLocator waitForService() throws InterruptedException
+	{
+		if (databaseLocator != null)
+			return databaseLocator;
+
+		return super.waitForService();
 	}
 
 	private DatabaseLocator databaseLocator;

@@ -26,6 +26,28 @@ public class DatabaseAuthenticationProviderComponent extends AbstractComponent i
 	public DatabaseAuthenticationProviderComponent()
 	{}
 
+	public void configure(Map<String, Object> properties)
+	{
+		uri = (String) properties.get(DatabaseAuthenticationProvider.PROP_URI);
+		user = (String) properties.get(DatabaseAuthenticationProvider.PROP_USER);
+		password = (String) properties.get(DatabaseAuthenticationProvider.PROP_PASSWORD);
+	
+		if (uri == null || uri.isEmpty())
+			handleIllegalConfiguration("The MongoDB uri was not found in the configuration properties");
+	
+		if (user == null || user.isEmpty())
+			handleIllegalConfiguration("The MongoDB user was not found in the configuration properties");
+	
+		if (password == null || password.isEmpty())
+			handleIllegalConfiguration("The MongoDB password was not found in the configuration properties");
+	
+		// The URI will be of the form: mongodb://host[:port]/db
+		// When the string is split on / the URI must have 4 parts
+	
+		if (!uri.startsWith("mongodb://") || uri.split("/").length != 4)
+			handleIllegalConfiguration("The uri: '" + uri + "' does not have the form 'mongodb://host[:port]/db'");
+	}
+
 	@Override
 	public String getURI()
 	{
@@ -42,27 +64,5 @@ public class DatabaseAuthenticationProviderComponent extends AbstractComponent i
 	public String getPassword()
 	{
 		return password;
-	}
-
-	public void configure(Map<String, Object> properties)
-	{
-		uri = (String) properties.get(DatabaseAuthenticationProvider.PROP_URI);
-		user = (String) properties.get(DatabaseAuthenticationProvider.PROP_USER);
-		password = (String) properties.get(DatabaseAuthenticationProvider.PROP_PASSWORD);
-
-		if (uri == null || uri.isEmpty())
-			handleIllegalConfiguration("The MongoDB uri was not found in the configuration properties");
-
-		if (user == null || user.isEmpty())
-			handleIllegalConfiguration("The MongoDB user was not found in the configuration properties");
-
-		if (password == null || password.isEmpty())
-			handleIllegalConfiguration("The MongoDB password was not found in the configuration properties");
-
-		// The URI will be of the form: mongodb://host[:port]/db
-		// When the string is split on / the URI must have 4 parts
-
-		if (!uri.startsWith("mongodb://") && uri.split("/").length != 4)
-			handleIllegalConfiguration("The uri: '" + uri + "' does not have the form 'mongodb://host[:port]/db'");
 	}
 }

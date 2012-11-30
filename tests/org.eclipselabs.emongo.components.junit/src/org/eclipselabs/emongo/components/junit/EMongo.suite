@@ -1,0 +1,6 @@
+package org.eclipselabs.emongo.components.junit
+
+#eMongo
+
+- "DatabaseAuthenticationProviderComponent"
+- "MongoIdFactoryComponent"

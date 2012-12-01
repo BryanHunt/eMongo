@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/org.eclipselabs.emongo.junit.feature_1.0.0.qualifier.jar" id="org.eclipselabs.emongo.junit.feature" version="1.0.0.qualifier">
+      <category name="emongo"/>
+   </feature>
+   <feature url="features/org.eclipselabs.emongo.runtime.feature_1.0.0.qualifier.jar" id="org.eclipselabs.emongo.runtime.feature" version="1.0.0.qualifier">
+      <category name="emongo"/>
+   </feature>
+   <feature url="features/org.eclipselabs.emongo.sdk.feature_1.0.0.qualifier.jar" id="org.eclipselabs.emongo.sdk.feature" version="1.0.0.qualifier">
+      <category name="emongo"/>
+   </feature>
+   <category-def name="emongo" label="eMongo"/>
+</site>

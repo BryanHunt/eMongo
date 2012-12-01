@@ -29,6 +29,15 @@ describe MongoClientProviderComponent
 			subject.URIs.size should be 1
 			subject.URIs.get(0) should be "mongodb://localhost"
 		}
+		
+		fact "a single MongoClient is created on activation"
+		{
+			subject.activate(properties)
+			subject.mongoClient should be mongoClient
+			val MongoClientProviderComponentTestHarness target = subject as MongoClientProviderComponentTestHarness
+			target.serverAddress.host should be "localhost"
+			target.serverAddresses should be null
+		}
 	}
 	
 	context "database replica set"

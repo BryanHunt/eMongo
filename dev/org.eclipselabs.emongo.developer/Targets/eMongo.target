@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<?pde version="3.8"?><target name="eMongo" sequenceNumber="11">
+<?pde version="3.8"?>
+
+<target name="eMongo" sequenceNumber="12">
 <locations>
-<location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
-<unit id="org.hamcrest.feature.feature.group" version="1.3.0.201212010921"/>
-<unit id="org.mockito.feature.feature.group" version="1.9.5.201212010921"/>
-<repository location="http://bryanhunt.github.com/3rd-party-libs/"/>
-</location>
 <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.jnario.feature.group" version="0.3.0.201211300028"/>
 <repository location="http://www.jnario.org/updates/snapshot/"/>
@@ -18,6 +15,12 @@
 <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipselabs.eunit.junit.utils.feature.feature.group" version="1.0.0.201211300010"/>
 <repository location="http://bryanhunt.github.com/eUnit/releases/1.0.0/"/>
+</location>
+<location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
+<unit id="org.hamcrest.feature.feature.group" version="1.3.0.201212011033"/>
+<unit id="org.junit.feature.feature.group" version="4.11.0.201212011033"/>
+<unit id="org.mockito.feature.feature.group" version="1.9.5.201212011033"/>
+<repository location="http://bryanhunt.github.com/3rd-party-libs/"/>
 </location>
 </locations>
 </target>

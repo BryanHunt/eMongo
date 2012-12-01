@@ -9,7 +9,7 @@
  *    Bryan Hunt - initial API and implementation
  *******************************************************************************/
 
-package org.eclipselabs.emongo.junit.configuration;
+package org.eclipselabs.emongo.configurator.local;
 
 import java.io.IOException;
 import java.util.Dictionary;
@@ -23,13 +23,13 @@ import org.osgi.service.cm.ConfigurationAdmin;
  * @author bhunt
  * 
  */
-public class ProviderConfiguration
+public class LocalMongoClientProviderConfigurator
 {
 	private ConfigurationAdmin configurationAdmin;
 
 	void activate() throws IOException
 	{
-		Configuration config = configurationAdmin.getConfiguration("org.eclipselabs.emongo.provider", null);
+		Configuration config = configurationAdmin.getConfiguration("org.eclipselabs.emongo.clientProvider", null);
 
 		Dictionary<String, Object> properties = config.getProperties();
 

@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: eMongo JUnit Client Provider Configuration
-Bundle-SymbolicName: org.eclipselabs.emongo.junit.configuration
+Bundle-SymbolicName: org.eclipselabs.emongo.configurator.local
 Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: EclipseLabs
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

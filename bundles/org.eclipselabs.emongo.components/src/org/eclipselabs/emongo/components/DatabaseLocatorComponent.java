@@ -34,8 +34,13 @@ public class DatabaseLocatorComponent implements DatabaseLocator
 	{
 		int dbStart = uri.indexOf('/', 10);
 		int dbEnd = uri.indexOf('/', dbStart + 1);
+
+		if (dbEnd == -1)
+			dbEnd = uri.length();
+
+		String clientURI = uri.substring(0, dbStart + 1);
 		String dbURI = uri.substring(0, dbEnd);
-		String databaseName = uri.substring(dbStart + 1, dbEnd);
+		String databaseName = uri.substring(dbStart + 1);
 
 		synchronized (databasesByURI)
 		{
@@ -48,18 +53,18 @@ public class DatabaseLocatorComponent implements DatabaseLocator
 
 			synchronized (mongoProvidersByURI)
 			{
-				mongoProvider = mongoProvidersByURI.get(dbURI);
+				mongoProvider = mongoProvidersByURI.get(clientURI);
 			}
 
 			if (mongoProvider == null)
 				return null;
 
 			database = mongoProvider.getMongoClient().getDB(databaseName);
-			databasesByURI.put(dbURI.toString(), database);
+			databasesByURI.put(dbURI, database);
 
 			synchronized (databaseAuthenticationProvidersByURI)
 			{
-				DatabaseAuthenticationProvider databaseAuthenticationProvider = databaseAuthenticationProvidersByURI.get(dbURI.toString());
+				DatabaseAuthenticationProvider databaseAuthenticationProvider = databaseAuthenticationProvidersByURI.get(dbURI);
 
 				if (databaseAuthenticationProvider != null)
 					database.authenticate(databaseAuthenticationProvider.getUser(), databaseAuthenticationProvider.getPassword().toCharArray());
@@ -85,7 +90,7 @@ public class DatabaseLocatorComponent implements DatabaseLocator
 		}
 	}
 
-	public void bindMongoProvider(MongoClientProvider mongoProvider)
+	public void bindMongoClientProvider(MongoClientProvider mongoProvider)
 	{
 		synchronized (mongoProvidersByURI)
 		{
@@ -94,7 +99,7 @@ public class DatabaseLocatorComponent implements DatabaseLocator
 		}
 	}
 
-	public void unbindMongoProvider(MongoClientProvider mongoProvider)
+	public void unbindMongoClientProvider(MongoClientProvider mongoProvider)
 	{
 		synchronized (mongoProvidersByURI)
 		{

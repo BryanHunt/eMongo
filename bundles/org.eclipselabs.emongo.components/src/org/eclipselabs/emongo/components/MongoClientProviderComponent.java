@@ -17,25 +17,26 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Map;
 
-import org.eclipselabs.emongo.MongoProvider;
+import org.eclipselabs.emongo.MongoClientProvider;
 
-import com.mongodb.Mongo;
-import com.mongodb.MongoOptions;
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientOptions;
 import com.mongodb.ServerAddress;
+import com.mongodb.WriteConcern;
 
 /**
  * @author bhunt
  * 
  */
-public class MongoProviderComponent extends AbstractComponent implements MongoProvider
+public class MongoClientProviderComponent extends AbstractComponent implements MongoClientProvider
 {
 	private volatile String[] uris;
-	private volatile Mongo mongo;
+	private volatile MongoClient mongoClient;
 
 	@Override
-	public Mongo getMongo()
+	public MongoClient getMongoClient()
 	{
-		return mongo;
+		return mongoClient;
 	}
 
 	@Override
@@ -46,7 +47,7 @@ public class MongoProviderComponent extends AbstractComponent implements MongoPr
 
 	public void activate(Map<String, Object> properties)
 	{
-		MongoOptions options = createMongoOptions(properties);
+		MongoClientOptions options = createMongoClientOptions(properties);
 
 		// The uriProperty is a single string containing one or more server URIs.
 		// When more than one URI is specified, it denotes a replica set and the
@@ -57,9 +58,9 @@ public class MongoProviderComponent extends AbstractComponent implements MongoPr
 		if (uriProperty == null || uriProperty.isEmpty())
 			handleIllegalConfiguration("The MongoDB URI was not found in the configuration properties");
 
-		// The regex \s matches whitepsace.  The extra \ is needed because of how it's treated in java strings.
-		// The split is done on any number of whitespace chars followed by a comma followed by any number of
-		// whitespace chars.  What is left is the URI(s).
+		// The regex \s matches whitepsace. The extra \ is needed because of how it's treated in java
+		// strings. The split is done on any number of whitespace chars followed by a comma followed by
+		// any number of whitespace chars. What is left is the URI(s).
 
 		uris = uriProperty.split("\\s*,\\s*");
 		String currentURI = null;
@@ -77,7 +78,7 @@ public class MongoProviderComponent extends AbstractComponent implements MongoPr
 					handleIllegalConfiguration("The uri: '" + currentURI + "' does not have the form 'mongodb://host[:port]/db'");
 
 				ServerAddress serverAddress = createServerAddress(currentURI);
-				mongo = createMongo(options, serverAddress);
+				mongoClient = createMongoClient(options, serverAddress);
 			}
 			else
 			{
@@ -96,7 +97,7 @@ public class MongoProviderComponent extends AbstractComponent implements MongoPr
 					serverAddresses.add(createServerAddress(currentURI));
 				}
 
-				mongo = createMongo(options, serverAddresses);
+				mongoClient = createMongoClient(options, serverAddresses);
 			}
 		}
 		catch (UnknownHostException e)
@@ -111,95 +112,98 @@ public class MongoProviderComponent extends AbstractComponent implements MongoPr
 
 	public void deactivate()
 	{
-		if (mongo != null)
-			mongo.close();
+		if (mongoClient != null)
+			mongoClient.close();
 	}
 
-	protected Mongo createMongo(MongoOptions options, ArrayList<ServerAddress> serverAddresses)
+	protected MongoClient createMongoClient(MongoClientOptions options, ArrayList<ServerAddress> serverAddresses)
 	{
-		return new Mongo(serverAddresses, options);
+		return new MongoClient(serverAddresses, options);
 	}
 
-	protected Mongo createMongo(MongoOptions options, ServerAddress serverAddress)
+	protected MongoClient createMongoClient(MongoClientOptions options, ServerAddress serverAddress)
 	{
-		return new Mongo(serverAddress, options);
+		return new MongoClient(serverAddress, options);
 	}
 
-	private MongoOptions createMongoOptions(Map<String, Object> properties)
+	private MongoClientOptions createMongoClientOptions(Map<String, Object> properties)
 	{
-		MongoOptions options = new MongoOptions();
+		MongoClientOptions.Builder optionsBuilder = new MongoClientOptions.Builder();
 
 		String description = (String) properties.get(PROP_DESCRIPTION);
 
 		if (description != null)
-			options.description = description;
+			optionsBuilder.description(description);
 
 		Integer connectionsPerHost = (Integer) properties.get(PROP_CONNECTIONS_PER_HOST);
 
 		if (connectionsPerHost != null)
-			options.connectionsPerHost = connectionsPerHost;
+			optionsBuilder.connectionsPerHost(connectionsPerHost);
 
 		Integer threadsAllowedToBlockForConnectionMultiplier = (Integer) properties.get(PROP_THREADS_ALLOWED_TO_BLOCK_FOR_CONNECTION_MULTIPLIER);
 
 		if (threadsAllowedToBlockForConnectionMultiplier != null)
-			options.threadsAllowedToBlockForConnectionMultiplier = threadsAllowedToBlockForConnectionMultiplier;
+			optionsBuilder.threadsAllowedToBlockForConnectionMultiplier(threadsAllowedToBlockForConnectionMultiplier);
 
 		Integer maxWaitTime = (Integer) properties.get(PROP_MAX_WAIT_TIME);
 
 		if (maxWaitTime != null)
-			options.maxWaitTime = maxWaitTime;
+			optionsBuilder.maxWaitTime(maxWaitTime);
 
 		Integer connectTimeout = (Integer) properties.get(PROP_CONNECT_TIMEOUT);
 
 		if (connectTimeout != null)
-			options.connectTimeout = connectTimeout;
+			optionsBuilder.connectTimeout(connectTimeout);
 
 		Integer socketTimeout = (Integer) properties.get(PROP_SOCKET_TIMEOUT);
 
 		if (socketTimeout != null)
-			options.socketTimeout = socketTimeout;
+			optionsBuilder.socketTimeout(socketTimeout);
 
 		Boolean socketKeepAlive = (Boolean) properties.get(PROP_SOCKET_KEEP_ALIVE);
 
 		if (socketKeepAlive != null)
-			options.socketKeepAlive = socketKeepAlive;
+			optionsBuilder.socketKeepAlive(socketKeepAlive);
 
 		Boolean autoConnectRetry = (Boolean) properties.get(PROP_AUTO_CONNECT_RETRY);
 
 		if (autoConnectRetry != null)
-			options.autoConnectRetry = autoConnectRetry;
+			optionsBuilder.autoConnectRetry(autoConnectRetry);
 
 		Long maxAutoConnectRetryTime = (Long) properties.get(PROP_MAX_AUTO_CONNECT_RETRY_TIME);
 
 		if (maxAutoConnectRetryTime != null)
-			options.maxAutoConnectRetryTime = maxAutoConnectRetryTime;
+			optionsBuilder.maxAutoConnectRetryTime(maxAutoConnectRetryTime);
 
-		Boolean safe = (Boolean) properties.get(PROP_SAFE);
+		Boolean continueOnInsertError = (Boolean) properties.get(PROP_CONTINUE_ON_INSERT_ERROR);
 
-		if (safe != null)
-			options.safe = safe;
+		if (continueOnInsertError == null)
+			continueOnInsertError = Boolean.FALSE;
 
 		Integer w = (Integer) properties.get(PROP_W);
 
-		if (w != null)
-			options.w = w;
+		if (w == null)
+			w = Integer.valueOf(1);
 
 		Integer wtimeout = (Integer) properties.get(PROP_WTIMEOUT);
 
-		if (wtimeout != null)
-			options.wtimeout = wtimeout;
+		if (wtimeout == null)
+			wtimeout = Integer.valueOf(0);
 
 		Boolean fsync = (Boolean) properties.get(PROP_FSYNC);
 
-		if (fsync != null)
-			options.fsync = fsync;
+		if (fsync == null)
+			fsync = Boolean.FALSE;
 
 		Boolean j = (Boolean) properties.get(PROP_J);
 
-		if (j != null)
-			options.j = j;
+		if (j == null)
+			j = Boolean.FALSE;
 
-		return options;
+		WriteConcern writeConcern = new WriteConcern(w, wtimeout, fsync, j, continueOnInsertError);
+		optionsBuilder.writeConcern(writeConcern);
+
+		return optionsBuilder.build();
 	}
 
 	private ServerAddress createServerAddress(String uriProperty) throws URISyntaxException, UnknownHostException

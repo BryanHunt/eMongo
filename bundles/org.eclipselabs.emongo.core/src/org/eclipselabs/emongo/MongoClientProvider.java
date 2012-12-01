@@ -11,7 +11,7 @@
 
 package org.eclipselabs.emongo;
 
-import com.mongodb.Mongo;
+import com.mongodb.MongoClient;
 
 /**
  * This OSGi service provides access to a configured MongoDB driver. The MongoDB driver
@@ -20,9 +20,9 @@ import com.mongodb.Mongo;
  * @author bhunt
  * 
  */
-public interface MongoProvider
+public interface MongoClientProvider
 {
-	//--- MongoOptions properties ---------------------------------------------------------
+	// --- MongoOptions properties ---------------------------------------------------------
 
 	public String PROP_DESCRIPTION = "description";
 	public String PROP_CONNECTIONS_PER_HOST = "connectionsPerHost";
@@ -33,23 +33,28 @@ public interface MongoProvider
 	public String PROP_SOCKET_KEEP_ALIVE = "socketKeepAlive";
 	public String PROP_AUTO_CONNECT_RETRY = "autoConnectRetry";
 	public String PROP_MAX_AUTO_CONNECT_RETRY_TIME = "maxAutoConnectRetryTime";
-	public String PROP_SAFE = "safe";
+	public String PROP_CONTINUE_ON_INSERT_ERROR = "continueOnInsertError";
 	public String PROP_W = "w";
 	public String PROP_WTIMEOUT = "wtimeout";
 	public String PROP_FSYNC = "fsync";
 	public String PROP_J = "j";
 
-	//--- Provider service specific properties ---------------------------------------------
+	// --- Provider service specific properties ---------------------------------------------
 
 	public String PROP_URI = "uri";
 
-	//--------------------------------------------------------------------------------------
+	// --------------------------------------------------------------------------------------
 
 	/**
 	 * 
-	 * @return the MongoDB driver configured by the service properties
+	 * @return the MongoDB client driver configured by the service properties
 	 */
-	Mongo getMongo();
+	MongoClient getMongoClient();
 
+	/**
+	 * 
+	 * @return list of URIs configured on the client. A single URI will be returned for a single
+	 *         MongoDB. Multiple URIs will be returned for a replica set.
+	 */
 	String[] getURIs();
 }

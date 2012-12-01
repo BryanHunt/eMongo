@@ -14,11 +14,11 @@ package org.eclipselabs.mongo.junit.integration.tests;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-import org.eclipselabs.emongo.MongoProvider;
+import org.eclipselabs.emongo.MongoClientProvider;
 import org.eclipselabs.eunit.junit.utils.ServiceTestHarness;
 import org.junit.Test;
 
-import com.mongodb.Mongo;
+import com.mongodb.MongoClient;
 
 /**
  * @author bhunt
@@ -29,15 +29,15 @@ public class TestMongoProvider extends ServiceTestHarness
 	@Test
 	public void testCreateMongo()
 	{
-		Mongo mongo = mongoProvider.getMongo();
+		MongoClient mongo = mongoProvider.getMongoClient();
 		assertThat(mongo.getAddress().getHost(), is("localhost"));
 		assertThat(mongo.getAddress().getPort(), is(27017));
 	}
 
-	void bindMongoProvider(MongoProvider service)
+	void bindMongoProvider(MongoClientProvider service)
 	{
 		mongoProvider = service;
 	}
 
-	private static MongoProvider mongoProvider;
+	private static MongoClientProvider mongoProvider;
 }

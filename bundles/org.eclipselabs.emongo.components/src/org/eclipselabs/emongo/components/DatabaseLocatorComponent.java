@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipselabs.emongo.DatabaseLocator;
-import org.eclipselabs.emongo.MongoProvider;
+import org.eclipselabs.emongo.MongoClientProvider;
 
 import com.mongodb.DB;
 
@@ -25,7 +25,7 @@ import com.mongodb.DB;
  */
 public class DatabaseLocatorComponent implements DatabaseLocator
 {
-	private Map<String, MongoProvider> mongoProvidersByURI = new HashMap<String, MongoProvider>();
+	private Map<String, MongoClientProvider> mongoProvidersByURI = new HashMap<String, MongoClientProvider>();
 	private Map<String, DatabaseAuthenticationProvider> databaseAuthenticationProvidersByURI = new HashMap<String, DatabaseAuthenticationProvider>();
 	private Map<String, DB> databasesByURI = new HashMap<String, DB>();
 
@@ -44,7 +44,7 @@ public class DatabaseLocatorComponent implements DatabaseLocator
 			if (database != null)
 				return database;
 
-			MongoProvider mongoProvider = null;
+			MongoClientProvider mongoProvider = null;
 
 			synchronized (mongoProvidersByURI)
 			{
@@ -54,7 +54,7 @@ public class DatabaseLocatorComponent implements DatabaseLocator
 			if (mongoProvider == null)
 				return null;
 
-			database = mongoProvider.getMongo().getDB(databaseName);
+			database = mongoProvider.getMongoClient().getDB(databaseName);
 			databasesByURI.put(dbURI.toString(), database);
 
 			synchronized (databaseAuthenticationProvidersByURI)
@@ -85,7 +85,7 @@ public class DatabaseLocatorComponent implements DatabaseLocator
 		}
 	}
 
-	public void bindMongoProvider(MongoProvider mongoProvider)
+	public void bindMongoProvider(MongoClientProvider mongoProvider)
 	{
 		synchronized (mongoProvidersByURI)
 		{
@@ -94,7 +94,7 @@ public class DatabaseLocatorComponent implements DatabaseLocator
 		}
 	}
 
-	public void unbindMongoProvider(MongoProvider mongoProvider)
+	public void unbindMongoProvider(MongoClientProvider mongoProvider)
 	{
 		synchronized (mongoProvidersByURI)
 		{

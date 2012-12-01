@@ -1,6 +1,9 @@
 package org.eclipselabs.emongo.components.junit
 
+import org.eclipselabs.emongo.components.junit.*
+
 #eMongo
 
 - "DatabaseAuthenticationProviderComponent"
 - "MongoIdFactoryComponent"
+- "MongoClientProviderComponent"

@@ -5,9 +5,8 @@ Bundle-SymbolicName: org.eclipselabs.emongo.components
 Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: EclipseLabs
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Import-Package: com.mongodb;version="2.9.3.RELEASE",
- org.bson;version="2.9.3.RELEASE",
- org.eclipse.emf.common.util,
+Import-Package: com.mongodb;version="2.10.0.RELEASE",
+ org.bson;version="2.10.0.RELEASE",
  org.eclipselabs.emongo,
  org.osgi.service.event;version="1.3.0",
  org.osgi.service.log;version="1.3.0"

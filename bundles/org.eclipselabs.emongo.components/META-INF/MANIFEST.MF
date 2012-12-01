@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: MongoDB Service Imlementation Components
+Bundle-Name: eMongo Service Imlementation Components
 Bundle-SymbolicName: org.eclipselabs.emongo.components
 Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: EclipseLabs

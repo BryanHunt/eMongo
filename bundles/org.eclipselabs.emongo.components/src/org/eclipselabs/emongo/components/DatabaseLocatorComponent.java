@@ -32,8 +32,14 @@ public class DatabaseLocatorComponent implements DatabaseLocator
 	@Override
 	public DB getDatabase(String uri)
 	{
+		if (!uri.startsWith("mongodb://"))
+			throw new IllegalArgumentException("URI: '" + uri + "' does not start with mongodb://");
+
 		int dbStart = uri.indexOf('/', 10);
 		int dbEnd = uri.indexOf('/', dbStart + 1);
+
+		if (dbStart == -1)
+			throw new IllegalArgumentException("URI: '" + uri + "' does not specify a database name");
 
 		if (dbEnd == -1)
 			dbEnd = uri.length();

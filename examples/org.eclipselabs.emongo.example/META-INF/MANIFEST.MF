@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: eMongo Example
+Bundle-SymbolicName: org.eclipselabs.emongo.example
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: EclipseLabs
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Import-Package: com.mongodb;version="2.10.0.RELEASE",
+ org.bson;version="2.10.0.RELEASE",
+ org.eclipselabs.emongo,
+ org.osgi.service.cm;version="1.4.0"
+Service-Component: OSGI-INF/example.xml

@@ -9,7 +9,7 @@
  *    Bryan Hunt - initial API and implementation
  *******************************************************************************/
 
-package org.eclipselabs.mongo.junit.configuration;
+package org.eclipselabs.emongo.junit.configuration;
 
 import java.io.IOException;
 import java.util.Dictionary;

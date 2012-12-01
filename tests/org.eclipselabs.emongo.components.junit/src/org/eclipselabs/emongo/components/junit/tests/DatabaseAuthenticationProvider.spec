@@ -1,4 +1,4 @@
-package org.eclipselabs.emongo.components.junit
+package org.eclipselabs.emongo.components.junit.tests
 
 import static org.mockito.Mockito.*
 

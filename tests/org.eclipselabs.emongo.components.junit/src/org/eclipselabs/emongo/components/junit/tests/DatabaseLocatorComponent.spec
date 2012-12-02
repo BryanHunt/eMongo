@@ -23,25 +23,63 @@ describe DatabaseLocatorComponent
 		when(mongoClient.getDB("db")).thenReturn(db)		
 	}
 	
-	fact "getDatabase returns valid database"
+	context "normal operation"
 	{
-		subject.bindMongoClientProvider(mongoClientProvider)
-		subject.getDatabase("mongodb://localhost/db") should be db
+		fact "getDatabase returns valid database without collection specified"
+		{
+			subject.bindMongoClientProvider(mongoClientProvider)
+			subject.getDatabase("mongodb://localhost/db") should be db
+		}
+		
+		fact "getDatabase returns valid database with collection specified"
+		{
+			subject.bindMongoClientProvider(mongoClientProvider)
+			subject.getDatabase("mongodb://localhost/db/collection") should be db
+		}
+	
+		fact "waitForDatabase returns valid database without collection specified"
+		{
+			subject.bindMongoClientProvider(mongoClientProvider)
+			subject.waitForDatabase("mongodb://localhost/db", 0) should be db
+		}
+	
+		fact "waitForDatabase returns valid database with collection specified"
+		{
+			subject.bindMongoClientProvider(mongoClientProvider)
+			subject.waitForDatabase("mongodb://localhost/db/collection", 0) should be db
+		}
+	
+		fact "getDatabase returns null without provider"
+		{
+			subject.getDatabase("mongodb://localhost/db") should be null
+		}
+	
+		fact "waitForDatabase returns null without provider"
+		{
+			subject.waitForDatabase("mongodb://localhost/db", 100) should be null
+		}
 	}
 	
-	fact "waitForDatabase returns valid database"
+	context "bad uri"
 	{
-		subject.bindMongoClientProvider(mongoClientProvider)
-		subject.waitForDatabase("mongodb://localhost/db", 0) should be db
-	}
-
-	fact "getDatabase returns null without provider"
-	{
-		subject.getDatabase("mongodb://localhost/db") should be null
-	}
-
-	fact "waitForDatabase returns null without provider"
-	{
-		subject.waitForDatabase("mongodb://localhost/db", 100) should be null
+		fact "getDatabase throws exception if the uri does not start with mongodb://"
+		{
+			subject.getDatabase("mongodd://localhost/db") throws IllegalArgumentException
+		}
+	
+		fact "getDatabase throws exception if the uri is missing the database"
+		{
+			subject.getDatabase("mongodb://localhost") throws IllegalArgumentException
+		}
+	
+		fact "getDatabase throws exception if the database name is empty"
+		{
+			subject.getDatabase("mongodb://localhost/") throws IllegalArgumentException
+		}
+	
+		fact "waitForDatabase throws exception if the uri does not start with mongodb://"
+		{
+			subject.waitForDatabase("mongodd://localhost/db", 100) throws IllegalArgumentException
+		}
 	}
 }

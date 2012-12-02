@@ -53,7 +53,10 @@ public class DatabaseLocatorComponent implements DatabaseLocator
 
 		String clientURI = uri.substring(0, dbStart - 1);
 		String dbURI = uri.substring(0, dbEnd);
-		String databaseName = uri.substring(dbStart);
+		String databaseName = uri.substring(dbStart, dbEnd);
+
+		if (databaseName.isEmpty())
+			throw new IllegalArgumentException("URI: '" + uri + "' does not specify a database name");
 
 		DB database = databasesByURI.get(dbURI);
 

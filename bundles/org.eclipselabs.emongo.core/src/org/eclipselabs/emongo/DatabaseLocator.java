@@ -26,4 +26,6 @@ public interface DatabaseLocator
 	 * @return the database instance if found; null otherwise
 	 */
 	DB getDatabase(String uri);
+
+	DB waitForDatabase(String uri, long timeout);
 }

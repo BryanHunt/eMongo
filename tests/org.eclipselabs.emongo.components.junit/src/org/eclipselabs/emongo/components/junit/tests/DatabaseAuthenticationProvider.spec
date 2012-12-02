@@ -3,7 +3,6 @@ package org.eclipselabs.emongo.components.junit.tests
 import static org.mockito.Mockito.*
 
 import java.util.HashMap
-import java.util.Map
 import org.eclipselabs.emongo.components.DatabaseAuthenticationProviderComponent
 import org.eclipselabs.emongo.components.DatabaseAuthenticationProvider
 import org.osgi.service.log.LogService
@@ -15,7 +14,7 @@ import org.osgi.service.log.LogService
  */
 describe DatabaseAuthenticationProviderComponent
 {
-	val	Map<String, Object> properties = new HashMap<String, Object>()
+	val	properties = new HashMap<String, Object>()
 
 	before
 	{
@@ -88,7 +87,7 @@ describe DatabaseAuthenticationProviderComponent
 	
 	context "configuration exceptions with logging"
 	{
-		val LogService logService = mock(typeof(LogService))
+		val logService = mock(typeof(LogService))
 		before subject.bindLogService(logService)
 		
 		fact "configure throws exception when URI is missing"

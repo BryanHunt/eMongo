@@ -11,8 +11,8 @@
 
 package org.eclipselabs.emongo.components;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipselabs.emongo.DatabaseLocator;
 import org.eclipselabs.emongo.MongoClientProvider;
@@ -25,92 +25,110 @@ import com.mongodb.DB;
  */
 public class DatabaseLocatorComponent implements DatabaseLocator
 {
-	private Map<String, MongoClientProvider> mongoProvidersByURI = new HashMap<String, MongoClientProvider>();
-	private Map<String, DatabaseAuthenticationProvider> databaseAuthenticationProvidersByURI = new HashMap<String, DatabaseAuthenticationProvider>();
-	private Map<String, DB> databasesByURI = new HashMap<String, DB>();
+	private Map<String, MongoClientProvider> mongoProvidersByURI = new ConcurrentHashMap<String, MongoClientProvider>();
+	private Map<String, DatabaseAuthenticationProvider> databaseAuthenticationProvidersByURI = new ConcurrentHashMap<String, DatabaseAuthenticationProvider>();
+	private Map<String, DB> databasesByURI = new ConcurrentHashMap<String, DB>();
 
 	@Override
 	public DB getDatabase(String uri)
 	{
+		return waitForDatabase(uri, 0);
+	}
+
+	@Override
+	public DB waitForDatabase(String uri, long timeout)
+	{
 		if (!uri.startsWith("mongodb://"))
 			throw new IllegalArgumentException("URI: '" + uri + "' does not start with mongodb://");
 
-		int dbStart = uri.indexOf('/', 10);
-		int dbEnd = uri.indexOf('/', dbStart + 1);
+		int dbStart = uri.indexOf('/', 10) + 1;
 
-		if (dbStart == -1)
+		if (dbStart == 0)
 			throw new IllegalArgumentException("URI: '" + uri + "' does not specify a database name");
+
+		int dbEnd = uri.indexOf('/', dbStart);
 
 		if (dbEnd == -1)
 			dbEnd = uri.length();
 
-		String clientURI = uri.substring(0, dbStart + 1);
+		String clientURI = uri.substring(0, dbStart - 1);
 		String dbURI = uri.substring(0, dbEnd);
-		String databaseName = uri.substring(dbStart + 1);
+		String databaseName = uri.substring(dbStart);
 
-		synchronized (databasesByURI)
+		DB database = databasesByURI.get(dbURI);
+
+		if (database != null)
+			return database;
+
+		return createDatabase(dbURI, clientURI, databaseName, timeout);
+	}
+
+	public void bindDatabaseAuthenticationProvider(DatabaseAuthenticationProvider databaseAuthenticationProvider)
+	{
+		databaseAuthenticationProvidersByURI.put(databaseAuthenticationProvider.getURI(), databaseAuthenticationProvider);
+	}
+
+	public void unbindDatabaseAuthenticationProvider(DatabaseAuthenticationProvider databaseAuthenticationProvider)
+	{
+		databaseAuthenticationProvidersByURI.remove(databaseAuthenticationProvider.getURI());
+	}
+
+	public void bindMongoClientProvider(MongoClientProvider mongoProvider)
+	{
+		for (String uri : mongoProvider.getURIs())
+			mongoProvidersByURI.put(uri, mongoProvider);
+	}
+
+	public void unbindMongoClientProvider(MongoClientProvider mongoProvider)
+	{
+		for (String uri : mongoProvider.getURIs())
+			mongoProvidersByURI.remove(uri);
+	}
+
+	protected DB createDatabase(String dbURI, String clientURI, String databaseName, long timeout)
+	{
+		MongoClientProvider mongoProvider = waitForMongoClientProvider(clientURI, timeout);
+
+		if (mongoProvider == null)
+			return null;
+
+		synchronized (mongoProvider)
 		{
-			DB database = databasesByURI.get(uri);
+			DB database = databasesByURI.get(dbURI);
 
 			if (database != null)
 				return database;
 
-			MongoClientProvider mongoProvider = null;
-
-			synchronized (mongoProvidersByURI)
-			{
-				mongoProvider = mongoProvidersByURI.get(clientURI);
-			}
-
-			if (mongoProvider == null)
-				return null;
-
 			database = mongoProvider.getMongoClient().getDB(databaseName);
 			databasesByURI.put(dbURI, database);
 
-			synchronized (databaseAuthenticationProvidersByURI)
-			{
-				DatabaseAuthenticationProvider databaseAuthenticationProvider = databaseAuthenticationProvidersByURI.get(dbURI);
+			DatabaseAuthenticationProvider databaseAuthenticationProvider = databaseAuthenticationProvidersByURI.get(dbURI);
 
-				if (databaseAuthenticationProvider != null)
-					database.authenticate(databaseAuthenticationProvider.getUser(), databaseAuthenticationProvider.getPassword().toCharArray());
-			}
+			if (databaseAuthenticationProvider != null)
+				database.authenticate(databaseAuthenticationProvider.getUser(), databaseAuthenticationProvider.getPassword().toCharArray());
 
 			return database;
 		}
 	}
 
-	public void bindDatabaseAuthenticationProvider(DatabaseAuthenticationProvider databaseAuthenticationProvider)
+	protected MongoClientProvider waitForMongoClientProvider(String clientURI, long timeout)
 	{
-		synchronized (databaseAuthenticationProvidersByURI)
-		{
-			databaseAuthenticationProvidersByURI.put(databaseAuthenticationProvider.getURI(), databaseAuthenticationProvider);
-		}
-	}
+		MongoClientProvider mongoClientProvider;
 
-	public void unbindDatabaseAuthenticationProvider(DatabaseAuthenticationProvider databaseAuthenticationProvider)
-	{
-		synchronized (databaseAuthenticationProvidersByURI)
+		do
 		{
-			databaseAuthenticationProvidersByURI.remove(databaseAuthenticationProvider.getURI());
-		}
-	}
+			mongoClientProvider = mongoProvidersByURI.get(clientURI);
+			timeout -= 10;
 
-	public void bindMongoClientProvider(MongoClientProvider mongoProvider)
-	{
-		synchronized (mongoProvidersByURI)
-		{
-			for (String uri : mongoProvider.getURIs())
-				mongoProvidersByURI.put(uri, mongoProvider);
+			try
+			{
+				Thread.sleep(10);
+			}
+			catch (InterruptedException e)
+			{}
 		}
-	}
+		while (mongoClientProvider == null && timeout > 0);
 
-	public void unbindMongoClientProvider(MongoClientProvider mongoProvider)
-	{
-		synchronized (mongoProvidersByURI)
-		{
-			for (String uri : mongoProvider.getURIs())
-				mongoProvidersByURI.remove(uri);
-		}
+		return mongoClientProvider;
 	}
 }

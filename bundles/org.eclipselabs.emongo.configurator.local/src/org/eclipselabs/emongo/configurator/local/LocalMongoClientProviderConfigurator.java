@@ -36,7 +36,7 @@ public class LocalMongoClientProviderConfigurator
 		if (properties == null)
 			properties = new Hashtable<String, Object>();
 
-		properties.put(MongoClientProvider.PROP_URI, "mongodb://localhost/");
+		properties.put(MongoClientProvider.PROP_URI, "mongodb://localhost");
 		config.update(properties);
 	}
 

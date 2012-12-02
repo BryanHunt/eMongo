@@ -70,13 +70,7 @@ public class MongoClientProviderComponent extends AbstractComponent implements M
 			if (uris.length == 1)
 			{
 				currentURI = uris[0].trim();
-
-				// The URI will be of the form: mongodb://host[:port]/db
-				// When the string is split on / the URI must have 4 parts
-
-				if (!currentURI.startsWith("mongodb://") && currentURI.split("/").length != 4)
-					handleIllegalConfiguration("The uri: '" + currentURI + "' does not have the form 'mongodb://host[:port]/db'");
-
+				checkURI(currentURI);
 				ServerAddress serverAddress = createServerAddress(currentURI);
 				mongoClient = createMongoClient(options, serverAddress);
 			}
@@ -87,13 +81,7 @@ public class MongoClientProviderComponent extends AbstractComponent implements M
 				for (String uri : uris)
 				{
 					currentURI = uri.trim();
-
-					// The URI will be of the form: mongodb://host[:port]/db
-					// When the string is split on / the URI must have 4 parts
-
-					if (!currentURI.startsWith("mongodb://") && currentURI.split("/").length != 4)
-						handleIllegalConfiguration("The uri: '" + currentURI + "' does not have the form 'mongodb://host[:port]/db'");
-
+					checkURI(currentURI);
 					serverAddresses.add(createServerAddress(currentURI));
 				}
 
@@ -124,6 +112,15 @@ public class MongoClientProviderComponent extends AbstractComponent implements M
 	protected MongoClient createMongoClient(MongoClientOptions options, ServerAddress serverAddress)
 	{
 		return new MongoClient(serverAddress, options);
+	}
+
+	private void checkURI(String currentURI)
+	{
+		// The URI will be of the form: mongodb://host[:port]
+		// When the string is split on / the URI must have 3 parts
+
+		if (!currentURI.startsWith("mongodb://") || currentURI.endsWith("/") || currentURI.split("/").length != 3)
+			handleIllegalConfiguration("The uri: '" + currentURI + "' does not have the form 'mongodb://host[:port]'");
 	}
 
 	private MongoClientOptions createMongoClientOptions(Map<String, Object> properties)

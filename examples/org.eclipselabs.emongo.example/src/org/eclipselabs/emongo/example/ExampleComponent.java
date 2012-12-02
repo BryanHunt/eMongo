@@ -23,6 +23,7 @@ public class ExampleComponent
 	{
 		DB database = databaseLocator.getDatabase("mongodb://localhost/example");
 		DBCollection collection = database.getCollection("items");
+		collection.drop();
 
 		for (int i = 0; i < 10; i++)
 			collection.insert(new BasicDBObject("x", i));
@@ -30,7 +31,9 @@ public class ExampleComponent
 		DBCursor cursor = collection.find();
 
 		while (cursor.hasNext())
-			System.out.println(cursor.next().get("x"));
+			System.out.print(cursor.next().get("x") + " ");
+
+		System.out.println();
 	}
 
 	public void bindDatabaseLocator(DatabaseLocator databaseLocator)

@@ -12,3 +12,4 @@ Import-Package: com.mongodb;version="2.10.0.RELEASE",
  org.osgi.service.log;version="1.3.0"
 Service-Component: OSGI-INF/services/provider.xml,OSGI-INF/services/locator.xml,
  OSGI-INF/services/auth.xml, OSGI-INF/services/id.xml
+Bundle-ActivationPolicy: lazy

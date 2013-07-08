@@ -17,35 +17,48 @@ import java.util.Map;
  * @author bhunt
  * 
  */
-public class DatabaseAuthenticationProviderComponent extends AbstractComponent implements DatabaseAuthenticationProvider
+public class DatabaseConfigurationProviderComponent extends AbstractComponent implements DatabaseConfigurationProvider
 {
+	private volatile String alias;
+	private volatile String databaseName;
 	private volatile String uri;
 	private volatile String user;
 	private volatile String password;
 
-	public DatabaseAuthenticationProviderComponent()
-	{}
-
 	public void configure(Map<String, Object> properties)
 	{
-		uri = (String) properties.get(DatabaseAuthenticationProvider.PROP_URI);
-		user = (String) properties.get(DatabaseAuthenticationProvider.PROP_USER);
-		password = (String) properties.get(DatabaseAuthenticationProvider.PROP_PASSWORD);
-	
+		alias = (String) properties.get(DatabaseConfigurationProvider.PROP_ALIAS);
+		uri = (String) properties.get(DatabaseConfigurationProvider.PROP_URI);
+		user = (String) properties.get(DatabaseConfigurationProvider.PROP_USER);
+		password = (String) properties.get(DatabaseConfigurationProvider.PROP_PASSWORD);
+
+		if (alias == null || alias.isEmpty())
+			handleIllegalConfiguration("The database alias was not found in the configuration properties");
+
 		if (uri == null || uri.isEmpty())
 			handleIllegalConfiguration("The MongoDB uri was not found in the configuration properties");
-	
-		if (user == null || user.isEmpty())
-			handleIllegalConfiguration("The MongoDB user was not found in the configuration properties");
-	
-		if (password == null || password.isEmpty())
-			handleIllegalConfiguration("The MongoDB password was not found in the configuration properties");
-	
+
 		// The URI will be of the form: mongodb://host[:port]/db
 		// When the string is split on / the URI must have 4 parts
-	
-		if (!uri.startsWith("mongodb://") || uri.split("/").length != 4)
+
+		String[] uriElements = uri.split("/");
+
+		if (!uri.startsWith("mongodb://") || uriElements.length != 4)
 			handleIllegalConfiguration("The uri: '" + uri + "' does not have the form 'mongodb://host[:port]/db'");
+
+		databaseName = uriElements[3];
+	}
+
+	@Override
+	public String getAlias()
+	{
+		return alias;
+	}
+
+	@Override
+	public String getDatabaseName()
+	{
+		return databaseName;
 	}
 
 	@Override

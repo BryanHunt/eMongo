@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: eMongo Services API
-Bundle-SymbolicName: org.eclipselabs.emongo.core
+Bundle-SymbolicName: org.eclipselabs.emongo.api
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: EclipseLabs

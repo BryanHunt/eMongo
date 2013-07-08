@@ -11,21 +11,16 @@
 
 package org.eclipselabs.emongo;
 
-import com.mongodb.DB;
+import java.io.IOException;
 
 /**
- * This OSGi service gives clients access to a configured DB instance lookup by URI.
- * The URI may be any extension of the MongoDB database URI.
- * 
  * @author bhunt
+ * 
  */
-public interface DatabaseLocator
+public interface MongoIdFactory
 {
-	/**
-	 * @param uri the URI of the database - may contain extra path information
-	 * @return the database instance if found; null otherwise
-	 */
-	DB getDatabase(String uri);
+	String PROP_ALIAS = "alias";
+	String PROP_URI = "uri";
 
-	DB waitForDatabase(String uri, long timeout);
+	String getNextId() throws IOException;
 }

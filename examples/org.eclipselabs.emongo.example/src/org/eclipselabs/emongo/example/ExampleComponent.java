@@ -4,7 +4,7 @@
 
 package org.eclipselabs.emongo.example;
 
-import org.eclipselabs.emongo.DatabaseLocator;
+import org.eclipselabs.emongo.MongoDatabaseLocator;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
@@ -17,11 +17,11 @@ import com.mongodb.DBCursor;
  */
 public class ExampleComponent
 {
-	private DatabaseLocator databaseLocator;
+	private MongoDatabaseLocator databaseLocator;
 
 	public void activate()
 	{
-		DB database = databaseLocator.getDatabase("mongodb://localhost/example");
+		DB database = databaseLocator.getDatabaseByURI("mongodb://localhost/example");
 		DBCollection collection = database.getCollection("items");
 		collection.drop();
 
@@ -36,7 +36,7 @@ public class ExampleComponent
 		System.out.println();
 	}
 
-	public void bindDatabaseLocator(DatabaseLocator databaseLocator)
+	public void bindDatabaseLocator(MongoDatabaseLocator databaseLocator)
 	{
 		this.databaseLocator = databaseLocator;
 	}

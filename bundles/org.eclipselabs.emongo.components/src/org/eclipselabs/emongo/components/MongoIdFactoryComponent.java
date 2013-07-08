@@ -13,8 +13,9 @@ package org.eclipselabs.emongo.components;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
-import org.eclipselabs.emongo.DatabaseLocator;
+import org.eclipselabs.emongo.MongoDatabaseProvider;
 import org.eclipselabs.emongo.MongoIdFactory;
 
 import com.mongodb.BasicDBObject;
@@ -28,11 +29,14 @@ import com.mongodb.DBObject;
  */
 public class MongoIdFactoryComponent extends AbstractComponent implements MongoIdFactory
 {
-	private volatile DatabaseLocator databaseLocator;
+	private volatile String alias;
+	private volatile String uri;
+	private volatile String collectionName;
+
 	private volatile DBCollection collection;
 	private volatile DBObject query;
 	private volatile DBObject update;
-	private volatile DB db;
+	private Map<String, MongoDatabaseProvider> mongoDatabaseProvidersByAlias = new ConcurrentHashMap<String, MongoDatabaseProvider>();
 
 	private static final String ID = "_id";
 	private static final String LAST_ID = "lastId";
@@ -40,9 +44,12 @@ public class MongoIdFactoryComponent extends AbstractComponent implements MongoI
 	@Override
 	public String getNextId() throws IOException
 	{
+		if (collection == null)
+			return null;
+
 		DBObject result = collection.findAndModify(query, null, null, false, update, true, false);
 
-		if (!db.getLastError().ok())
+		if (!collection.getDB().getLastError().ok())
 			throw new IOException("Failed to update the id counter for collection: '" + collection.getName() + "'");
 
 		return result.get(LAST_ID).toString();
@@ -50,7 +57,11 @@ public class MongoIdFactoryComponent extends AbstractComponent implements MongoI
 
 	public void configure(Map<String, Object> parameters)
 	{
-		String uri = (String) parameters.get(PROP_URI);
+		alias = (String) parameters.get(PROP_ALIAS);
+		uri = (String) parameters.get(PROP_URI);
+
+		if (alias == null || alias.isEmpty())
+			handleIllegalConfiguration("The alias was not specified as part of the component configuration");
 
 		// The URI will be of the form: mongodb://host[:port]/db/collection
 		// When the string is split on / the URI must have 5 parts
@@ -60,13 +71,30 @@ public class MongoIdFactoryComponent extends AbstractComponent implements MongoI
 		if (segments.length != 5)
 			handleIllegalConfiguration("The uri: '" + uri + "' does not have the form 'mongodb://host[:port]/db'");
 
-		String collectionName = segments[4];
+		collectionName = segments[4];
 
-		db = databaseLocator.getDatabase(uri);
+		MongoDatabaseProvider mongoDatabaseProvider = mongoDatabaseProvidersByAlias.get(alias);
 
-		if (db == null)
-			handleIllegalConfiguration("Could not find database for URI: '" + uri + "'");
+		if (mongoDatabaseProvider != null)
+			init(mongoDatabaseProvider);
+	}
 
+	public void bindMongoDatabaseProvider(MongoDatabaseProvider mongoDatabaseProvider)
+	{
+		if (mongoDatabaseProvider.getAlias().equals(alias))
+			init(mongoDatabaseProvider);
+		else
+			mongoDatabaseProvidersByAlias.put(mongoDatabaseProvider.getAlias(), mongoDatabaseProvider);
+	}
+
+	public void unbindMongoDatabaseProvider(MongoDatabaseProvider mongoDatabaseProvider)
+	{
+		mongoDatabaseProvidersByAlias.remove(mongoDatabaseProvider.getAlias());
+	}
+
+	private void init(MongoDatabaseProvider mongoDatabaseProvider)
+	{
+		DB db = mongoDatabaseProvider.getDB();
 		collection = db.getCollection(collectionName);
 		query = new BasicDBObject(ID, "0");
 		update = new BasicDBObject("$inc", new BasicDBObject(LAST_ID, Long.valueOf(1)));
@@ -83,10 +111,5 @@ public class MongoIdFactoryComponent extends AbstractComponent implements MongoI
 			if (!db.getLastError().ok())
 				handleIllegalConfiguration("Could not initialize the id counter for collection: '" + collection.getName() + "'");
 		}
-	}
-
-	public void bindDatabaseLocator(DatabaseLocator databaseLocator)
-	{
-		this.databaseLocator = databaseLocator;
 	}
 }

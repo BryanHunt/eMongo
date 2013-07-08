@@ -1,27 +1,25 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<?pde version="3.8"?>
-
-<target name="eMongo" sequenceNumber="14">
+<?pde version="3.8"?><target name="eMongo" sequenceNumber="20">
 <locations>
 <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
-<unit id="org.jnario.feature.group" version="0.3.0.201212290159"/>
-<repository location="http://www.jnario.org/updates/snapshot/"/>
-</location>
-<location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
-<unit id="org.eclipse.equinox.sdk.feature.group" version="3.8.0.v20120522-1841-7M7fA78g5_y-g-jtHxcd5k8q8lFR"/>
-<unit id="org.eclipse.xtend.sdk.feature.group" version="2.3.1.v201208210947"/>
-<repository location="http://download.eclipse.org/releases/juno"/>
-</location>
-<location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
-<unit id="org.eclipselabs.eunit.junit.utils.feature.feature.group" version="1.0.0.201301101649"/>
+<unit id="org.eclipselabs.eunit.junit.utils.feature.feature.group" version="1.0.0.201307070919"/>
 <repository location="http://bryanhunt.github.com/eUnit/releases/1.0.0/"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
-<unit id="org.hamcrest.feature.feature.group" version="1.3.0.201212101902"/>
-<unit id="org.junit.feature.feature.group" version="4.11.0.201212101902"/>
-<unit id="org.mockito.feature.feature.group" version="1.9.5.201212101902"/>
-<unit id="org.mongodb.feature.feature.group" version="2.9.3.201212101902"/>
+<unit id="org.hamcrest.feature.feature.group" version="1.3.0.201306111021"/>
+<unit id="org.junit.feature.feature.group" version="4.11.0.201306111021"/>
+<unit id="org.mockito.feature.feature.group" version="1.9.5.201306111021"/>
+<unit id="org.mongodb.feature.feature.group" version="2.9.3.201306111021"/>
 <repository location="http://bryanhunt.github.com/3rd-party-libs/"/>
+</location>
+<location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
+<unit id="org.jnario.feature.group" version="0.5.0.201306271414"/>
+<repository location="http://www.jnario.org/updates/snapshot/"/>
+</location>
+<location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
+<unit id="org.eclipse.xtend.sdk.feature.group" version="2.4.2.v201306120542"/>
+<unit id="org.eclipse.equinox.sdk.feature.group" version="3.9.0.v20130604-2047"/>
+<repository location="http://download.eclipse.org/releases/kepler"/>
 </location>
 </locations>
 </target>

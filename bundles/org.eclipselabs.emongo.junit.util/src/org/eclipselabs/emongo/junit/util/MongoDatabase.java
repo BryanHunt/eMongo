@@ -14,9 +14,10 @@ package org.eclipselabs.emongo.junit.util;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 import org.eclipse.emf.common.util.URI;
-import org.eclipselabs.emongo.DatabaseLocator;
+import org.eclipselabs.emongo.MongoDatabaseProvider;
 import org.eclipselabs.eunit.junit.utils.ServiceLocator;
 
 import com.mongodb.DB;
@@ -34,7 +35,7 @@ import com.mongodb.DB;
  * @author bhunt
  * 
  */
-public class MongoDatabase extends ServiceLocator<DatabaseLocator>
+public class MongoDatabase extends ServiceLocator<MongoDatabaseProvider>
 {
 	/**
 	 * Connects to the "junit" database on localhost:27017
@@ -42,11 +43,6 @@ public class MongoDatabase extends ServiceLocator<DatabaseLocator>
 	public MongoDatabase()
 	{
 		this("junit");
-	}
-
-	public MongoDatabase(DatabaseLocator dbLocator)
-	{
-		this("junit", dbLocator);
 	}
 
 	/**
@@ -59,11 +55,6 @@ public class MongoDatabase extends ServiceLocator<DatabaseLocator>
 		this("localhost", database);
 	}
 
-	public MongoDatabase(String database, DatabaseLocator dbLocator)
-	{
-		this("localhost", database, dbLocator);
-	}
-
 	/**
 	 * Connects to the specified database on the specified host using the default port 27017
 	 * 
@@ -72,12 +63,7 @@ public class MongoDatabase extends ServiceLocator<DatabaseLocator>
 	 */
 	public MongoDatabase(String hostname, String database)
 	{
-		this(hostname, 27017, database);
-	}
-
-	public MongoDatabase(String hostname, String database, DatabaseLocator dbLocator)
-	{
-		this(hostname, 27017, database, dbLocator);
+		this(hostname, 27017, database, null);
 	}
 
 	/**
@@ -86,17 +72,12 @@ public class MongoDatabase extends ServiceLocator<DatabaseLocator>
 	 * @param hostname the host running MongoDB
 	 * @param port the port MongoDB is listening on
 	 * @param database the name of the database to use for unit testing
+	 * @param alias the alias configured on the MongoDB provider service
 	 */
-	public MongoDatabase(String hostname, int port, String database)
+	public MongoDatabase(String hostname, int port, String database, String alias)
 	{
-		this(hostname, port, database, null);
-	}
-
-	public MongoDatabase(String hostname, int port, String database, DatabaseLocator dbLocator)
-	{
-		super(DatabaseLocator.class);
+		super(MongoDatabaseProvider.class, (alias != null ? "(alias=" + alias + ")" : null));
 		baseURI = URI.createURI("mongodb://" + hostname + (port == 27017 ? "" : ":" + port) + "/" + database);
-		databaseLocator = dbLocator;
 	}
 
 	/**
@@ -138,7 +119,7 @@ public class MongoDatabase extends ServiceLocator<DatabaseLocator>
 	protected void before() throws Throwable
 	{
 		super.before();
-		db = getService().getDatabase(baseURI.toString());
+		db = getService().getDB();
 		assertThat("No database configured for: " + baseURI.toString(), db, is(notNullValue()));
 	}
 
@@ -158,23 +139,13 @@ public class MongoDatabase extends ServiceLocator<DatabaseLocator>
 			}
 			catch (Exception e)
 			{
-				e.printStackTrace();
+				fail("Failed to clean up database: " + baseURI.toString() + "\n\n" + e.getMessage());
 			}
 		}
 
 		super.after();
 	}
 
-	@Override
-	protected DatabaseLocator waitForService() throws InterruptedException
-	{
-		if (databaseLocator != null)
-			return databaseLocator;
-
-		return super.waitForService();
-	}
-
-	private DatabaseLocator databaseLocator;
 	private DB db;
 	private URI baseURI;
 }

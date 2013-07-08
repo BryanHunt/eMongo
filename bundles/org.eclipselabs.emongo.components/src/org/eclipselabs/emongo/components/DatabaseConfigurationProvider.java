@@ -9,17 +9,26 @@
  *    Bryan Hunt - initial API and implementation
  *******************************************************************************/
 
-package org.eclipselabs.emongo;
-
-import java.io.IOException;
+package org.eclipselabs.emongo.components;
 
 /**
  * @author bhunt
  * 
  */
-public interface MongoIdFactory
+public interface DatabaseConfigurationProvider
 {
-	String PROP_URI = "uri";
+	public String PROP_ALIAS = "alias";
+	public String PROP_USER = "user";
+	public String PROP_PASSWORD = "password";
+	public String PROP_URI = "uri";
 
-	String getNextId() throws IOException;
+	String getAlias();
+
+	String getDatabaseName();
+
+	String getURI();
+
+	String getUser();
+
+	String getPassword();
 }

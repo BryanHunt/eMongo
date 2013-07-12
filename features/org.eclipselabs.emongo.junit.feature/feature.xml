@@ -18,14 +18,13 @@
    </license>
 
    <requires>
-      <import plugin="org.eclipselabs.emongo.core"/>
-      <import plugin="org.eclipse.osgi.services"/>
       <import plugin="org.mongodb.mongo-java-driver"/>
       <import plugin="org.eclipse.emf.common"/>
       <import plugin="org.eclipselabs.eunit.junit.utils"/>
       <import plugin="org.hamcrest"/>
       <import plugin="org.junit"/>
       <import plugin="org.eclipse.osgi"/>
+      <import plugin="org.eclipse.osgi.services"/>
    </requires>
 
    <plugin

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012 Bryan Hunt.
+ * Copyright (c) 2013 Bryan Hunt.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,19 +9,28 @@
  *    Bryan Hunt - initial API and implementation
  *******************************************************************************/
 
-package org.eclipselabs.emongo;
-
-import java.io.IOException;
+package org.eclipselabs.emongo.configurator;
 
 /**
  * @author bhunt
  * 
  */
-public interface MongoIdFactory
+public class ConfigurationException extends Exception
 {
-	String PROP_FACTORY_ID = "org.eclipselabs.emongo.idFactory";
-	String PROP_ALIAS = "alias";
-	String PROP_URI = "uri";
+	private static final long serialVersionUID = 1L;
 
-	String getNextId() throws IOException;
+	public ConfigurationException(String message)
+	{
+		super(message);
+	}
+
+	public ConfigurationException(Throwable cause)
+	{
+		super(cause);
+	}
+
+	public ConfigurationException(String message, Throwable arg1)
+	{
+		super(message, arg1);
+	}
 }

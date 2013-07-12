@@ -39,7 +39,7 @@ public class MongoIdFactoryComponent extends AbstractComponent implements MongoI
 	private Map<String, MongoDatabaseProvider> mongoDatabaseProvidersByAlias = new ConcurrentHashMap<String, MongoDatabaseProvider>();
 
 	private static final String ID = "_id";
-	private static final String LAST_ID = "lastId";
+	private static final String LAST_ID = "_lastId";
 
 	@Override
 	public String getNextId() throws IOException
@@ -55,13 +55,16 @@ public class MongoIdFactoryComponent extends AbstractComponent implements MongoI
 		return result.get(LAST_ID).toString();
 	}
 
-	public void configure(Map<String, Object> parameters)
+	public void activate(Map<String, Object> properties)
 	{
-		alias = (String) parameters.get(PROP_ALIAS);
-		uri = (String) parameters.get(PROP_URI);
+		alias = (String) properties.get(PROP_ALIAS);
+		uri = (String) properties.get(PROP_URI);
 
 		if (alias == null || alias.isEmpty())
 			handleIllegalConfiguration("The alias was not specified as part of the component configuration");
+
+		if (uri == null || uri.isEmpty())
+			handleIllegalConfiguration("The MongoDB uri was not found in the configuration properties");
 
 		// The URI will be of the form: mongodb://host[:port]/db/collection
 		// When the string is split on / the URI must have 5 parts
@@ -69,7 +72,7 @@ public class MongoIdFactoryComponent extends AbstractComponent implements MongoI
 		String[] segments = uri.split("/");
 
 		if (segments.length != 5)
-			handleIllegalConfiguration("The uri: '" + uri + "' does not have the form 'mongodb://host[:port]/db'");
+			handleIllegalConfiguration("The uri: '" + uri + "' does not have the form 'mongodb://host[:port]/db/collection'");
 
 		collectionName = segments[4];
 

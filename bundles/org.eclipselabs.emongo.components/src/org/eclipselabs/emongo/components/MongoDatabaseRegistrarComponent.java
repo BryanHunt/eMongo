@@ -29,21 +29,26 @@ public class MongoDatabaseRegistrarComponent
 {
 	private volatile ComponentContext context;
 	private Map<String, MongoClientProvider> mongoClientProvidersByClientURI = new ConcurrentHashMap<String, MongoClientProvider>();
-	private Map<String, DatabaseConfigurationProvider> databaseConfigurationProvidersByDatabaseURI = new ConcurrentHashMap<String, DatabaseConfigurationProvider>();
+	private Map<String, MongoAuthenticatedDatabaseConfigurationProvider> databaseConfigurationProvidersByDatabaseURI = new ConcurrentHashMap<String, MongoAuthenticatedDatabaseConfigurationProvider>();
 	private Map<String, ServiceRegistration<MongoDatabaseProvider>> serviceRegistrationsByDatabaseURI = new ConcurrentHashMap<String, ServiceRegistration<MongoDatabaseProvider>>();
 
 	public void activate(ComponentContext context)
 	{
 		this.context = context;
+
+		for (MongoAuthenticatedDatabaseConfigurationProvider provider : databaseConfigurationProvidersByDatabaseURI.values())
+			registerMongoDatabaseProvider(provider);
 	}
 
-	public void bindDatabaseConfigurationProvider(DatabaseConfigurationProvider databaseConfigurationProvider)
+	public void bindMongoDatabaseConfigurationProvider(MongoAuthenticatedDatabaseConfigurationProvider databaseConfigurationProvider)
 	{
 		databaseConfigurationProvidersByDatabaseURI.put(databaseConfigurationProvider.getURI(), databaseConfigurationProvider);
-		registerMongoDatabaseProvider(databaseConfigurationProvider);
+
+		if (context != null)
+			registerMongoDatabaseProvider(databaseConfigurationProvider);
 	}
 
-	public void unbindDatabaseConfigurationProvider(DatabaseConfigurationProvider databaseConfigurationProvider)
+	public void unbindMongoDatabaseConfigurationProvider(MongoAuthenticatedDatabaseConfigurationProvider databaseConfigurationProvider)
 	{
 		databaseConfigurationProvidersByDatabaseURI.remove(databaseConfigurationProvider.getURI());
 		unregisterMongoDatabaseProvider(databaseConfigurationProvider);
@@ -54,7 +59,8 @@ public class MongoDatabaseRegistrarComponent
 		for (String clientURI : mongoProvider.getURIs())
 			mongoClientProvidersByClientURI.put(clientURI, mongoProvider);
 
-		registerMongoDatabaseProvider(mongoProvider);
+		if (context != null)
+			registerMongoDatabaseProvider(mongoProvider);
 	}
 
 	public void unbindMongoClientProvider(MongoClientProvider mongoProvider)
@@ -67,7 +73,7 @@ public class MongoDatabaseRegistrarComponent
 
 	private void registerMongoDatabaseProvider(MongoClientProvider mongoClientProvider)
 	{
-		for (Entry<String, DatabaseConfigurationProvider> entry : databaseConfigurationProvidersByDatabaseURI.entrySet())
+		for (Entry<String, MongoAuthenticatedDatabaseConfigurationProvider> entry : databaseConfigurationProvidersByDatabaseURI.entrySet())
 		{
 			for (String clientURI : mongoClientProvider.getURIs())
 			{
@@ -80,7 +86,7 @@ public class MongoDatabaseRegistrarComponent
 		}
 	}
 
-	private void registerMongoDatabaseProvider(DatabaseConfigurationProvider databaseConfigurationProvider)
+	private void registerMongoDatabaseProvider(MongoAuthenticatedDatabaseConfigurationProvider databaseConfigurationProvider)
 	{
 		int trimIndex = databaseConfigurationProvider.getURI().lastIndexOf("/");
 		String clientURI = databaseConfigurationProvider.getURI().substring(0, trimIndex);
@@ -90,10 +96,11 @@ public class MongoDatabaseRegistrarComponent
 			registerMongoDatabaseProvider(mongoClientProvider, databaseConfigurationProvider);
 	}
 
-	private void registerMongoDatabaseProvider(MongoClientProvider mongoClientProvider, DatabaseConfigurationProvider databaseConfigurationProvider)
+	private void registerMongoDatabaseProvider(MongoClientProvider mongoClientProvider, MongoAuthenticatedDatabaseConfigurationProvider databaseConfigurationProvider)
 	{
 		MongoDatabaseProviderComponent mongoDatabaseProviderComponent = new MongoDatabaseProviderComponent(databaseConfigurationProvider, mongoClientProvider);
 		Hashtable<String, Object> properties = new Hashtable<String, Object>();
+		properties.put(MongoDatabaseProvider.PROP_ALIAS, databaseConfigurationProvider.getAlias());
 		ServiceRegistration<MongoDatabaseProvider> serviceRegistration = context.getBundleContext().registerService(MongoDatabaseProvider.class, mongoDatabaseProviderComponent, properties);
 		serviceRegistrationsByDatabaseURI.put(databaseConfigurationProvider.getURI(), serviceRegistration);
 	}
@@ -113,7 +120,7 @@ public class MongoDatabaseRegistrarComponent
 		}
 	}
 
-	private void unregisterMongoDatabaseProvider(DatabaseConfigurationProvider databaseConfigurationProvider)
+	private void unregisterMongoDatabaseProvider(MongoAuthenticatedDatabaseConfigurationProvider databaseConfigurationProvider)
 	{
 		unregisterMongoDatabaseProvider(databaseConfigurationProvider.getURI());
 	}

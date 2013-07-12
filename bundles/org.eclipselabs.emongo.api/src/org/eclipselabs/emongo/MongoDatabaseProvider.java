@@ -12,6 +12,8 @@ import com.mongodb.DB;
  */
 public interface MongoDatabaseProvider
 {
+	String PROP_ALIAS = "alias";
+
 	String getAlias();
 
 	DB getDB();

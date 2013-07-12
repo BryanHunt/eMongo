@@ -126,11 +126,10 @@ public class MongoDatabase extends ServiceLocator<MongoDatabaseProvider>
 	@Override
 	protected void after()
 	{
-		if (getService() != null)
+		if (db != null)
 		{
 			try
 			{
-
 				for (String collectionName : db.getCollectionNames())
 				{
 					if (!"system.indexes".equals(collectionName))

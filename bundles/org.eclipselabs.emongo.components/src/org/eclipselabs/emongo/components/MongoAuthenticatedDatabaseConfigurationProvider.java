@@ -11,22 +11,16 @@
 
 package org.eclipselabs.emongo.components;
 
+import org.eclipselabs.emongo.config.MongoDatabaseConfigurationProvider;
+
 /**
  * @author bhunt
  * 
  */
-public interface DatabaseConfigurationProvider
+public interface MongoAuthenticatedDatabaseConfigurationProvider extends MongoDatabaseConfigurationProvider
 {
-	public String PROP_ALIAS = "alias";
 	public String PROP_USER = "user";
 	public String PROP_PASSWORD = "password";
-	public String PROP_URI = "uri";
-
-	String getAlias();
-
-	String getDatabaseName();
-
-	String getURI();
 
 	String getUser();
 

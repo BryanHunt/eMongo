@@ -15,7 +15,9 @@ import java.io.IOException;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
+import org.eclipselabs.emongo.MongoClientProvider;
 import org.eclipselabs.emongo.MongoIdFactory;
+import org.eclipselabs.emongo.config.MongoDatabaseConfigurationProvider;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 
@@ -23,20 +25,42 @@ import org.osgi.service.cm.ConfigurationAdmin;
  * @author bhunt
  * 
  */
-public class MongoIdConfiguration
+public class MongoConfiguration
 {
 	private ConfigurationAdmin configurationAdmin;
 
 	void activate() throws IOException
 	{
-		Configuration config = configurationAdmin.getConfiguration("org.eclipselabs.mongo.id", null);
+		Configuration config = configurationAdmin.getConfiguration(MongoClientProvider.PROP_FACTORY_ID, null);
 
 		Dictionary<String, Object> properties = config.getProperties();
 
 		if (properties == null)
 			properties = new Hashtable<String, Object>();
 
+		properties.put(MongoClientProvider.PROP_URI, "mongodb://localhost");
+		config.update(properties);
+
+		config = configurationAdmin.getConfiguration(MongoDatabaseConfigurationProvider.PROP_FACTORY_ID, null);
+
+		properties = config.getProperties();
+
+		if (properties == null)
+			properties = new Hashtable<String, Object>();
+
+		properties.put(MongoDatabaseConfigurationProvider.PROP_URI, "mongodb://localhost/junit");
+		properties.put(MongoDatabaseConfigurationProvider.PROP_ALIAS, "junit");
+		config.update(properties);
+
+		config = configurationAdmin.getConfiguration(MongoIdFactory.PROP_FACTORY_ID, null);
+
+		properties = config.getProperties();
+
+		if (properties == null)
+			properties = new Hashtable<String, Object>();
+
 		properties.put(MongoIdFactory.PROP_URI, "mongodb://localhost/junit/junit_id");
+		properties.put(MongoIdFactory.PROP_ALIAS, "junit");
 		config.update(properties);
 	}
 

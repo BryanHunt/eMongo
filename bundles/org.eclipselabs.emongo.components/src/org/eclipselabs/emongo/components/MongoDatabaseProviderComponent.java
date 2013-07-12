@@ -15,14 +15,14 @@ import com.mongodb.DB;
  */
 public class MongoDatabaseProviderComponent implements MongoDatabaseProvider
 {
-	private DatabaseConfigurationProvider databaseConfigurationProvider;
+	private MongoAuthenticatedDatabaseConfigurationProvider databaseConfigurationProvider;
 	private MongoClientProvider mongoClientProvider;
 
 	/**
 	 * @param databaseConfigurationProvider
 	 * @param mongoClientProvider
 	 */
-	public MongoDatabaseProviderComponent(DatabaseConfigurationProvider databaseConfigurationProvider, MongoClientProvider mongoClientProvider)
+	public MongoDatabaseProviderComponent(MongoAuthenticatedDatabaseConfigurationProvider databaseConfigurationProvider, MongoClientProvider mongoClientProvider)
 	{
 		super();
 		this.databaseConfigurationProvider = databaseConfigurationProvider;

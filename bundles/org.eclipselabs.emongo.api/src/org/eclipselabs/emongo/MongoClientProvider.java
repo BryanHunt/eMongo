@@ -24,24 +24,25 @@ public interface MongoClientProvider
 {
 	// --- MongoOptions properties ---------------------------------------------------------
 
-	public String PROP_DESCRIPTION = "description";
-	public String PROP_CONNECTIONS_PER_HOST = "connectionsPerHost";
-	public String PROP_THREADS_ALLOWED_TO_BLOCK_FOR_CONNECTION_MULTIPLIER = "threadsAllowedToBlockForConnectionMultiplier";
-	public String PROP_MAX_WAIT_TIME = "maxWaitTime";
-	public String PROP_CONNECT_TIMEOUT = "connectTimeout";
-	public String PROP_SOCKET_TIMEOUT = "socketTimeout";
-	public String PROP_SOCKET_KEEP_ALIVE = "socketKeepAlive";
-	public String PROP_AUTO_CONNECT_RETRY = "autoConnectRetry";
-	public String PROP_MAX_AUTO_CONNECT_RETRY_TIME = "maxAutoConnectRetryTime";
-	public String PROP_CONTINUE_ON_INSERT_ERROR = "continueOnInsertError";
-	public String PROP_W = "w";
-	public String PROP_WTIMEOUT = "wtimeout";
-	public String PROP_FSYNC = "fsync";
-	public String PROP_J = "j";
+	String PROP_DESCRIPTION = "description";
+	String PROP_CONNECTIONS_PER_HOST = "connectionsPerHost";
+	String PROP_THREADS_ALLOWED_TO_BLOCK_FOR_CONNECTION_MULTIPLIER = "threadsAllowedToBlockForConnectionMultiplier";
+	String PROP_MAX_WAIT_TIME = "maxWaitTime";
+	String PROP_CONNECT_TIMEOUT = "connectTimeout";
+	String PROP_SOCKET_TIMEOUT = "socketTimeout";
+	String PROP_SOCKET_KEEP_ALIVE = "socketKeepAlive";
+	String PROP_AUTO_CONNECT_RETRY = "autoConnectRetry";
+	String PROP_MAX_AUTO_CONNECT_RETRY_TIME = "maxAutoConnectRetryTime";
+	String PROP_CONTINUE_ON_INSERT_ERROR = "continueOnInsertError";
+	String PROP_W = "w";
+	String PROP_WTIMEOUT = "wtimeout";
+	String PROP_FSYNC = "fsync";
+	String PROP_J = "j";
 
 	// --- Provider service specific properties ---------------------------------------------
 
-	public String PROP_URI = "uri";
+	String PROP_FACTORY_ID = "org.eclipselabs.emongo.clientProvider";
+	String PROP_URI = "uri";
 
 	// --------------------------------------------------------------------------------------
 

@@ -17,7 +17,7 @@ import java.util.Map;
  * @author bhunt
  * 
  */
-public class DatabaseConfigurationProviderComponent extends AbstractComponent implements DatabaseConfigurationProvider
+public class MongoDatabaseConfigurationProviderComponent extends AbstractComponent implements MongoAuthenticatedDatabaseConfigurationProvider
 {
 	private volatile String alias;
 	private volatile String databaseName;
@@ -25,12 +25,12 @@ public class DatabaseConfigurationProviderComponent extends AbstractComponent im
 	private volatile String user;
 	private volatile String password;
 
-	public void configure(Map<String, Object> properties)
+	public void activate(Map<String, Object> properties)
 	{
-		alias = (String) properties.get(DatabaseConfigurationProvider.PROP_ALIAS);
-		uri = (String) properties.get(DatabaseConfigurationProvider.PROP_URI);
-		user = (String) properties.get(DatabaseConfigurationProvider.PROP_USER);
-		password = (String) properties.get(DatabaseConfigurationProvider.PROP_PASSWORD);
+		alias = (String) properties.get(MongoAuthenticatedDatabaseConfigurationProvider.PROP_ALIAS);
+		uri = (String) properties.get(MongoAuthenticatedDatabaseConfigurationProvider.PROP_URI);
+		user = (String) properties.get(MongoAuthenticatedDatabaseConfigurationProvider.PROP_USER);
+		password = (String) properties.get(MongoAuthenticatedDatabaseConfigurationProvider.PROP_PASSWORD);
 
 		if (alias == null || alias.isEmpty())
 			handleIllegalConfiguration("The database alias was not found in the configuration properties");
@@ -47,6 +47,9 @@ public class DatabaseConfigurationProviderComponent extends AbstractComponent im
 			handleIllegalConfiguration("The uri: '" + uri + "' does not have the form 'mongodb://host[:port]/db'");
 
 		databaseName = uriElements[3];
+
+		if (databaseName.isEmpty())
+			handleIllegalConfiguration("The uri: '" + uri + "' does not have the form 'mongodb://host[:port]/db'");
 	}
 
 	@Override

@@ -36,12 +36,14 @@ public class TestMongoIdFactory
 	@Rule
 	public MongoDatabase database = new MongoDatabase();
 
+	@Rule
+	public ServiceLocator<MongoIdFactory> mongoIdFactoryLocator = new ServiceLocator<MongoIdFactory>(MongoIdFactory.class);
+
 	private MongoIdFactory mongoId;
 
 	@Before
 	public void setUp()
 	{
-		ServiceLocator<MongoIdFactory> mongoIdFactoryLocator = new ServiceLocator<MongoIdFactory>(MongoIdFactory.class);
 		mongoId = mongoIdFactoryLocator.getService();
 	}
 
@@ -50,7 +52,7 @@ public class TestMongoIdFactory
 	{
 		assertThat(mongoId.getNextId(), is("1"));
 		DBCollection collection = database.getMongoDB().getCollection("junit_id");
-		DBObject result = collection.findOne(new BasicDBObject("_id", Long.valueOf(0)));
+		DBObject result = collection.findOne(new BasicDBObject("_id", "0"));
 		assertThat((Long) result.get("lastId"), is(1L));
 	}
 }

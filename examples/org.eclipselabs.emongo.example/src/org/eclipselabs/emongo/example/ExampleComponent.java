@@ -1,10 +1,17 @@
-/**
- * 
- */
+/*******************************************************************************
+ * Copyright (c) 2013 Bryan Hunt.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Bryan Hunt - initial API and implementation
+ *******************************************************************************/
 
 package org.eclipselabs.emongo.example;
 
-import org.eclipselabs.emongo.MongoDatabaseLocator;
+import org.eclipselabs.emongo.MongoDatabaseProvider;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
@@ -17,11 +24,11 @@ import com.mongodb.DBCursor;
  */
 public class ExampleComponent
 {
-	private MongoDatabaseLocator databaseLocator;
+	private MongoDatabaseProvider mongoDatabaseProvider;
 
 	public void activate()
 	{
-		DB database = databaseLocator.getDatabaseByURI("mongodb://localhost/example");
+		DB database = mongoDatabaseProvider.getDB();
 		DBCollection collection = database.getCollection("items");
 		collection.drop();
 
@@ -34,10 +41,11 @@ public class ExampleComponent
 			System.out.print(cursor.next().get("x") + " ");
 
 		System.out.println();
+		collection.drop();
 	}
 
-	public void bindDatabaseLocator(MongoDatabaseLocator databaseLocator)
+	public void bindMongoDatabaseProvider(MongoDatabaseProvider mongoDatabaseProvider)
 	{
-		this.databaseLocator = databaseLocator;
+		this.mongoDatabaseProvider = mongoDatabaseProvider;
 	}
 }

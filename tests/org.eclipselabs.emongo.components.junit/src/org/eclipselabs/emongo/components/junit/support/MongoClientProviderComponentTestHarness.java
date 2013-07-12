@@ -5,7 +5,7 @@
 package org.eclipselabs.emongo.components.junit.support;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
 import org.eclipselabs.emongo.components.MongoClientProviderComponent;
 
@@ -19,17 +19,21 @@ import com.mongodb.ServerAddress;
  */
 public class MongoClientProviderComponentTestHarness extends MongoClientProviderComponent
 {
+	private MongoClient mongoClient;
+	private MongoClientOptions options;
+	private Collection<ServerAddress> serverAddresses;
+
 	public MongoClientProviderComponentTestHarness(MongoClient mongoClient)
 	{
 		this.mongoClient = mongoClient;
 	}
 
-	public ServerAddress getServerAddress()
+	public MongoClientOptions getMongoClientOptions()
 	{
-		return serverAddress;
+		return options;
 	}
 
-	public List<ServerAddress> getServerAddresses()
+	public Collection<ServerAddress> getServerAddresses()
 	{
 		return serverAddresses;
 	}
@@ -37,6 +41,7 @@ public class MongoClientProviderComponentTestHarness extends MongoClientProvider
 	@Override
 	protected MongoClient createMongoClient(MongoClientOptions options, ArrayList<ServerAddress> serverAddresses)
 	{
+		this.options = options;
 		this.serverAddresses = serverAddresses;
 		return mongoClient;
 	}
@@ -44,11 +49,9 @@ public class MongoClientProviderComponentTestHarness extends MongoClientProvider
 	@Override
 	protected MongoClient createMongoClient(MongoClientOptions options, ServerAddress serverAddress)
 	{
-		this.serverAddress = serverAddress;
+		this.options = options;
+		this.serverAddresses = new ArrayList<>(1);
+		serverAddresses.add(serverAddress);
 		return mongoClient;
 	}
-
-	private MongoClient mongoClient;
-	private ServerAddress serverAddress;
-	private List<ServerAddress> serverAddresses;
 }

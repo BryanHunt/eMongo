@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <MetaData xmlns="http://www.osgi.org/xmlns/metatype/v1.1.0">
-	<OCD name="MongoDB Authentication" id="org.eclipselabs.emongo.databaseConfigurationProvider" description="MongoDB Database Configuration">
+	<OCD name="MongoDB Database" id="org.eclipselabs.emongo.databaseConfigurationProvider" description="MongoDB Database Configuration">
 		<AD name="Alias"    id="alias"    type="String"   description="The alias of the MongoDB database."/>
 		<AD name="URI"      id="uri"      type="String"   description="The URI of the MongoDB database of the form 'mongodb://host:[port]/db'."/>
 		<AD name="User"     id="user"     type="String"   description="The user id to use for authenticating to the MongoDB server (optional)."/>

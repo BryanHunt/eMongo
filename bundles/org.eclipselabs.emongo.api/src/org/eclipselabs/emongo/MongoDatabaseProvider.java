@@ -16,5 +16,7 @@ public interface MongoDatabaseProvider
 
 	String getAlias();
 
+	String getURI();
+
 	DB getDB();
 }

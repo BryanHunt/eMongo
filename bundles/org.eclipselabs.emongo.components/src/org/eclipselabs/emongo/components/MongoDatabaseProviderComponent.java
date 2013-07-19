@@ -36,6 +36,12 @@ public class MongoDatabaseProviderComponent implements MongoDatabaseProvider
 	}
 
 	@Override
+	public String getURI()
+	{
+		return databaseConfigurationProvider.getURI();
+	}
+
+	@Override
 	public DB getDB()
 	{
 		DB db = mongoClientProvider.getMongoClient().getDB(databaseConfigurationProvider.getDatabaseName());

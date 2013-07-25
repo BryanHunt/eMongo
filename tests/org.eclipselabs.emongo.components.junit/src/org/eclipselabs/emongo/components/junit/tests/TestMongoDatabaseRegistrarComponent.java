@@ -40,7 +40,9 @@ import org.osgi.service.component.ComponentContext;
  */
 public class TestMongoDatabaseRegistrarComponent
 {
+	private String clientId;
 	private String alias;
+	private String databaseName;
 	private ComponentContext componentContext;
 	private BundleContext bundleContext;
 	private ServiceRegistration<MongoDatabaseProvider> serviceRegistration;
@@ -53,9 +55,10 @@ public class TestMongoDatabaseRegistrarComponent
 	@Before
 	public void setUp()
 	{
+		clientId = "junit";
 		alias = "junit";
 		String clientURI = "mongodb://locahost";
-		String databaseURI = clientURI + "/junit";
+		databaseName = "junit";
 		String[] uris = new String[] { clientURI };
 
 		componentContext = mock(ComponentContext.class);
@@ -65,8 +68,12 @@ public class TestMongoDatabaseRegistrarComponent
 		mongoAuthenticatedDatabaseConfigurationProvider = mock(MongoAuthenticatedDatabaseConfigurationProvider.class);
 
 		when(mongoClientProvider.getURIs()).thenReturn(uris);
-		when(mongoAuthenticatedDatabaseConfigurationProvider.getURI()).thenReturn(databaseURI);
+		when(mongoClientProvider.getClientId()).thenReturn(clientId);
+
+		when(mongoAuthenticatedDatabaseConfigurationProvider.getClientId()).thenReturn(clientId);
+		when(mongoAuthenticatedDatabaseConfigurationProvider.getDatabaseName()).thenReturn(databaseName);
 		when(mongoAuthenticatedDatabaseConfigurationProvider.getAlias()).thenReturn(alias);
+
 		when(componentContext.getBundleContext()).thenReturn(bundleContext);
 		when(bundleContext.registerService(eq(MongoDatabaseProvider.class), any(MongoDatabaseProvider.class), any(Dictionary.class))).thenReturn(serviceRegistration);
 
@@ -88,12 +95,13 @@ public class TestMongoDatabaseRegistrarComponent
 
 		mongoDatabaseRegistrarComponent.bindMongoClientProvider(mongoClientProvider);
 
-		verify(mongoClientProvider).getURIs();
+		verify(mongoClientProvider, atLeastOnce()).getClientId();
 		verifyNoMoreInteractions(componentContext);
 
 		mongoDatabaseRegistrarComponent.bindMongoDatabaseConfigurationProvider(mongoAuthenticatedDatabaseConfigurationProvider);
 
-		verify(mongoAuthenticatedDatabaseConfigurationProvider, atLeastOnce()).getURI();
+		verify(mongoAuthenticatedDatabaseConfigurationProvider, atLeastOnce()).getClientId();
+		verify(mongoAuthenticatedDatabaseConfigurationProvider, atLeastOnce()).getDatabaseName();
 		verify(mongoAuthenticatedDatabaseConfigurationProvider, atLeastOnce()).getAlias();
 		verify(componentContext).getBundleContext();
 
@@ -108,14 +116,15 @@ public class TestMongoDatabaseRegistrarComponent
 	{
 		mongoDatabaseRegistrarComponent.bindMongoClientProvider(mongoClientProvider);
 
-		verify(mongoClientProvider).getURIs();
+		verify(mongoClientProvider).getClientId();
 		verifyNoMoreInteractions(componentContext);
 
 		mongoDatabaseRegistrarComponent.activate(componentContext);
 
 		mongoDatabaseRegistrarComponent.bindMongoDatabaseConfigurationProvider(mongoAuthenticatedDatabaseConfigurationProvider);
 
-		verify(mongoAuthenticatedDatabaseConfigurationProvider, atLeastOnce()).getURI();
+		verify(mongoAuthenticatedDatabaseConfigurationProvider, atLeastOnce()).getClientId();
+		verify(mongoAuthenticatedDatabaseConfigurationProvider, atLeastOnce()).getDatabaseName();
 		verify(mongoAuthenticatedDatabaseConfigurationProvider, atLeastOnce()).getAlias();
 		verify(componentContext).getBundleContext();
 
@@ -130,18 +139,19 @@ public class TestMongoDatabaseRegistrarComponent
 	{
 		mongoDatabaseRegistrarComponent.bindMongoClientProvider(mongoClientProvider);
 
-		verify(mongoClientProvider).getURIs();
+		verify(mongoClientProvider).getClientId();
 		verifyNoMoreInteractions(componentContext);
 
 		mongoDatabaseRegistrarComponent.bindMongoDatabaseConfigurationProvider(mongoAuthenticatedDatabaseConfigurationProvider);
 
-		verify(mongoAuthenticatedDatabaseConfigurationProvider).getURI();
+		verify(mongoAuthenticatedDatabaseConfigurationProvider, atLeastOnce()).getClientId();
 		verifyNoMoreInteractions(componentContext);
 
 		mongoDatabaseRegistrarComponent.activate(componentContext);
 
 		verify(mongoAuthenticatedDatabaseConfigurationProvider, atLeastOnce()).getAlias();
-		verify(mongoAuthenticatedDatabaseConfigurationProvider, atLeastOnce()).getURI();
+		verify(mongoAuthenticatedDatabaseConfigurationProvider, atLeastOnce()).getDatabaseName();
+		verify(mongoAuthenticatedDatabaseConfigurationProvider, atLeastOnce()).getClientId();
 		verify(componentContext).getBundleContext();
 
 		ArgumentCaptor<Dictionary> argument = ArgumentCaptor.forClass(Dictionary.class);
@@ -157,12 +167,12 @@ public class TestMongoDatabaseRegistrarComponent
 
 		mongoDatabaseRegistrarComponent.bindMongoDatabaseConfigurationProvider(mongoAuthenticatedDatabaseConfigurationProvider);
 
-		verify(mongoAuthenticatedDatabaseConfigurationProvider, atLeastOnce()).getURI();
+		verify(mongoAuthenticatedDatabaseConfigurationProvider, atLeastOnce()).getClientId();
 		verifyNoMoreInteractions(componentContext);
 
 		mongoDatabaseRegistrarComponent.bindMongoClientProvider(mongoClientProvider);
 
-		verify(mongoClientProvider, atLeastOnce()).getURIs();
+		verify(mongoClientProvider, atLeastOnce()).getClientId();
 		verify(componentContext).getBundleContext();
 
 		ArgumentCaptor<Dictionary> argument = ArgumentCaptor.forClass(Dictionary.class);
@@ -176,12 +186,12 @@ public class TestMongoDatabaseRegistrarComponent
 	{
 		mongoDatabaseRegistrarComponent.bindMongoDatabaseConfigurationProvider(mongoAuthenticatedDatabaseConfigurationProvider);
 
-		verify(mongoAuthenticatedDatabaseConfigurationProvider, atLeastOnce()).getURI();
+		verify(mongoAuthenticatedDatabaseConfigurationProvider, atLeastOnce()).getClientId();
 		verifyNoMoreInteractions(componentContext, mongoClientProvider, mongoAuthenticatedDatabaseConfigurationProvider);
 
 		mongoDatabaseRegistrarComponent.bindMongoClientProvider(mongoClientProvider);
 
-		verify(mongoClientProvider, atLeastOnce()).getURIs();
+		verify(mongoClientProvider, atLeastOnce()).getClientId();
 		verifyNoMoreInteractions(componentContext);
 
 		mongoDatabaseRegistrarComponent.activate(componentContext);

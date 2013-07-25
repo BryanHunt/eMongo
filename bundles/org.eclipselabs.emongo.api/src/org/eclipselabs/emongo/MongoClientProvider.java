@@ -43,6 +43,7 @@ public interface MongoClientProvider
 
 	String PROP_FACTORY_ID = "org.eclipselabs.emongo.clientProvider";
 	String PROP_URI = "uri";
+	String PROP_CLIENT_ID = "client_id";
 
 	// --------------------------------------------------------------------------------------
 
@@ -58,4 +59,6 @@ public interface MongoClientProvider
 	 *         MongoDB. Multiple URIs will be returned for a replica set.
 	 */
 	String[] getURIs();
+
+	String getClientId();
 }

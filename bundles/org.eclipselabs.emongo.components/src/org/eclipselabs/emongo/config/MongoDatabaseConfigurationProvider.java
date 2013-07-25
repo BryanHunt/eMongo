@@ -11,6 +11,8 @@
 
 package org.eclipselabs.emongo.config;
 
+import org.eclipselabs.emongo.MongoClientProvider;
+
 /**
  * @author bhunt
  * 
@@ -18,12 +20,13 @@ package org.eclipselabs.emongo.config;
 public interface MongoDatabaseConfigurationProvider
 {
 	String PROP_FACTORY_ID = "org.eclipselabs.emongo.databaseConfigurationProvider";
-	String PROP_URI = "uri";
+	String PROP_CLIENT_ID = MongoClientProvider.PROP_CLIENT_ID;
 	String PROP_ALIAS = "alias";
+	String PROP_DATABASE = "database";
 
 	String getAlias();
 
 	String getDatabaseName();
 
-	String getURI();
+	String getClientId();
 }

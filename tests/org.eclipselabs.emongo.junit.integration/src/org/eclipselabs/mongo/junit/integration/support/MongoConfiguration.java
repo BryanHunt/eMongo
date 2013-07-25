@@ -38,6 +38,7 @@ public class MongoConfiguration
 		if (properties == null)
 			properties = new Hashtable<String, Object>();
 
+		properties.put(MongoClientProvider.PROP_CLIENT_ID, "junit");
 		properties.put(MongoClientProvider.PROP_URI, "mongodb://localhost");
 		config.update(properties);
 
@@ -48,7 +49,8 @@ public class MongoConfiguration
 		if (properties == null)
 			properties = new Hashtable<String, Object>();
 
-		properties.put(MongoDatabaseConfigurationProvider.PROP_URI, "mongodb://localhost/junit");
+		properties.put(MongoDatabaseConfigurationProvider.PROP_CLIENT_ID, "junit");
+		properties.put(MongoDatabaseConfigurationProvider.PROP_DATABASE, "junit");
 		properties.put(MongoDatabaseConfigurationProvider.PROP_ALIAS, "junit");
 		config.update(properties);
 

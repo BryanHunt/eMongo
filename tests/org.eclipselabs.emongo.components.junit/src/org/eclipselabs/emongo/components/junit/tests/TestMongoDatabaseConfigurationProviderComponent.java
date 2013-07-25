@@ -30,8 +30,8 @@ public class TestMongoDatabaseConfigurationProviderComponent
 {
 	private Map<String, Object> properties;
 	private MongoDatabaseConfigurationProviderComponent mongoDatabaseConfigurationProviderComponent;
+	private String clientId;
 	private String databaseName;
-	private String uri;
 	private String factory;
 	private String alias;
 	private String user;
@@ -40,15 +40,16 @@ public class TestMongoDatabaseConfigurationProviderComponent
 	@Before
 	public void setUp()
 	{
+		clientId = "junit";
 		databaseName = "junit";
-		uri = "mongodb://localhost/" + databaseName;
 		factory = "factory";
 		alias = "alias";
 		user = "user";
 		password = "password";
 
 		properties = new HashMap<String, Object>();
-		properties.put(MongoAuthenticatedDatabaseConfigurationProvider.PROP_URI, uri);
+		properties.put(MongoAuthenticatedDatabaseConfigurationProvider.PROP_CLIENT_ID, clientId);
+		properties.put(MongoAuthenticatedDatabaseConfigurationProvider.PROP_DATABASE, databaseName);
 		properties.put(MongoAuthenticatedDatabaseConfigurationProvider.PROP_FACTORY_ID, factory);
 		properties.put(MongoAuthenticatedDatabaseConfigurationProvider.PROP_ALIAS, alias);
 		properties.put(MongoAuthenticatedDatabaseConfigurationProvider.PROP_USER, user);
@@ -63,7 +64,7 @@ public class TestMongoDatabaseConfigurationProviderComponent
 		mongoDatabaseConfigurationProviderComponent.activate(properties);
 
 		assertThat(mongoDatabaseConfigurationProviderComponent.getAlias(), is(alias));
-		assertThat(mongoDatabaseConfigurationProviderComponent.getURI(), is(uri));
+		assertThat(mongoDatabaseConfigurationProviderComponent.getClientId(), is(clientId));
 		assertThat(mongoDatabaseConfigurationProviderComponent.getDatabaseName(), is(databaseName));
 		assertThat(mongoDatabaseConfigurationProviderComponent.getUser(), is(user));
 		assertThat(mongoDatabaseConfigurationProviderComponent.getPassword(), is(password));
@@ -84,44 +85,30 @@ public class TestMongoDatabaseConfigurationProviderComponent
 	}
 
 	@Test(expected = IllegalStateException.class)
-	public void testActivateWithNullURI()
+	public void testActivateWithNullDatabaseName()
 	{
-		properties.put(MongoAuthenticatedDatabaseConfigurationProvider.PROP_URI, null);
+		properties.put(MongoAuthenticatedDatabaseConfigurationProvider.PROP_DATABASE, null);
 		mongoDatabaseConfigurationProviderComponent.activate(properties);
 	}
 
 	@Test(expected = IllegalStateException.class)
-	public void testActivateWithEmptyURI()
+	public void testActivateWithEmptyDatabaseName()
 	{
-		properties.put(MongoAuthenticatedDatabaseConfigurationProvider.PROP_URI, "");
+		properties.put(MongoAuthenticatedDatabaseConfigurationProvider.PROP_DATABASE, "");
 		mongoDatabaseConfigurationProviderComponent.activate(properties);
 	}
 
 	@Test(expected = IllegalStateException.class)
-	public void testActivateWithBadURIScheme()
+	public void testActivateWithNullClientId()
 	{
-		properties.put(MongoAuthenticatedDatabaseConfigurationProvider.PROP_URI, "mongodd://localhost/db");
+		properties.put(MongoAuthenticatedDatabaseConfigurationProvider.PROP_CLIENT_ID, null);
 		mongoDatabaseConfigurationProviderComponent.activate(properties);
 	}
 
 	@Test(expected = IllegalStateException.class)
-	public void testActivateWithMissingURISegments()
+	public void testActivateWithEmptyClientId()
 	{
-		properties.put(MongoAuthenticatedDatabaseConfigurationProvider.PROP_URI, "mongodb://localhost");
-		mongoDatabaseConfigurationProviderComponent.activate(properties);
-	}
-
-	@Test(expected = IllegalStateException.class)
-	public void testActivateWithTooManyURISegments()
-	{
-		properties.put(MongoAuthenticatedDatabaseConfigurationProvider.PROP_URI, "mongodb://localhost/db/collection");
-		mongoDatabaseConfigurationProviderComponent.activate(properties);
-	}
-
-	@Test(expected = IllegalStateException.class)
-	public void testActivateWithURIMissingDatabaseName()
-	{
-		properties.put(MongoAuthenticatedDatabaseConfigurationProvider.PROP_URI, "mongodb://localhost/");
+		properties.put(MongoAuthenticatedDatabaseConfigurationProvider.PROP_CLIENT_ID, "");
 		mongoDatabaseConfigurationProviderComponent.activate(properties);
 	}
 }

@@ -45,7 +45,7 @@ public class MongoConfigurator
 		mongoConfigurator = null;
 	}
 
-	public void configureClient(String clientURI) throws ConfigurationException
+	public void configureClient(String clientId, String clientURI) throws ConfigurationException
 	{
 		try
 		{
@@ -56,6 +56,7 @@ public class MongoConfigurator
 			if (properties == null)
 				properties = new Hashtable<String, Object>();
 
+			properties.put(MongoClientProvider.PROP_CLIENT_ID, clientId);
 			properties.put(MongoClientProvider.PROP_URI, clientURI);
 			config.update(properties);
 		}
@@ -65,7 +66,7 @@ public class MongoConfigurator
 		}
 	}
 
-	public void configureDatabase(String databaseURI, String alias, String user, String password) throws ConfigurationException
+	public void configureDatabase(String clientId, String databaseName, String alias, String user, String password) throws ConfigurationException
 	{
 		try
 		{
@@ -76,7 +77,8 @@ public class MongoConfigurator
 			if (properties == null)
 				properties = new Hashtable<String, Object>();
 
-			properties.put(MongoAuthenticatedDatabaseConfigurationProvider.PROP_URI, databaseURI);
+			properties.put(MongoAuthenticatedDatabaseConfigurationProvider.PROP_CLIENT_ID, clientId);
+			properties.put(MongoAuthenticatedDatabaseConfigurationProvider.PROP_DATABASE, databaseName);
 			properties.put(MongoAuthenticatedDatabaseConfigurationProvider.PROP_ALIAS, alias);
 			properties.put(MongoAuthenticatedDatabaseConfigurationProvider.PROP_USER, user);
 			properties.put(MongoAuthenticatedDatabaseConfigurationProvider.PROP_PASSWORD, password);

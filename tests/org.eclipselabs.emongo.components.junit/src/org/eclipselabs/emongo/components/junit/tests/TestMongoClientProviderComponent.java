@@ -37,6 +37,7 @@ public class TestMongoClientProviderComponent
 	private MongoClient mongoClient;
 	private MongoClientProviderComponentTestHarness mongoClientProviderComponent;
 	private String[] uris = new String[] { "mongodb://localhost", "mongodb://www.google.com", "mongodb://www.apple.com" };
+	private String clientId = "junit";
 
 	@Before
 	public void setUp()
@@ -44,6 +45,7 @@ public class TestMongoClientProviderComponent
 		mongoClient = mock(MongoClient.class);
 		properties = new HashMap<String, Object>();
 		mongoClientProviderComponent = new MongoClientProviderComponentTestHarness(mongoClient);
+		properties.put(MongoClientProvider.PROP_CLIENT_ID, clientId);
 	}
 
 	@Test
@@ -96,6 +98,22 @@ public class TestMongoClientProviderComponent
 	public void testActivateWithTooManuURISegments()
 	{
 		properties.put(MongoClientProvider.PROP_URI, "mongodd://localhost/");
+		mongoClientProviderComponent.activate(properties);
+	}
+
+	@Test(expected = IllegalStateException.class)
+	public void testActivateWithNullClientId()
+	{
+		properties.put(MongoClientProvider.PROP_URI, uris[0]);
+		properties.put(MongoClientProvider.PROP_CLIENT_ID, null);
+		mongoClientProviderComponent.activate(properties);
+	}
+
+	@Test(expected = IllegalStateException.class)
+	public void testActivateWithEmptyClientId()
+	{
+		properties.put(MongoClientProvider.PROP_URI, uris[0]);
+		properties.put(MongoClientProvider.PROP_CLIENT_ID, "");
 		mongoClientProviderComponent.activate(properties);
 	}
 }

@@ -53,6 +53,6 @@ public class TestMongoIdFactory
 		assertThat(mongoId.getNextId(), is("1"));
 		DBCollection collection = database.getMongoDB().getCollection("junit_id");
 		DBObject result = collection.findOne(new BasicDBObject("_id", "0"));
-		assertThat((Long) result.get("lastId"), is(1L));
+		assertThat((Long) result.get("_lastId"), is(1L));
 	}
 }

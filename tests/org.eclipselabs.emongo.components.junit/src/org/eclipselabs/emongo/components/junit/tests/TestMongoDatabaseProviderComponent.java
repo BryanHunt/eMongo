@@ -40,8 +40,12 @@ public class TestMongoDatabaseProviderComponent
 	@Before
 	public void setUp()
 	{
+		String[] uris = { "mongodb://localhost" };
+
 		databaseConfigurationProvider = mock(MongoAuthenticatedDatabaseConfigurationProvider.class);
 		mongoClientProvider = mock(MongoClientProvider.class);
+		when(databaseConfigurationProvider.getDatabaseName()).thenReturn("junit");
+		when(mongoClientProvider.getURIs()).thenReturn(uris);
 		mongoDatabaseProviderComponent = new MongoDatabaseProviderComponent(databaseConfigurationProvider, mongoClientProvider);
 	}
 

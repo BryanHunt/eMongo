@@ -30,8 +30,15 @@ import com.mongodb.WriteConcern;
  */
 public class MongoClientProviderComponent extends AbstractComponent implements MongoClientProvider
 {
+	private volatile String clientId;
 	private volatile String[] uris;
 	private volatile MongoClient mongoClient;
+
+	@Override
+	public String getClientId()
+	{
+		return clientId;
+	}
 
 	@Override
 	public MongoClient getMongoClient()
@@ -47,6 +54,11 @@ public class MongoClientProviderComponent extends AbstractComponent implements M
 
 	public void activate(Map<String, Object> properties)
 	{
+		clientId = (String) properties.get(MongoClientProvider.PROP_CLIENT_ID);
+
+		if (clientId == null || clientId.isEmpty())
+			handleIllegalConfiguration("The MongoDB client id was not found in the configuration properties");
+
 		MongoClientOptions options = createMongoClientOptions(properties);
 
 		// The uriProperty is a single string containing one or more server URIs.

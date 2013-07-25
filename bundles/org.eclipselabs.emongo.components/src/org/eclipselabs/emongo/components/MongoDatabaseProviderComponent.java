@@ -17,6 +17,7 @@ public class MongoDatabaseProviderComponent implements MongoDatabaseProvider
 {
 	private MongoAuthenticatedDatabaseConfigurationProvider databaseConfigurationProvider;
 	private MongoClientProvider mongoClientProvider;
+	private String uri;
 
 	/**
 	 * @param databaseConfigurationProvider
@@ -27,6 +28,7 @@ public class MongoDatabaseProviderComponent implements MongoDatabaseProvider
 		super();
 		this.databaseConfigurationProvider = databaseConfigurationProvider;
 		this.mongoClientProvider = mongoClientProvider;
+		uri = mongoClientProvider.getURIs()[0] + "/" + databaseConfigurationProvider.getDatabaseName();
 	}
 
 	@Override
@@ -38,7 +40,7 @@ public class MongoDatabaseProviderComponent implements MongoDatabaseProvider
 	@Override
 	public String getURI()
 	{
-		return databaseConfigurationProvider.getURI();
+		return uri;
 	}
 
 	@Override

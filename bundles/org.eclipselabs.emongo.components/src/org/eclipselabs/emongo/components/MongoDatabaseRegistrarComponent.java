@@ -11,9 +11,12 @@
 
 package org.eclipselabs.emongo.components;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipselabs.emongo.MongoClientProvider;
@@ -28,21 +31,33 @@ import org.osgi.service.component.ComponentContext;
 public class MongoDatabaseRegistrarComponent
 {
 	private volatile ComponentContext context;
-	private Map<String, MongoClientProvider> mongoClientProvidersByClientURI = new ConcurrentHashMap<String, MongoClientProvider>();
-	private Map<String, MongoAuthenticatedDatabaseConfigurationProvider> databaseConfigurationProvidersByDatabaseURI = new ConcurrentHashMap<String, MongoAuthenticatedDatabaseConfigurationProvider>();
-	private Map<String, ServiceRegistration<MongoDatabaseProvider>> serviceRegistrationsByDatabaseURI = new ConcurrentHashMap<String, ServiceRegistration<MongoDatabaseProvider>>();
+	private Map<String, MongoClientProvider> mongoClientProvidersByClientId = new HashMap<String, MongoClientProvider>();
+	private Map<String, Set<MongoAuthenticatedDatabaseConfigurationProvider>> databaseConfigurationProvidersByClientId = new HashMap<String, Set<MongoAuthenticatedDatabaseConfigurationProvider>>();
+	private Map<MongoAuthenticatedDatabaseConfigurationProvider, ServiceRegistration<MongoDatabaseProvider>> serviceRegistrationsByDatabaseConfiguration = new ConcurrentHashMap<MongoAuthenticatedDatabaseConfigurationProvider, ServiceRegistration<MongoDatabaseProvider>>();
 
 	public void activate(ComponentContext context)
 	{
 		this.context = context;
 
-		for (MongoAuthenticatedDatabaseConfigurationProvider provider : databaseConfigurationProvidersByDatabaseURI.values())
-			registerMongoDatabaseProvider(provider);
+		for (Collection<MongoAuthenticatedDatabaseConfigurationProvider> providers : databaseConfigurationProvidersByClientId.values())
+			for (MongoAuthenticatedDatabaseConfigurationProvider provider : providers)
+				registerMongoDatabaseProvider(provider);
 	}
 
 	public void bindMongoDatabaseConfigurationProvider(MongoAuthenticatedDatabaseConfigurationProvider databaseConfigurationProvider)
 	{
-		databaseConfigurationProvidersByDatabaseURI.put(databaseConfigurationProvider.getURI(), databaseConfigurationProvider);
+		synchronized (databaseConfigurationProvidersByClientId)
+		{
+			Set<MongoAuthenticatedDatabaseConfigurationProvider> databaseConfigurationProviders = databaseConfigurationProvidersByClientId.get(databaseConfigurationProvider.getClientId());
+
+			if (databaseConfigurationProviders == null)
+			{
+				databaseConfigurationProviders = new HashSet<MongoAuthenticatedDatabaseConfigurationProvider>();
+				databaseConfigurationProvidersByClientId.put(databaseConfigurationProvider.getClientId(), databaseConfigurationProviders);
+			}
+
+			databaseConfigurationProviders.add(databaseConfigurationProvider);
+		}
 
 		if (context != null)
 			registerMongoDatabaseProvider(databaseConfigurationProvider);
@@ -50,50 +65,62 @@ public class MongoDatabaseRegistrarComponent
 
 	public void unbindMongoDatabaseConfigurationProvider(MongoAuthenticatedDatabaseConfigurationProvider databaseConfigurationProvider)
 	{
-		databaseConfigurationProvidersByDatabaseURI.remove(databaseConfigurationProvider.getURI());
+		synchronized (databaseConfigurationProvidersByClientId)
+		{
+			Set<MongoAuthenticatedDatabaseConfigurationProvider> databaseConfigurationProviders = databaseConfigurationProvidersByClientId.get(databaseConfigurationProvider.getAlias());
+
+			if (databaseConfigurationProviders != null)
+				databaseConfigurationProviders.remove(databaseConfigurationProvider);
+		}
+
 		unregisterMongoDatabaseProvider(databaseConfigurationProvider);
 	}
 
-	public void bindMongoClientProvider(MongoClientProvider mongoProvider)
+	public void bindMongoClientProvider(MongoClientProvider mongoClientProvider)
 	{
-		for (String clientURI : mongoProvider.getURIs())
-			mongoClientProvidersByClientURI.put(clientURI, mongoProvider);
+		synchronized (mongoClientProvidersByClientId)
+		{
+			mongoClientProvidersByClientId.put(mongoClientProvider.getClientId(), mongoClientProvider);
+		}
 
 		if (context != null)
-			registerMongoDatabaseProvider(mongoProvider);
+			registerMongoDatabaseProvider(mongoClientProvider);
 	}
 
-	public void unbindMongoClientProvider(MongoClientProvider mongoProvider)
+	public void unbindMongoClientProvider(MongoClientProvider mongoClientProvider)
 	{
-		for (String clientURI : mongoProvider.getURIs())
-			mongoClientProvidersByClientURI.remove(clientURI);
+		synchronized (mongoClientProvidersByClientId)
+		{
+			if (mongoClientProvidersByClientId.get(mongoClientProvider.getClientId()) == mongoClientProvider)
+				mongoClientProvidersByClientId.remove(mongoClientProvider.getClientId());
+		}
 
-		unregisterMongoDatabaseProvider(mongoProvider);
+		unregisterMongoDatabaseProvider(mongoClientProvider);
 	}
 
 	private void registerMongoDatabaseProvider(MongoClientProvider mongoClientProvider)
 	{
-		for (Entry<String, MongoAuthenticatedDatabaseConfigurationProvider> entry : databaseConfigurationProvidersByDatabaseURI.entrySet())
+		synchronized (databaseConfigurationProvidersByClientId)
 		{
-			for (String clientURI : mongoClientProvider.getURIs())
+			Set<MongoAuthenticatedDatabaseConfigurationProvider> databaseConfigurationProviders = databaseConfigurationProvidersByClientId.get(mongoClientProvider.getClientId());
+
+			if (databaseConfigurationProviders != null)
 			{
-				if (entry.getKey().startsWith(clientURI))
-				{
-					registerMongoDatabaseProvider(mongoClientProvider, entry.getValue());
-					return;
-				}
+				for (MongoAuthenticatedDatabaseConfigurationProvider databaseConfigurationProvider : databaseConfigurationProviders)
+					registerMongoDatabaseProvider(mongoClientProvider, databaseConfigurationProvider);
 			}
 		}
 	}
 
 	private void registerMongoDatabaseProvider(MongoAuthenticatedDatabaseConfigurationProvider databaseConfigurationProvider)
 	{
-		int trimIndex = databaseConfigurationProvider.getURI().lastIndexOf("/");
-		String clientURI = databaseConfigurationProvider.getURI().substring(0, trimIndex);
-		MongoClientProvider mongoClientProvider = mongoClientProvidersByClientURI.get(clientURI);
+		synchronized (mongoClientProvidersByClientId)
+		{
+			MongoClientProvider mongoClientProvider = mongoClientProvidersByClientId.get(databaseConfigurationProvider.getClientId());
 
-		if (mongoClientProvider != null)
-			registerMongoDatabaseProvider(mongoClientProvider, databaseConfigurationProvider);
+			if (mongoClientProvider != null)
+				registerMongoDatabaseProvider(mongoClientProvider, databaseConfigurationProvider);
+		}
 	}
 
 	private void registerMongoDatabaseProvider(MongoClientProvider mongoClientProvider, MongoAuthenticatedDatabaseConfigurationProvider databaseConfigurationProvider)
@@ -102,32 +129,26 @@ public class MongoDatabaseRegistrarComponent
 		Hashtable<String, Object> properties = new Hashtable<String, Object>();
 		properties.put(MongoDatabaseProvider.PROP_ALIAS, databaseConfigurationProvider.getAlias());
 		ServiceRegistration<MongoDatabaseProvider> serviceRegistration = context.getBundleContext().registerService(MongoDatabaseProvider.class, mongoDatabaseProviderComponent, properties);
-		serviceRegistrationsByDatabaseURI.put(databaseConfigurationProvider.getURI(), serviceRegistration);
+		serviceRegistrationsByDatabaseConfiguration.put(databaseConfigurationProvider, serviceRegistration);
 	}
 
 	private void unregisterMongoDatabaseProvider(MongoClientProvider mongoClientProvider)
 	{
-		for (String dbURI : databaseConfigurationProvidersByDatabaseURI.keySet())
+		synchronized (databaseConfigurationProvidersByClientId)
 		{
-			for (String clientURI : mongoClientProvider.getURIs())
+			Set<MongoAuthenticatedDatabaseConfigurationProvider> databaseConfigurationProviders = databaseConfigurationProvidersByClientId.get(mongoClientProvider.getClientId());
+
+			if (databaseConfigurationProviders != null)
 			{
-				if (dbURI.startsWith(clientURI))
-				{
-					unregisterMongoDatabaseProvider(dbURI);
-					return;
-				}
+				for (MongoAuthenticatedDatabaseConfigurationProvider databaseConfigurationProvider : databaseConfigurationProviders)
+					unregisterMongoDatabaseProvider(databaseConfigurationProvider);
 			}
 		}
 	}
 
 	private void unregisterMongoDatabaseProvider(MongoAuthenticatedDatabaseConfigurationProvider databaseConfigurationProvider)
 	{
-		unregisterMongoDatabaseProvider(databaseConfigurationProvider.getURI());
-	}
-
-	private void unregisterMongoDatabaseProvider(String dbURI)
-	{
-		ServiceRegistration<MongoDatabaseProvider> serviceRegistration = serviceRegistrationsByDatabaseURI.remove(dbURI);
+		ServiceRegistration<MongoDatabaseProvider> serviceRegistration = serviceRegistrationsByDatabaseConfiguration.remove(databaseConfigurationProvider);
 
 		if (serviceRegistration != null)
 			serviceRegistration.unregister();

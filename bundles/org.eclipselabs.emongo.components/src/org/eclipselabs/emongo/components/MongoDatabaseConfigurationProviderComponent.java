@@ -21,35 +21,26 @@ public class MongoDatabaseConfigurationProviderComponent extends AbstractCompone
 {
 	private volatile String alias;
 	private volatile String databaseName;
-	private volatile String uri;
+	private volatile String clientId;
 	private volatile String user;
 	private volatile String password;
 
 	public void activate(Map<String, Object> properties)
 	{
 		alias = (String) properties.get(MongoAuthenticatedDatabaseConfigurationProvider.PROP_ALIAS);
-		uri = (String) properties.get(MongoAuthenticatedDatabaseConfigurationProvider.PROP_URI);
+		clientId = (String) properties.get(MongoAuthenticatedDatabaseConfigurationProvider.PROP_CLIENT_ID);
+		databaseName = (String) properties.get(MongoAuthenticatedDatabaseConfigurationProvider.PROP_DATABASE);
 		user = (String) properties.get(MongoAuthenticatedDatabaseConfigurationProvider.PROP_USER);
 		password = (String) properties.get(MongoAuthenticatedDatabaseConfigurationProvider.PROP_PASSWORD);
 
 		if (alias == null || alias.isEmpty())
 			handleIllegalConfiguration("The database alias was not found in the configuration properties");
 
-		if (uri == null || uri.isEmpty())
-			handleIllegalConfiguration("The MongoDB uri was not found in the configuration properties");
+		if (clientId == null || clientId.isEmpty())
+			handleIllegalConfiguration("The MongoDB client id was not found in the configuration properties");
 
-		// The URI will be of the form: mongodb://host[:port]/db
-		// When the string is split on / the URI must have 4 parts
-
-		String[] uriElements = uri.split("/");
-
-		if (!uri.startsWith("mongodb://") || uriElements.length != 4)
-			handleIllegalConfiguration("The uri: '" + uri + "' does not have the form 'mongodb://host[:port]/db'");
-
-		databaseName = uriElements[3];
-
-		if (databaseName.isEmpty())
-			handleIllegalConfiguration("The uri: '" + uri + "' does not have the form 'mongodb://host[:port]/db'");
+		if (databaseName == null || databaseName.isEmpty())
+			handleIllegalConfiguration("The MongoDB client id was not found in the configuration properties");
 	}
 
 	@Override
@@ -65,9 +56,9 @@ public class MongoDatabaseConfigurationProviderComponent extends AbstractCompone
 	}
 
 	@Override
-	public String getURI()
+	public String getClientId()
 	{
-		return uri;
+		return clientId;
 	}
 
 	@Override

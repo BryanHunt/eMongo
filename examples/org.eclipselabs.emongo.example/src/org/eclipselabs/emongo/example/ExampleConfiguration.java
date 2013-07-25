@@ -37,6 +37,7 @@ public class ExampleConfiguration
 			if (properties == null)
 				properties = new Hashtable<String, Object>();
 
+			properties.put(MongoClientProvider.PROP_CLIENT_ID, "example");
 			properties.put(MongoClientProvider.PROP_URI, "mongodb://localhost");
 			config.update(properties);
 		}
@@ -54,7 +55,8 @@ public class ExampleConfiguration
 			if (properties == null)
 				properties = new Hashtable<String, Object>();
 
-			properties.put(MongoDatabaseConfigurationProvider.PROP_URI, "mongodb://localhost/example");
+			properties.put(MongoDatabaseConfigurationProvider.PROP_CLIENT_ID, "example");
+			properties.put(MongoDatabaseConfigurationProvider.PROP_DATABASE, "example");
 			properties.put(MongoDatabaseConfigurationProvider.PROP_ALIAS, "example");
 			config.update(properties);
 		}

@@ -30,7 +30,6 @@ import com.mongodb.DBObject;
 public class MongoIdFactoryComponent extends AbstractComponent implements MongoIdFactory
 {
 	private volatile String alias;
-	private volatile String uri;
 	private volatile String collectionName;
 
 	private volatile DBCollection collection;
@@ -58,23 +57,14 @@ public class MongoIdFactoryComponent extends AbstractComponent implements MongoI
 	public void activate(Map<String, Object> properties)
 	{
 		alias = (String) properties.get(PROP_ALIAS);
-		uri = (String) properties.get(PROP_URI);
 
 		if (alias == null || alias.isEmpty())
 			handleIllegalConfiguration("The alias was not specified as part of the component configuration");
 
-		if (uri == null || uri.isEmpty())
-			handleIllegalConfiguration("The MongoDB uri was not found in the configuration properties");
+		collectionName = (String) properties.get(PROP_COLLECTION);
 
-		// The URI will be of the form: mongodb://host[:port]/db/collection
-		// When the string is split on / the URI must have 5 parts
-
-		String[] segments = uri.split("/");
-
-		if (segments.length != 5)
-			handleIllegalConfiguration("The uri: '" + uri + "' does not have the form 'mongodb://host[:port]/db/collection'");
-
-		collectionName = segments[4];
+		if (collectionName == null || collectionName.isEmpty())
+			handleIllegalConfiguration("The collection was not specified as part of the component configuration");
 
 		MongoDatabaseProvider mongoDatabaseProvider = mongoDatabaseProvidersByAlias.get(alias);
 

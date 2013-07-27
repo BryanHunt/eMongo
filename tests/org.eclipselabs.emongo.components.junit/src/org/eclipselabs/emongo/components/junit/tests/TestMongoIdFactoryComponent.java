@@ -52,16 +52,16 @@ public class TestMongoIdFactoryComponent
 	private DB db;
 	private DBCollection collection;
 	private CommandResult commandResult;
-	private String uri;
+	private String collectionName;
 
 	@Before
 	public void setUp()
 	{
 		alias = "junit";
-		uri = "mongodb://localhost/junit/elements";
+		collectionName = "elements";
 		properties = new HashMap<String, Object>();
 		properties.put(MongoIdFactory.PROP_ALIAS, alias);
-		properties.put(MongoIdFactory.PROP_URI, uri);
+		properties.put(MongoIdFactory.PROP_COLLECTION, collectionName);
 
 		mongoIdFactoryComponent = new MongoIdFactoryComponent();
 
@@ -138,37 +138,16 @@ public class TestMongoIdFactoryComponent
 	}
 
 	@Test(expected = IllegalStateException.class)
-	public void testActivateWithNullURI()
+	public void testActivateWithNullCollectionName()
 	{
-		properties.put(MongoIdFactory.PROP_URI, null);
+		properties.put(MongoIdFactory.PROP_COLLECTION, null);
 		mongoIdFactoryComponent.activate(properties);
 	}
 
 	@Test(expected = IllegalStateException.class)
-	public void testActivateWithEmptyURI()
+	public void testActivateWithEmptyCollectionName()
 	{
-		properties.put(MongoIdFactory.PROP_URI, "");
-		mongoIdFactoryComponent.activate(properties);
-	}
-
-	@Test(expected = IllegalStateException.class)
-	public void testActivateWithBadURIScheme()
-	{
-		properties.put(MongoIdFactory.PROP_URI, "mongodd://localhost/db");
-		mongoIdFactoryComponent.activate(properties);
-	}
-
-	@Test(expected = IllegalStateException.class)
-	public void testActivateWithMissingURISegments()
-	{
-		properties.put(MongoIdFactory.PROP_URI, "mongodb://localhost");
-		mongoIdFactoryComponent.activate(properties);
-	}
-
-	@Test(expected = IllegalStateException.class)
-	public void testActivateWithTooManyURISegments()
-	{
-		properties.put(MongoIdFactory.PROP_URI, "mongodb://localhost/db/collection/item");
+		properties.put(MongoIdFactory.PROP_COLLECTION, "");
 		mongoIdFactoryComponent.activate(properties);
 	}
 

@@ -21,7 +21,7 @@ public interface MongoIdFactory
 {
 	String PROP_FACTORY_ID = "org.eclipselabs.emongo.idFactory";
 	String PROP_ALIAS = "alias";
-	String PROP_URI = "uri";
+	String PROP_COLLECTION = "collection";
 
 	String getNextId() throws IOException;
 }

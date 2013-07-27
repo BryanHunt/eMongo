@@ -61,7 +61,7 @@ public class MongoConfiguration
 		if (properties == null)
 			properties = new Hashtable<String, Object>();
 
-		properties.put(MongoIdFactory.PROP_URI, "mongodb://localhost/junit/junit_id");
+		properties.put(MongoIdFactory.PROP_COLLECTION, "junit_id");
 		properties.put(MongoIdFactory.PROP_ALIAS, "junit");
 		config.update(properties);
 	}

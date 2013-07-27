@@ -29,7 +29,7 @@ public class MongoIdFactoryMetaTypeProvider implements MetaTypeProvider
 	@Override
 	public ObjectClassDefinition getObjectClassDefinition(String arg0, String arg1)
 	{
-		AttributeDefinitionImpl database = new AttributeDefinitionImpl("database", "Database", AttributeDefinition.STRING);
+		AttributeDefinitionImpl database = new AttributeDefinitionImpl("alias", "Database", AttributeDefinition.STRING);
 		database.setCardinality(1);
 		database.setDescription("The MongoDB database");
 		database.setOptionLabels(databases.toArray(new String[0]));

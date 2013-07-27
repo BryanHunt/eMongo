@@ -31,6 +31,7 @@ public class MongoIdFactoryComponent extends AbstractComponent implements MongoI
 {
 	private volatile String alias;
 	private volatile String collectionName;
+	private volatile String uri;
 
 	private volatile DBCollection collection;
 	private volatile DBObject query;
@@ -39,6 +40,12 @@ public class MongoIdFactoryComponent extends AbstractComponent implements MongoI
 
 	private static final String ID = "_id";
 	private static final String LAST_ID = "_lastId";
+
+	@Override
+	public String getCollectionURI()
+	{
+		return uri;
+	}
 
 	@Override
 	public String getNextId() throws IOException
@@ -70,6 +77,8 @@ public class MongoIdFactoryComponent extends AbstractComponent implements MongoI
 
 		if (mongoDatabaseProvider != null)
 			init(mongoDatabaseProvider);
+
+		uri = mongoDatabaseProvider.getURI() + "/" + collectionName;
 	}
 
 	public void bindMongoDatabaseProvider(MongoDatabaseProvider mongoDatabaseProvider)

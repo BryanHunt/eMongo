@@ -23,5 +23,7 @@ public interface MongoIdFactory
 	String PROP_ALIAS = "alias";
 	String PROP_COLLECTION = "collection";
 
+	String getCollectionURI();
+
 	String getNextId() throws IOException;
 }

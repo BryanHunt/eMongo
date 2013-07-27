@@ -12,8 +12,8 @@
 package org.eclipselabs.emongo.components;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipselabs.emongo.MongoDatabaseProvider;
 import org.eclipselabs.emongo.MongoIdFactory;
@@ -36,7 +36,7 @@ public class MongoIdFactoryComponent extends AbstractComponent implements MongoI
 	private volatile DBCollection collection;
 	private volatile DBObject query;
 	private volatile DBObject update;
-	private Map<String, MongoDatabaseProvider> mongoDatabaseProvidersByAlias = new ConcurrentHashMap<String, MongoDatabaseProvider>();
+	private Map<String, MongoDatabaseProvider> mongoDatabaseProvidersByAlias = new HashMap<String, MongoDatabaseProvider>();
 
 	private static final String ID = "_id";
 	private static final String LAST_ID = "_lastId";
@@ -73,7 +73,12 @@ public class MongoIdFactoryComponent extends AbstractComponent implements MongoI
 		if (collectionName == null || collectionName.isEmpty())
 			handleIllegalConfiguration("The collection was not specified as part of the component configuration");
 
-		MongoDatabaseProvider mongoDatabaseProvider = mongoDatabaseProvidersByAlias.get(alias);
+		MongoDatabaseProvider mongoDatabaseProvider = null;
+
+		synchronized (mongoDatabaseProvidersByAlias)
+		{
+			mongoDatabaseProvider = mongoDatabaseProvidersByAlias.get(alias);
+		}
 
 		if (mongoDatabaseProvider != null)
 			init(mongoDatabaseProvider);
@@ -86,12 +91,21 @@ public class MongoIdFactoryComponent extends AbstractComponent implements MongoI
 		if (mongoDatabaseProvider.getAlias().equals(alias))
 			init(mongoDatabaseProvider);
 		else
-			mongoDatabaseProvidersByAlias.put(mongoDatabaseProvider.getAlias(), mongoDatabaseProvider);
+		{
+			synchronized (mongoDatabaseProvidersByAlias)
+			{
+				mongoDatabaseProvidersByAlias.put(mongoDatabaseProvider.getAlias(), mongoDatabaseProvider);
+			}
+		}
 	}
 
 	public void unbindMongoDatabaseProvider(MongoDatabaseProvider mongoDatabaseProvider)
 	{
-		mongoDatabaseProvidersByAlias.remove(mongoDatabaseProvider.getAlias());
+		synchronized (mongoDatabaseProvidersByAlias)
+		{
+			if (mongoDatabaseProvidersByAlias.get(mongoDatabaseProvider.getAlias()) == mongoDatabaseProvider)
+				mongoDatabaseProvidersByAlias.remove(mongoDatabaseProvider.getAlias());
+		}
 	}
 
 	private void init(MongoDatabaseProvider mongoDatabaseProvider)

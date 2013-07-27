@@ -11,6 +11,8 @@
 
 package org.eclipselabs.emongo.components;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 import org.osgi.service.log.LogService;
 
 /**
@@ -19,35 +21,34 @@ import org.osgi.service.log.LogService;
  */
 public abstract class AbstractComponent
 {
-	private volatile LogService logService;
+	private AtomicReference<LogService> logServiceReference;
 
 	public void bindLogService(LogService logService)
 	{
-		this.logService = logService;
+		logServiceReference.set(logService);
 	}
 
 	public void unbindLogService(LogService logService)
 	{
-		if (logService == this.logService)
-			this.logService = null;
+		logServiceReference.compareAndSet(logService, null);
 	}
 
 	protected void handleIllegalConfiguration(String message)
 	{
-		LogService ls = logService;
+		LogService logService = logServiceReference.get();
 
-		if (ls != null)
-			ls.log(LogService.LOG_ERROR, message);
+		if (logService != null)
+			logService.log(LogService.LOG_ERROR, message);
 
 		throw new IllegalStateException(message);
 	}
 
 	protected void handleConfigurationException(String message, Exception e)
 	{
-		LogService ls = logService;
+		LogService logService = logServiceReference.get();
 
-		if (ls != null)
-			ls.log(LogService.LOG_ERROR, message, e);
+		if (logService != null)
+			logService.log(LogService.LOG_ERROR, message, e);
 
 		throw new IllegalStateException(e);
 	}

@@ -21,7 +21,7 @@ import org.osgi.service.log.LogService;
  */
 public abstract class AbstractComponent
 {
-	private AtomicReference<LogService> logServiceReference;
+	private AtomicReference<LogService> logServiceReference = new AtomicReference<LogService>();
 
 	public void bindLogService(LogService logService)
 	{

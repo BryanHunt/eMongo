@@ -40,7 +40,7 @@ public class MongoDatabaseConfigurationProviderComponent extends AbstractCompone
 			handleIllegalConfiguration("The MongoDB client id was not found in the configuration properties");
 
 		if (databaseName == null || databaseName.isEmpty())
-			handleIllegalConfiguration("The MongoDB client id was not found in the configuration properties");
+			handleIllegalConfiguration("The MongoDB database name was not found in the configuration properties");
 	}
 
 	@Override

@@ -48,7 +48,7 @@ public class MongoDatabaseProviderComponent implements MongoDatabaseProvider
 	{
 		DB db = mongoClientProvider.getMongoClient().getDB(databaseConfigurationProvider.getDatabaseName());
 
-		if (databaseConfigurationProvider.getUser() != null)
+		if (databaseConfigurationProvider.getUser() != null && !databaseConfigurationProvider.getUser().isEmpty())
 			db.authenticate(databaseConfigurationProvider.getUser(), databaseConfigurationProvider.getPassword().toCharArray());
 
 		return db;

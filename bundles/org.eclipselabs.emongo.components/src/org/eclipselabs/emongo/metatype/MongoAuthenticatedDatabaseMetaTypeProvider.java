@@ -31,7 +31,6 @@ public class MongoAuthenticatedDatabaseMetaTypeProvider implements MetaTypeProvi
 	{
 		AttributeDefinitionImpl clientId = new AttributeDefinitionImpl("client_id", "Client", AttributeDefinition.STRING);
 		clientId.setDescription("The MongoDB database client.");
-		clientId.setCardinality(1);
 		clientId.setOptionLabels(mongoClientProviders.toArray(new String[0]));
 		clientId.setOptionValues(mongoClientProviders.toArray(new String[0]));
 

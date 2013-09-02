@@ -30,7 +30,7 @@ public class ExampleConfiguration
 	{
 		try
 		{
-			Configuration config = configurationAdmin.getConfiguration(MongoClientProvider.PROP_FACTORY_ID, null);
+			Configuration config = configurationAdmin.getConfiguration("org.eclipselabs.emongo.clientProvider", null);
 
 			Dictionary<String, Object> properties = config.getProperties();
 

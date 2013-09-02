@@ -14,16 +14,41 @@ package org.eclipselabs.emongo;
 import java.io.IOException;
 
 /**
- * @author bhunt
+ * A MongoIdFactory provides the equivalent of an auto-increment primary key.
+ * Calling getNextId() will return the next value to be used as the _id in the
+ * collection. The current value is stored in the collection to maintain
+ * integrity across server restarts. There is an obvious performance penalty
+ * when using the MongoIdFactory instead of letting MongoDB generate the _id
+ * for you.
  * 
+ * @author bhunt
  */
 public interface MongoIdFactory
 {
-	String PROP_FACTORY_ID = "org.eclipselabs.emongo.idFactory";
+	/**
+	 * The service property key for configuring the mongo database alias. The
+	 * value of the alias service property will be used to compare against the
+	 * mongo database alias property to obtain the proper database.
+	 */
 	String PROP_ALIAS = "alias";
+
+	/**
+	 * The service property key for configuring the database collection. Set
+	 * the value of the collection property to the name of the database collection
+	 * for which you want to use a sequential _id.
+	 */
 	String PROP_COLLECTION = "collection";
 
+	/**
+	 * 
+	 * @return the URI of the collection in the form mongodb://host[:port]/database/collection
+	 */
 	String getCollectionURI();
 
+	/**
+	 * 
+	 * @return the next auto-increment id value to be used as the _id value
+	 * @throws IOException if the current value could not be stored to the database
+	 */
 	String getNextId() throws IOException;
 }

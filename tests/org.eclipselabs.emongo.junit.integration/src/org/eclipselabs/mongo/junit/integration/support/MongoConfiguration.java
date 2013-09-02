@@ -31,7 +31,7 @@ public class MongoConfiguration
 
 	void activate() throws IOException
 	{
-		Configuration config = configurationAdmin.getConfiguration(MongoClientProvider.PROP_FACTORY_ID, null);
+		Configuration config = configurationAdmin.getConfiguration("org.eclipselabs.emongo.clientProvider", null);
 
 		Dictionary<String, Object> properties = config.getProperties();
 
@@ -54,7 +54,7 @@ public class MongoConfiguration
 		properties.put(MongoDatabaseConfigurationProvider.PROP_ALIAS, "junit");
 		config.update(properties);
 
-		config = configurationAdmin.getConfiguration(MongoIdFactory.PROP_FACTORY_ID, null);
+		config = configurationAdmin.getConfiguration("org.eclipselabs.emongo.idFactory", null);
 
 		properties = config.getProperties();
 

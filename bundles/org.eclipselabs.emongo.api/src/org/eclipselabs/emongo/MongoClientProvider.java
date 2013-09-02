@@ -41,7 +41,6 @@ public interface MongoClientProvider
 
 	// --- Provider service specific properties ---------------------------------------------
 
-	String PROP_FACTORY_ID = "org.eclipselabs.emongo.clientProvider";
 	String PROP_URI = "uri";
 	String PROP_CLIENT_ID = "client_id";
 
@@ -60,5 +59,9 @@ public interface MongoClientProvider
 	 */
 	String[] getURIs();
 
+	/**
+	 * 
+	 * @return the unique client id configured by the service properties
+	 */
 	String getClientId();
 }

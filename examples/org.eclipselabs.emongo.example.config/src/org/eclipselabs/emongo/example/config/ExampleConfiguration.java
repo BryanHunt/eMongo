@@ -16,6 +16,7 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 
 import org.eclipselabs.emongo.MongoClientProvider;
+import org.eclipselabs.emongo.config.ConfigurationProperties;
 import org.eclipselabs.emongo.config.MongoDatabaseConfigurationProvider;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
@@ -30,7 +31,7 @@ public class ExampleConfiguration
 	{
 		try
 		{
-			Configuration config = configurationAdmin.getConfiguration("org.eclipselabs.emongo.clientProvider", null);
+			Configuration config = configurationAdmin.getConfiguration(ConfigurationProperties.CLIENT_PID, null);
 
 			Dictionary<String, Object> properties = config.getProperties();
 

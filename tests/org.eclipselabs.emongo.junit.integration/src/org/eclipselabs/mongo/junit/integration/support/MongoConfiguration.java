@@ -17,6 +17,7 @@ import java.util.Hashtable;
 
 import org.eclipselabs.emongo.MongoClientProvider;
 import org.eclipselabs.emongo.MongoIdFactory;
+import org.eclipselabs.emongo.config.ConfigurationProperties;
 import org.eclipselabs.emongo.config.MongoDatabaseConfigurationProvider;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
@@ -31,7 +32,7 @@ public class MongoConfiguration
 
 	void activate() throws IOException
 	{
-		Configuration config = configurationAdmin.getConfiguration("org.eclipselabs.emongo.clientProvider", null);
+		Configuration config = configurationAdmin.getConfiguration(ConfigurationProperties.CLIENT_PID, null);
 
 		Dictionary<String, Object> properties = config.getProperties();
 
@@ -54,7 +55,7 @@ public class MongoConfiguration
 		properties.put(MongoDatabaseConfigurationProvider.PROP_ALIAS, "junit");
 		config.update(properties);
 
-		config = configurationAdmin.getConfiguration("org.eclipselabs.emongo.idFactory", null);
+		config = configurationAdmin.getConfiguration(ConfigurationProperties.ID_FACTORY_PID, null);
 
 		properties = config.getProperties();
 

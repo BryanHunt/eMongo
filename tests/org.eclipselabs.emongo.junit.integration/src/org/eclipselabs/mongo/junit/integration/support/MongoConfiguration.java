@@ -18,7 +18,6 @@ import java.util.Hashtable;
 import org.eclipselabs.emongo.MongoClientProvider;
 import org.eclipselabs.emongo.MongoIdFactory;
 import org.eclipselabs.emongo.config.ConfigurationProperties;
-import org.eclipselabs.emongo.config.MongoDatabaseConfigurationProvider;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 
@@ -43,16 +42,16 @@ public class MongoConfiguration
 		properties.put(MongoClientProvider.PROP_URI, "mongodb://localhost");
 		config.update(properties);
 
-		config = configurationAdmin.getConfiguration(MongoDatabaseConfigurationProvider.PROP_FACTORY_ID, null);
+		config = configurationAdmin.getConfiguration(ConfigurationProperties.PROP_DATABASE_PID, null);
 
 		properties = config.getProperties();
 
 		if (properties == null)
 			properties = new Hashtable<String, Object>();
 
-		properties.put(MongoDatabaseConfigurationProvider.PROP_CLIENT_ID, "junit");
-		properties.put(MongoDatabaseConfigurationProvider.PROP_DATABASE, "junit");
-		properties.put(MongoDatabaseConfigurationProvider.PROP_ALIAS, "junit");
+		properties.put(ConfigurationProperties.PROP_CLIENT_ID, "junit");
+		properties.put(ConfigurationProperties.PROP_DATABASE, "junit");
+		properties.put(ConfigurationProperties.PROP_ALIAS, "junit");
 		config.update(properties);
 
 		config = configurationAdmin.getConfiguration(ConfigurationProperties.ID_FACTORY_PID, null);

@@ -17,7 +17,6 @@ import java.util.Hashtable;
 
 import org.eclipselabs.emongo.MongoClientProvider;
 import org.eclipselabs.emongo.config.ConfigurationProperties;
-import org.eclipselabs.emongo.config.MongoDatabaseConfigurationProvider;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 
@@ -49,16 +48,16 @@ public class ExampleConfiguration
 
 		try
 		{
-			Configuration config = configurationAdmin.getConfiguration(MongoDatabaseConfigurationProvider.PROP_FACTORY_ID, null);
+			Configuration config = configurationAdmin.getConfiguration(ConfigurationProperties.PROP_DATABASE_PID, null);
 
 			Dictionary<String, Object> properties = config.getProperties();
 
 			if (properties == null)
 				properties = new Hashtable<String, Object>();
 
-			properties.put(MongoDatabaseConfigurationProvider.PROP_CLIENT_ID, "example");
-			properties.put(MongoDatabaseConfigurationProvider.PROP_DATABASE, "example");
-			properties.put(MongoDatabaseConfigurationProvider.PROP_ALIAS, "example");
+			properties.put(ConfigurationProperties.PROP_CLIENT_ID, "example");
+			properties.put(ConfigurationProperties.PROP_DATABASE, "example");
+			properties.put(ConfigurationProperties.PROP_ALIAS, "example");
 			config.update(properties);
 		}
 		catch (IOException e)

@@ -32,27 +32,27 @@ public class MongoDatabaseRegistrarComponent
 {
 	private volatile ComponentContext context;
 	private Map<String, MongoClientProvider> mongoClientProvidersByClientId = new HashMap<String, MongoClientProvider>();
-	private Map<String, Set<MongoAuthenticatedDatabaseConfigurationProvider>> databaseConfigurationProvidersByClientId = new HashMap<String, Set<MongoAuthenticatedDatabaseConfigurationProvider>>();
-	private Map<MongoAuthenticatedDatabaseConfigurationProvider, ServiceRegistration<MongoDatabaseProvider>> serviceRegistrationsByDatabaseConfiguration = new ConcurrentHashMap<MongoAuthenticatedDatabaseConfigurationProvider, ServiceRegistration<MongoDatabaseProvider>>();
+	private Map<String, Set<MongoDatabaseConfigurationProvider>> databaseConfigurationProvidersByClientId = new HashMap<String, Set<MongoDatabaseConfigurationProvider>>();
+	private Map<MongoDatabaseConfigurationProvider, ServiceRegistration<MongoDatabaseProvider>> serviceRegistrationsByDatabaseConfiguration = new ConcurrentHashMap<MongoDatabaseConfigurationProvider, ServiceRegistration<MongoDatabaseProvider>>();
 
 	public void activate(ComponentContext context)
 	{
 		this.context = context;
 
-		for (Collection<MongoAuthenticatedDatabaseConfigurationProvider> providers : databaseConfigurationProvidersByClientId.values())
-			for (MongoAuthenticatedDatabaseConfigurationProvider provider : providers)
+		for (Collection<MongoDatabaseConfigurationProvider> providers : databaseConfigurationProvidersByClientId.values())
+			for (MongoDatabaseConfigurationProvider provider : providers)
 				registerMongoDatabaseProvider(provider);
 	}
 
-	public void bindMongoDatabaseConfigurationProvider(MongoAuthenticatedDatabaseConfigurationProvider databaseConfigurationProvider)
+	public void bindMongoDatabaseConfigurationProvider(MongoDatabaseConfigurationProvider databaseConfigurationProvider)
 	{
 		synchronized (databaseConfigurationProvidersByClientId)
 		{
-			Set<MongoAuthenticatedDatabaseConfigurationProvider> databaseConfigurationProviders = databaseConfigurationProvidersByClientId.get(databaseConfigurationProvider.getClientId());
+			Set<MongoDatabaseConfigurationProvider> databaseConfigurationProviders = databaseConfigurationProvidersByClientId.get(databaseConfigurationProvider.getClientId());
 
 			if (databaseConfigurationProviders == null)
 			{
-				databaseConfigurationProviders = new HashSet<MongoAuthenticatedDatabaseConfigurationProvider>();
+				databaseConfigurationProviders = new HashSet<MongoDatabaseConfigurationProvider>();
 				databaseConfigurationProvidersByClientId.put(databaseConfigurationProvider.getClientId(), databaseConfigurationProviders);
 			}
 
@@ -63,11 +63,11 @@ public class MongoDatabaseRegistrarComponent
 			registerMongoDatabaseProvider(databaseConfigurationProvider);
 	}
 
-	public void unbindMongoDatabaseConfigurationProvider(MongoAuthenticatedDatabaseConfigurationProvider databaseConfigurationProvider)
+	public void unbindMongoDatabaseConfigurationProvider(MongoDatabaseConfigurationProvider databaseConfigurationProvider)
 	{
 		synchronized (databaseConfigurationProvidersByClientId)
 		{
-			Set<MongoAuthenticatedDatabaseConfigurationProvider> databaseConfigurationProviders = databaseConfigurationProvidersByClientId.get(databaseConfigurationProvider.getAlias());
+			Set<MongoDatabaseConfigurationProvider> databaseConfigurationProviders = databaseConfigurationProvidersByClientId.get(databaseConfigurationProvider.getAlias());
 
 			if (databaseConfigurationProviders != null)
 				databaseConfigurationProviders.remove(databaseConfigurationProvider);
@@ -102,17 +102,17 @@ public class MongoDatabaseRegistrarComponent
 	{
 		synchronized (databaseConfigurationProvidersByClientId)
 		{
-			Set<MongoAuthenticatedDatabaseConfigurationProvider> databaseConfigurationProviders = databaseConfigurationProvidersByClientId.get(mongoClientProvider.getClientId());
+			Set<MongoDatabaseConfigurationProvider> databaseConfigurationProviders = databaseConfigurationProvidersByClientId.get(mongoClientProvider.getClientId());
 
 			if (databaseConfigurationProviders != null)
 			{
-				for (MongoAuthenticatedDatabaseConfigurationProvider databaseConfigurationProvider : databaseConfigurationProviders)
+				for (MongoDatabaseConfigurationProvider databaseConfigurationProvider : databaseConfigurationProviders)
 					registerMongoDatabaseProvider(mongoClientProvider, databaseConfigurationProvider);
 			}
 		}
 	}
 
-	private void registerMongoDatabaseProvider(MongoAuthenticatedDatabaseConfigurationProvider databaseConfigurationProvider)
+	private void registerMongoDatabaseProvider(MongoDatabaseConfigurationProvider databaseConfigurationProvider)
 	{
 		synchronized (mongoClientProvidersByClientId)
 		{
@@ -123,7 +123,7 @@ public class MongoDatabaseRegistrarComponent
 		}
 	}
 
-	private void registerMongoDatabaseProvider(MongoClientProvider mongoClientProvider, MongoAuthenticatedDatabaseConfigurationProvider databaseConfigurationProvider)
+	private void registerMongoDatabaseProvider(MongoClientProvider mongoClientProvider, MongoDatabaseConfigurationProvider databaseConfigurationProvider)
 	{
 		MongoDatabaseProviderComponent mongoDatabaseProviderComponent = new MongoDatabaseProviderComponent(databaseConfigurationProvider, mongoClientProvider);
 		Hashtable<String, Object> properties = new Hashtable<String, Object>();
@@ -136,17 +136,17 @@ public class MongoDatabaseRegistrarComponent
 	{
 		synchronized (databaseConfigurationProvidersByClientId)
 		{
-			Set<MongoAuthenticatedDatabaseConfigurationProvider> databaseConfigurationProviders = databaseConfigurationProvidersByClientId.get(mongoClientProvider.getClientId());
+			Set<MongoDatabaseConfigurationProvider> databaseConfigurationProviders = databaseConfigurationProvidersByClientId.get(mongoClientProvider.getClientId());
 
 			if (databaseConfigurationProviders != null)
 			{
-				for (MongoAuthenticatedDatabaseConfigurationProvider databaseConfigurationProvider : databaseConfigurationProviders)
+				for (MongoDatabaseConfigurationProvider databaseConfigurationProvider : databaseConfigurationProviders)
 					unregisterMongoDatabaseProvider(databaseConfigurationProvider);
 			}
 		}
 	}
 
-	private void unregisterMongoDatabaseProvider(MongoAuthenticatedDatabaseConfigurationProvider databaseConfigurationProvider)
+	private void unregisterMongoDatabaseProvider(MongoDatabaseConfigurationProvider databaseConfigurationProvider)
 	{
 		ServiceRegistration<MongoDatabaseProvider> serviceRegistration = serviceRegistrationsByDatabaseConfiguration.remove(databaseConfigurationProvider);
 

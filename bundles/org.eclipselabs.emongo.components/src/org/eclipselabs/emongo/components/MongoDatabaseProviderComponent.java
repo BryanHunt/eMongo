@@ -15,7 +15,7 @@ import com.mongodb.DB;
  */
 public class MongoDatabaseProviderComponent implements MongoDatabaseProvider
 {
-	private MongoAuthenticatedDatabaseConfigurationProvider databaseConfigurationProvider;
+	private MongoDatabaseConfigurationProvider databaseConfigurationProvider;
 	private MongoClientProvider mongoClientProvider;
 	private String uri;
 
@@ -23,7 +23,7 @@ public class MongoDatabaseProviderComponent implements MongoDatabaseProvider
 	 * @param databaseConfigurationProvider
 	 * @param mongoClientProvider
 	 */
-	public MongoDatabaseProviderComponent(MongoAuthenticatedDatabaseConfigurationProvider databaseConfigurationProvider, MongoClientProvider mongoClientProvider)
+	public MongoDatabaseProviderComponent(MongoDatabaseConfigurationProvider databaseConfigurationProvider, MongoClientProvider mongoClientProvider)
 	{
 		super();
 		this.databaseConfigurationProvider = databaseConfigurationProvider;

@@ -19,7 +19,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.eclipselabs.emongo.MongoClientProvider;
-import org.eclipselabs.emongo.components.MongoAuthenticatedDatabaseConfigurationProvider;
+import org.eclipselabs.emongo.components.MongoDatabaseConfigurationProvider;
 import org.eclipselabs.emongo.components.MongoDatabaseProviderComponent;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,7 +34,7 @@ import com.mongodb.MongoClient;
 public class TestMongoDatabaseProviderComponent
 {
 	private MongoDatabaseProviderComponent mongoDatabaseProviderComponent;
-	private MongoAuthenticatedDatabaseConfigurationProvider databaseConfigurationProvider;
+	private MongoDatabaseConfigurationProvider databaseConfigurationProvider;
 	private MongoClientProvider mongoClientProvider;
 
 	@Before
@@ -42,7 +42,7 @@ public class TestMongoDatabaseProviderComponent
 	{
 		String[] uris = { "mongodb://localhost" };
 
-		databaseConfigurationProvider = mock(MongoAuthenticatedDatabaseConfigurationProvider.class);
+		databaseConfigurationProvider = mock(MongoDatabaseConfigurationProvider.class);
 		mongoClientProvider = mock(MongoClientProvider.class);
 		when(databaseConfigurationProvider.getDatabaseName()).thenReturn("junit");
 		when(mongoClientProvider.getURIs()).thenReturn(uris);

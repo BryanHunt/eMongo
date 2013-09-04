@@ -12,6 +12,8 @@
 package org.eclipselabs.emongo.configurator;
 
 /**
+ * This exception is generally thrown when the configured service properties are bad or missing.
+ * 
  * @author bhunt
  * 
  */

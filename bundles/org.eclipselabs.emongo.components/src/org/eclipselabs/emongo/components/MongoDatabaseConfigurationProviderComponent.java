@@ -13,11 +13,13 @@ package org.eclipselabs.emongo.components;
 
 import java.util.Map;
 
+import org.eclipselabs.emongo.config.ConfigurationProperties;
+
 /**
  * @author bhunt
  * 
  */
-public class MongoDatabaseConfigurationProviderComponent extends AbstractComponent implements MongoAuthenticatedDatabaseConfigurationProvider
+public class MongoDatabaseConfigurationProviderComponent extends AbstractComponent implements MongoDatabaseConfigurationProvider
 {
 	private volatile String alias;
 	private volatile String databaseName;
@@ -27,11 +29,11 @@ public class MongoDatabaseConfigurationProviderComponent extends AbstractCompone
 
 	public void activate(Map<String, Object> properties)
 	{
-		alias = (String) properties.get(MongoAuthenticatedDatabaseConfigurationProvider.PROP_ALIAS);
-		clientId = (String) properties.get(MongoAuthenticatedDatabaseConfigurationProvider.PROP_CLIENT_ID);
-		databaseName = (String) properties.get(MongoAuthenticatedDatabaseConfigurationProvider.PROP_DATABASE);
-		user = (String) properties.get(MongoAuthenticatedDatabaseConfigurationProvider.PROP_USER);
-		password = (String) properties.get(MongoAuthenticatedDatabaseConfigurationProvider.PROP_PASSWORD);
+		alias = (String) properties.get(ConfigurationProperties.PROP_ALIAS);
+		clientId = (String) properties.get(ConfigurationProperties.PROP_CLIENT_ID);
+		databaseName = (String) properties.get(ConfigurationProperties.PROP_DATABASE);
+		user = (String) properties.get(ConfigurationProperties.PROP_USER);
+		password = (String) properties.get(ConfigurationProperties.PROP_PASSWORD);
 
 		if (alias == null || alias.isEmpty())
 			handleIllegalConfiguration("The database alias was not found in the configuration properties");

@@ -7,7 +7,7 @@ package org.eclipselabs.emongo.metatype;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-import org.eclipselabs.emongo.config.MongoDatabaseConfigurationProvider;
+import org.eclipselabs.emongo.components.MongoDatabaseConfigurationProvider;
 import org.osgi.service.metatype.AttributeDefinition;
 import org.osgi.service.metatype.MetaTypeProvider;
 import org.osgi.service.metatype.ObjectClassDefinition;

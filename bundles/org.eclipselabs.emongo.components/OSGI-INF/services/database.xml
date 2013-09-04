@@ -2,7 +2,6 @@
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="activate" configuration-policy="require" name="org.eclipselabs.emongo.databaseConfigurationProvider">
    <implementation class="org.eclipselabs.emongo.components.MongoDatabaseConfigurationProviderComponent"/>
    <service>
-      <provide interface="org.eclipselabs.emongo.config.MongoDatabaseConfigurationProvider"/>
-      <provide interface="org.eclipselabs.emongo.components.MongoAuthenticatedDatabaseConfigurationProvider"/>
+      <provide interface="org.eclipselabs.emongo.components.MongoDatabaseConfigurationProvider"/>
    </service>
 </scr:component>

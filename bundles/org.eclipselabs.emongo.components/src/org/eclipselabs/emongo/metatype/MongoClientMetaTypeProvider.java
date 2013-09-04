@@ -27,7 +27,7 @@ public class MongoClientMetaTypeProvider implements MetaTypeProvider
 		clientId.setDescription("The unique identifier for the client.");
 
 		AttributeDefinitionImpl uri = new AttributeDefinitionImpl("uri", "URI", AttributeDefinition.STRING);
-		uri.setDescription("The URI of the MongoDB server of the form 'mongodb://host:[port]'.  Separate URIs with a comma (CSV) for a replica set.");
+		uri.setDescription("The URI of the MongoDB server of the form 'mongodb://host[:port]'.  Separate URIs with a comma (CSV) for a replica set.");
 
 		AttributeDefinitionImpl description = new AttributeDefinitionImpl("description", "Description", AttributeDefinition.STRING);
 		description.setDescription("The description for Mongo instances created with these options. This is used in various places like logging.");

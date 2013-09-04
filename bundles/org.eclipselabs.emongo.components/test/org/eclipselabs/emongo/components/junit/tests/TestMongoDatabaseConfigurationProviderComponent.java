@@ -17,8 +17,8 @@ import static org.junit.Assert.assertThat;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipselabs.emongo.components.MongoAuthenticatedDatabaseConfigurationProvider;
 import org.eclipselabs.emongo.components.MongoDatabaseConfigurationProviderComponent;
+import org.eclipselabs.emongo.config.ConfigurationProperties;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -48,12 +48,12 @@ public class TestMongoDatabaseConfigurationProviderComponent
 		password = "password";
 
 		properties = new HashMap<String, Object>();
-		properties.put(MongoAuthenticatedDatabaseConfigurationProvider.PROP_CLIENT_ID, clientId);
-		properties.put(MongoAuthenticatedDatabaseConfigurationProvider.PROP_DATABASE, databaseName);
-		properties.put(MongoAuthenticatedDatabaseConfigurationProvider.PROP_FACTORY_ID, factory);
-		properties.put(MongoAuthenticatedDatabaseConfigurationProvider.PROP_ALIAS, alias);
-		properties.put(MongoAuthenticatedDatabaseConfigurationProvider.PROP_USER, user);
-		properties.put(MongoAuthenticatedDatabaseConfigurationProvider.PROP_PASSWORD, password);
+		properties.put(ConfigurationProperties.PROP_CLIENT_ID, clientId);
+		properties.put(ConfigurationProperties.PROP_DATABASE, databaseName);
+		properties.put(ConfigurationProperties.PROP_DATABASE_PID, factory);
+		properties.put(ConfigurationProperties.PROP_ALIAS, alias);
+		properties.put(ConfigurationProperties.PROP_USER, user);
+		properties.put(ConfigurationProperties.PROP_PASSWORD, password);
 
 		mongoDatabaseConfigurationProviderComponent = new MongoDatabaseConfigurationProviderComponent();
 	}
@@ -73,42 +73,42 @@ public class TestMongoDatabaseConfigurationProviderComponent
 	@Test(expected = IllegalStateException.class)
 	public void testActivateWithNullAlias()
 	{
-		properties.put(MongoAuthenticatedDatabaseConfigurationProvider.PROP_ALIAS, null);
+		properties.put(ConfigurationProperties.PROP_ALIAS, null);
 		mongoDatabaseConfigurationProviderComponent.activate(properties);
 	}
 
 	@Test(expected = IllegalStateException.class)
 	public void testActivateWithEmptyAlias()
 	{
-		properties.put(MongoAuthenticatedDatabaseConfigurationProvider.PROP_ALIAS, "");
+		properties.put(ConfigurationProperties.PROP_ALIAS, "");
 		mongoDatabaseConfigurationProviderComponent.activate(properties);
 	}
 
 	@Test(expected = IllegalStateException.class)
 	public void testActivateWithNullDatabaseName()
 	{
-		properties.put(MongoAuthenticatedDatabaseConfigurationProvider.PROP_DATABASE, null);
+		properties.put(ConfigurationProperties.PROP_DATABASE, null);
 		mongoDatabaseConfigurationProviderComponent.activate(properties);
 	}
 
 	@Test(expected = IllegalStateException.class)
 	public void testActivateWithEmptyDatabaseName()
 	{
-		properties.put(MongoAuthenticatedDatabaseConfigurationProvider.PROP_DATABASE, "");
+		properties.put(ConfigurationProperties.PROP_DATABASE, "");
 		mongoDatabaseConfigurationProviderComponent.activate(properties);
 	}
 
 	@Test(expected = IllegalStateException.class)
 	public void testActivateWithNullClientId()
 	{
-		properties.put(MongoAuthenticatedDatabaseConfigurationProvider.PROP_CLIENT_ID, null);
+		properties.put(ConfigurationProperties.PROP_CLIENT_ID, null);
 		mongoDatabaseConfigurationProviderComponent.activate(properties);
 	}
 
 	@Test(expected = IllegalStateException.class)
 	public void testActivateWithEmptyClientId()
 	{
-		properties.put(MongoAuthenticatedDatabaseConfigurationProvider.PROP_CLIENT_ID, "");
+		properties.put(ConfigurationProperties.PROP_CLIENT_ID, "");
 		mongoDatabaseConfigurationProviderComponent.activate(properties);
 	}
 }

@@ -29,8 +29,10 @@ import com.mongodb.DB;
  * 
  * Example usage:
  * 
- * @Rule
- *       public MongoDatabase database = new MongoDatabase();
+ * <pre>
+ * &#064;Rule
+ * public MongoDatabase database = new MongoDatabase();
+ * </pre>
  * 
  * @author bhunt
  * 

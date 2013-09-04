@@ -50,7 +50,7 @@ public class MongoClientProviderComponentTestHarness extends MongoClientProvider
 	protected MongoClient createMongoClient(MongoClientOptions options, ServerAddress serverAddress)
 	{
 		this.options = options;
-		this.serverAddresses = new ArrayList<ServerAddress>(1);
+		this.serverAddresses = new ArrayList<>(1);
 		serverAddresses.add(serverAddress);
 		return mongoClient;
 	}

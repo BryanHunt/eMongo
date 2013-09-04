@@ -72,7 +72,6 @@ public class TestMongoIdFactoryComponent
 
 		when(mongoDatabaseProvider.getAlias()).thenReturn(alias);
 		when(mongoDatabaseProvider.getDB()).thenReturn(db);
-		when(mongoDatabaseProvider.getURI()).thenReturn("mongodb://localhost/junit");
 		when(db.getCollection("elements")).thenReturn(collection);
 		when(collection.findOne(any(DBObject.class))).thenReturn(null);
 		when(collection.getDB()).thenReturn(db);

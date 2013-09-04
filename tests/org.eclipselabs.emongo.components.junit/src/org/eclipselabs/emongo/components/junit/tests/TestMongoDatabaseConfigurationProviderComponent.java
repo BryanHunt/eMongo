@@ -50,7 +50,7 @@ public class TestMongoDatabaseConfigurationProviderComponent
 		properties = new HashMap<String, Object>();
 		properties.put(ConfigurationProperties.PROP_CLIENT_ID, clientId);
 		properties.put(ConfigurationProperties.PROP_DATABASE, databaseName);
-		properties.put(ConfigurationProperties.PROP_DATABASE_PID, factory);
+		properties.put(ConfigurationProperties.ID_FACTORY_PID, factory);
 		properties.put(ConfigurationProperties.PROP_ALIAS, alias);
 		properties.put(ConfigurationProperties.PROP_USER, user);
 		properties.put(ConfigurationProperties.PROP_PASSWORD, password);

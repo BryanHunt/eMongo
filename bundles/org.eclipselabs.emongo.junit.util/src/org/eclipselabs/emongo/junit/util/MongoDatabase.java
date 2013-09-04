@@ -16,7 +16,9 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
-import org.eclipse.emf.common.util.URI;
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import org.eclipselabs.emongo.MongoDatabaseProvider;
 import org.eclipselabs.eunit.junit.utils.ServiceLocator;
 
@@ -40,6 +42,9 @@ import com.mongodb.DB;
  */
 public class MongoDatabase extends ServiceLocator<MongoDatabaseProvider>
 {
+	private DB db;
+	private String baseURI;
+
 	/**
 	 * Connects to the "junit" database on localhost:27017
 	 */
@@ -80,7 +85,7 @@ public class MongoDatabase extends ServiceLocator<MongoDatabaseProvider>
 	public MongoDatabase(String hostname, int port, String database, String alias)
 	{
 		super(MongoDatabaseProvider.class, (alias != null ? "(alias=" + alias + ")" : null));
-		baseURI = URI.createURI("mongodb://" + hostname + (port == 27017 ? "" : ":" + port) + "/" + database);
+		baseURI = "mongodb://" + hostname + (port == 27017 ? "" : ":" + port) + "/" + database;
 	}
 
 	/**
@@ -92,7 +97,14 @@ public class MongoDatabase extends ServiceLocator<MongoDatabaseProvider>
 	 */
 	public URI createCollectionURI(String collection)
 	{
-		return baseURI.appendSegments(new String[] { collection, "" });
+		try
+		{
+			return new URI(baseURI.toString() + "/" + collection + "/");
+		}
+		catch (URISyntaxException e)
+		{
+			throw new IllegalStateException(e);
+		}
 	}
 
 	/**
@@ -105,7 +117,14 @@ public class MongoDatabase extends ServiceLocator<MongoDatabaseProvider>
 	 */
 	public URI createObjectURI(String collection, String id)
 	{
-		return baseURI.appendSegments(new String[] { collection, id });
+		try
+		{
+			return new URI(baseURI + "/" + collection + "/" + id);
+		}
+		catch (URISyntaxException e)
+		{
+			throw new IllegalStateException(e);
+		}
 	}
 
 	/**
@@ -123,7 +142,7 @@ public class MongoDatabase extends ServiceLocator<MongoDatabaseProvider>
 	{
 		super.before();
 		db = getService().getDB();
-		assertThat("No database configured for: " + baseURI.toString(), db, is(notNullValue()));
+		assertThat("No database configured for: " + baseURI, db, is(notNullValue()));
 	}
 
 	@Override
@@ -141,13 +160,10 @@ public class MongoDatabase extends ServiceLocator<MongoDatabaseProvider>
 			}
 			catch (Exception e)
 			{
-				fail("Failed to clean up database: " + baseURI.toString() + "\n\n" + e.getMessage());
+				fail("Failed to clean up database: " + baseURI + "\n\n" + e.getMessage());
 			}
 		}
 
 		super.after();
 	}
-
-	private DB db;
-	private URI baseURI;
 }

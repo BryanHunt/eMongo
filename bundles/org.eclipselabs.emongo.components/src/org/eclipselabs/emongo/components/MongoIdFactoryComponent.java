@@ -82,6 +82,8 @@ public class MongoIdFactoryComponent extends AbstractComponent implements MongoI
 
 		if (mongoDatabaseProvider != null)
 			init(mongoDatabaseProvider);
+
+		uri = mongoDatabaseProvider.getURI() + "/" + collectionName;
 	}
 
 	public void bindMongoDatabaseProvider(MongoDatabaseProvider mongoDatabaseProvider)
@@ -108,8 +110,6 @@ public class MongoIdFactoryComponent extends AbstractComponent implements MongoI
 
 	private void init(MongoDatabaseProvider mongoDatabaseProvider)
 	{
-		uri = mongoDatabaseProvider.getURI() + "/" + collectionName;
-
 		DB db = mongoDatabaseProvider.getDB();
 		collection = db.getCollection(collectionName);
 		query = new BasicDBObject(ID, "0");

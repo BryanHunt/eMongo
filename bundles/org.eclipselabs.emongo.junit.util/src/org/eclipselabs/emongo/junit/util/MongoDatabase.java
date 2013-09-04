@@ -27,7 +27,8 @@ import com.mongodb.DB;
  * the IMongoDB service exists, and it will delete all collections in the specified
  * database after each test runs.
  * 
- * Example usage:
+ * Example usage: <br>
+ * <br>
  * 
  * <pre>
  * &#064;Rule

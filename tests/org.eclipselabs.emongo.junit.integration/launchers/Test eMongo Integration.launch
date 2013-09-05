@@ -12,8 +12,9 @@
 <booleanAttribute key="clearwslog" value="false"/>
 <stringAttribute key="configLocation" value="${workspace_loc}/.metadata/.plugins/org.eclipse.pde.core/pde-junit"/>
 <booleanAttribute key="default" value="false"/>
+<booleanAttribute key="default_auto_start" value="true"/>
 <booleanAttribute key="includeOptional" value="false"/>
-<stringAttribute key="location" value="${workspace_loc}/../Tests/junit"/>
+<stringAttribute key="location" value="${workspace_loc}/../Test/junit"/>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
 <listEntry value="/org.eclipselabs.emongo.junit.integration"/>
 </listAttribute>
@@ -27,21 +28,15 @@
 <booleanAttribute key="org.eclipse.jdt.launching.ATTR_USE_START_ON_FIRST_THREAD" value="true"/>
 <stringAttribute key="org.eclipse.jdt.launching.JRE_CONTAINER" value="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value=""/>
-<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-os ${target.os} -ws ${target.ws} -arch ${target.arch} -nl ${target.nl} -consoleLog -console"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-os ${target.os} -ws ${target.ws} -arch ${target.arch} -nl ${target.nl} -consoleLog"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="org.eclipselabs.emongo.junit.integration"/>
 <stringAttribute key="org.eclipse.jdt.launching.SOURCE_PATH_PROVIDER" value="org.eclipse.pde.ui.workbenchClasspathProvider"/>
 <stringAttribute key="pde.version" value="3.3"/>
 <stringAttribute key="product" value="org.eclipse.equinox.p2.director.app.product"/>
 <booleanAttribute key="run_in_ui_thread" value="false"/>
-<<<<<<< master
-<stringAttribute key="selected_target_plugins" value="com.springsource.org.objenesis@default:default,javax.xml@default:default,org.apache.felix.gogo.command@default:default,org.apache.felix.gogo.runtime@default:default,org.apache.felix.gogo.shell@default:default,org.eclipse.core.contenttype@default:default,org.eclipse.core.jobs@default:default,org.eclipse.core.runtime@default:true,org.eclipse.emf.common@default:default,org.eclipse.equinox.app@default:default,org.eclipse.equinox.cm@default:true,org.eclipse.equinox.common@2:true,org.eclipse.equinox.console@default:default,org.eclipse.equinox.ds@1:true,org.eclipse.equinox.preferences@default:default,org.eclipse.equinox.registry@default:default,org.eclipse.equinox.transforms.hook@default:false,org.eclipse.equinox.util@default:default,org.eclipse.equinox.weaving.hook@default:false,org.eclipse.osgi.services@default:default,org.eclipse.osgi@-1:true,org.eclipselabs.eunit.junit.utils@default:default,org.hamcrest@default:default,org.junit@default:default,org.mockito.mockito-core@default:default,org.mongodb.mongo-java-driver@default:default"/>
-=======
-<stringAttribute key="selected_target_plugins" value="com.springsource.org.objenesis@default:default,javax.xml@default:default,org.eclipse.core.contenttype@default:default,org.eclipse.core.jobs@default:default,org.eclipse.core.runtime@default:true,org.eclipse.emf.common@default:default,org.eclipse.equinox.app@default:default,org.eclipse.equinox.cm@default:true,org.eclipse.equinox.common@2:true,org.eclipse.equinox.ds@1:true,org.eclipse.equinox.preferences@default:default,org.eclipse.equinox.registry@default:default,org.eclipse.equinox.transforms.hook@default:false,org.eclipse.equinox.util@default:default,org.eclipse.equinox.weaving.hook@default:false,org.eclipse.osgi.services@default:default,org.eclipse.osgi@-1:true,org.eclipselabs.eunit.junit.utils@default:default,org.hamcrest.core@default:default,org.hamcrest@default:default,org.junit@default:default,org.mockito.mockito-core@default:default,org.mongodb.mongo-java-driver@default:default"/>
->>>>>>> 1acde26 Moved unit test to bundle
+<stringAttribute key="selected_target_plugins" value="com.springsource.org.objenesis@default:default,javax.xml@default:default,org.eclipse.core.contenttype@default:default,org.eclipse.core.jobs@default:default,org.eclipse.core.runtime@default:true,org.eclipse.equinox.app@default:default,org.eclipse.equinox.cm@default:default,org.eclipse.equinox.common@2:true,org.eclipse.equinox.ds@1:true,org.eclipse.equinox.preferences@default:default,org.eclipse.equinox.registry@default:default,org.eclipse.equinox.transforms.hook@default:false,org.eclipse.equinox.util@default:default,org.eclipse.equinox.weaving.hook@default:false,org.eclipse.osgi.services@default:default,org.eclipse.osgi@-1:true,org.eclipselabs.eunit.junit.utils@default:default,org.hamcrest@default:default,org.junit@default:default,org.mockito.mockito-core@default:default,org.mongodb.mongo-java-driver@default:default"/>
 <stringAttribute key="selected_workspace_plugins" value="org.eclipselabs.emongo.api@default:default,org.eclipselabs.emongo.components@default:default,org.eclipselabs.emongo.junit.integration@default:default,org.eclipselabs.emongo.junit.util@default:default"/>
 <booleanAttribute key="show_selected_only" value="false"/>
-<stringAttribute key="templateConfig" value="${target_home}/configuration/config.ini"/>
-<stringAttribute key="timestamp" value="1378258025923"/>
 <booleanAttribute key="tracing" value="false"/>
 <booleanAttribute key="useCustomFeatures" value="false"/>
 <booleanAttribute key="useDefaultConfig" value="true"/>

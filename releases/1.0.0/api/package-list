@@ -1,3 +1,4 @@
 org.eclipselabs.emongo
 org.eclipselabs.emongo.config
+org.eclipselabs.emongo.configurator
 org.eclipselabs.emongo.junit.util

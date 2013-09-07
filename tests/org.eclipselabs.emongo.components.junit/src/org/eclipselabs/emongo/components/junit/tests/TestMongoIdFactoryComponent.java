@@ -70,7 +70,6 @@ public class TestMongoIdFactoryComponent
 		commandResult = mock(CommandResult.class);
 		mongoDatabaseProvider = mock(MongoDatabaseProvider.class);
 
-		when(mongoDatabaseProvider.getAlias()).thenReturn(alias);
 		when(mongoDatabaseProvider.getDB()).thenReturn(db);
 		when(db.getCollection("elements")).thenReturn(collection);
 		when(collection.findOne(any(DBObject.class))).thenReturn(null);
@@ -80,22 +79,10 @@ public class TestMongoIdFactoryComponent
 	}
 
 	@Test
-	public void testBindBeforeActivate()
+	public void testActivate()
 	{
 		mongoIdFactoryComponent.bindMongoDatabaseProvider(mongoDatabaseProvider);
 		mongoIdFactoryComponent.activate(properties);
-
-		ArgumentCaptor<DBObject> argument = ArgumentCaptor.forClass(DBObject.class);
-		verify(collection).findOne(any(DBObject.class));
-		verify(collection).insert(argument.capture());
-		assertThat((Long) argument.getValue().get("_lastId"), is(0L));
-	}
-
-	@Test
-	public void testActivateBeforeBind()
-	{
-		mongoIdFactoryComponent.activate(properties);
-		mongoIdFactoryComponent.bindMongoDatabaseProvider(mongoDatabaseProvider);
 
 		ArgumentCaptor<DBObject> argument = ArgumentCaptor.forClass(DBObject.class);
 		verify(collection).findOne(any(DBObject.class));

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="activate" configuration-policy="require" immediate="true" name="org.eclipselabs.emongo.databaseConfigurationProvider">
-   <implementation class="org.eclipselabs.emongo.components.MongoDatabaseConfigurationProviderComponent"/>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="activate" configuration-policy="require" immediate="true" name="org.eclipselabs.emongo.databaseProvider">
+   <implementation class="org.eclipselabs.emongo.components.MongoDatabaseProviderComponent"/>
    <service>
-      <provide interface="org.eclipselabs.emongo.components.MongoDatabaseConfigurationProvider"/>
+      <provide interface="org.eclipselabs.emongo.MongoDatabaseProvider"/>
    </service>
+   <reference bind="bindMongoClientProvider" cardinality="1..1" interface="org.eclipselabs.emongo.MongoClientProvider" name="MongoClientProvider" policy="static"/>
 </scr:component>

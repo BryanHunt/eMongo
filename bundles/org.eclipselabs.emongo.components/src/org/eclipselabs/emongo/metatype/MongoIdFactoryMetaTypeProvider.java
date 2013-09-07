@@ -7,7 +7,10 @@ package org.eclipselabs.emongo.metatype;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-import org.eclipselabs.emongo.components.MongoDatabaseConfigurationProvider;
+import org.eclipselabs.emongo.MongoDatabaseProvider;
+import org.eclipselabs.emongo.MongoIdFactory;
+import org.eclipselabs.emongo.config.ConfigurationProperties;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.metatype.AttributeDefinition;
 import org.osgi.service.metatype.MetaTypeProvider;
 import org.osgi.service.metatype.ObjectClassDefinition;
@@ -29,32 +32,41 @@ public class MongoIdFactoryMetaTypeProvider implements MetaTypeProvider
 	@Override
 	public ObjectClassDefinition getObjectClassDefinition(String arg0, String arg1)
 	{
-		AttributeDefinitionImpl database = new AttributeDefinitionImpl("alias", "Database", AttributeDefinition.STRING);
+		AttributeDefinitionImpl database = new AttributeDefinitionImpl("MongoDatabaseProvider.target", "Database", AttributeDefinition.STRING);
 		database.setCardinality(1);
 		database.setDescription("The MongoDB database");
-		database.setOptionLabels(databases.toArray(new String[0]));
-		database.setOptionValues(databases.toArray(new String[0]));
+
+		String[] databaseAliases = new String[databases.size()];
+		String[] targetFilters = new String[databases.size()];
+
+		databases.toArray(databaseAliases);
+
+		for (int i = 0; i < databaseAliases.length; i++)
+			targetFilters[i] = "(" + MongoIdFactory.PROP_ALIAS + "=" + databaseAliases[i] + ")";
+
+		database.setOptionLabels(databaseAliases);
+		database.setOptionValues(targetFilters);
 
 		if (!databases.isEmpty())
 			database.setDefaultValue(new String[] { databases.iterator().next() });
 
-		AttributeDefinitionImpl collection = new AttributeDefinitionImpl("collection", "Collection", AttributeDefinition.STRING);
+		AttributeDefinitionImpl collection = new AttributeDefinitionImpl(MongoIdFactory.PROP_COLLECTION, "Collection", AttributeDefinition.STRING);
 		collection.setDescription("The MongoDB collection within the database");
 
-		ObjectClassDefinitionImpl ocd = new ObjectClassDefinitionImpl("org.eclipselabs.emongo.idFactory", "MongoDB ID", "MongoDB ID Provider Configuration");
+		ObjectClassDefinitionImpl ocd = new ObjectClassDefinitionImpl(ConfigurationProperties.ID_FACTORY_PID, "MongoDB ID", "MongoDB ID Provider Configuration");
 		ocd.addAttribute(database);
 		ocd.addAttribute(collection);
 
 		return ocd;
 	}
 
-	public void bindMongoDatabaseConfigurationProvider(MongoDatabaseConfigurationProvider mongoDatabaseConfigurationProvider)
+	public void bindMongoDatabaseConfigurationProvider(ServiceReference<MongoDatabaseProvider> serviceReference)
 	{
-		databases.add(mongoDatabaseConfigurationProvider.getAlias());
+		databases.add((String) serviceReference.getProperty(MongoDatabaseProvider.PROP_ALIAS));
 	}
 
-	public void unbindMongoDatabaseConfigurationProvider(MongoDatabaseConfigurationProvider mongoDatabaseConfigurationProvider)
+	public void unbindMongoDatabaseConfigurationProvider(ServiceReference<MongoDatabaseProvider> serviceReference)
 	{
-		databases.remove(mongoDatabaseConfigurationProvider.getAlias());
+		databases.remove((String) serviceReference.getProperty(MongoDatabaseProvider.PROP_ALIAS));
 	}
 }

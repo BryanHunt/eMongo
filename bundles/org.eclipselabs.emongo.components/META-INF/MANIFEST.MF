@@ -13,7 +13,7 @@ Import-Package: com.mongodb;version="2.10.0.RELEASE",
  org.osgi.service.event;version="1.3.0",
  org.osgi.service.log;version="1.3.0",
  org.osgi.service.metatype;version="1.2.0"
-Service-Component: OSGI-INF/services/client.xml,OSGI-INF/services/database.xml,OSGI-INF/services/id.xml, OSGI-INF/services/registrar.xml, 
+Service-Component: OSGI-INF/services/client.xml,OSGI-INF/services/database.xml,OSGI-INF/services/id.xml, 
  OSGI-INF/services/client_meta.xml, OSGI-INF/services/database_meta.xml, OSGI-INF/services/id_meta.xml
 Bundle-ActivationPolicy: lazy
 Eclipse-ExtensibleAPI: true

@@ -30,7 +30,7 @@ public interface MongoIdFactory
 	 * value of the alias service property will be used to compare against the
 	 * mongo database alias property to obtain the proper database.
 	 */
-	String PROP_ALIAS = "alias";
+	String PROP_ALIAS = MongoDatabaseProvider.PROP_ALIAS;
 
 	/**
 	 * The service property key for configuring the database collection. Set

@@ -12,7 +12,6 @@
 package org.eclipselabs.emongo.components;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipselabs.emongo.MongoDatabaseProvider;
@@ -36,7 +35,8 @@ public class MongoIdFactoryComponent extends AbstractComponent implements MongoI
 	private volatile DBCollection collection;
 	private volatile DBObject query;
 	private volatile DBObject update;
-	private Map<String, MongoDatabaseProvider> mongoDatabaseProvidersByAlias = new HashMap<String, MongoDatabaseProvider>();
+
+	private volatile MongoDatabaseProvider mongoDatabaseProvider;
 
 	private static final String ID = "_id";
 	private static final String LAST_ID = "_lastId";
@@ -73,41 +73,6 @@ public class MongoIdFactoryComponent extends AbstractComponent implements MongoI
 		if (collectionName == null || collectionName.isEmpty())
 			handleIllegalConfiguration("The collection was not specified as part of the component configuration");
 
-		MongoDatabaseProvider mongoDatabaseProvider = null;
-
-		synchronized (mongoDatabaseProvidersByAlias)
-		{
-			mongoDatabaseProvider = mongoDatabaseProvidersByAlias.get(alias);
-		}
-
-		if (mongoDatabaseProvider != null)
-			init(mongoDatabaseProvider);
-	}
-
-	public void bindMongoDatabaseProvider(MongoDatabaseProvider mongoDatabaseProvider)
-	{
-		if (mongoDatabaseProvider.getAlias().equals(alias))
-			init(mongoDatabaseProvider);
-		else
-		{
-			synchronized (mongoDatabaseProvidersByAlias)
-			{
-				mongoDatabaseProvidersByAlias.put(mongoDatabaseProvider.getAlias(), mongoDatabaseProvider);
-			}
-		}
-	}
-
-	public void unbindMongoDatabaseProvider(MongoDatabaseProvider mongoDatabaseProvider)
-	{
-		synchronized (mongoDatabaseProvidersByAlias)
-		{
-			if (mongoDatabaseProvidersByAlias.get(mongoDatabaseProvider.getAlias()) == mongoDatabaseProvider)
-				mongoDatabaseProvidersByAlias.remove(mongoDatabaseProvider.getAlias());
-		}
-	}
-
-	private void init(MongoDatabaseProvider mongoDatabaseProvider)
-	{
 		uri = mongoDatabaseProvider.getURI() + "/" + collectionName;
 
 		DB db = mongoDatabaseProvider.getDB();
@@ -127,5 +92,10 @@ public class MongoIdFactoryComponent extends AbstractComponent implements MongoI
 			if (!db.getLastError().ok())
 				handleIllegalConfiguration("Could not initialize the id counter for collection: '" + collection.getName() + "'");
 		}
+	}
+
+	public void bindMongoDatabaseProvider(MongoDatabaseProvider mongoDatabaseProvider)
+	{
+		this.mongoDatabaseProvider = mongoDatabaseProvider;
 	}
 }

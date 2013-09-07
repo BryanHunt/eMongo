@@ -34,9 +34,9 @@ public class TestMongoDatabaseProvider
 	}
 
 	@Test
-	public void testGetAlias()
+	public void testGetURI()
 	{
-		assertThat(mongoDatabaseProvider.getAlias(), is("junit"));
+		assertThat(mongoDatabaseProvider.getURI(), is("mongodb://localhost/junit"));
 	}
 
 	@Test

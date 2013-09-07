@@ -4,6 +4,8 @@
 
 package org.eclipselabs.emongo.components;
 
+import java.util.Map;
+
 import org.eclipselabs.emongo.MongoClientProvider;
 import org.eclipselabs.emongo.MongoDatabaseProvider;
 
@@ -13,28 +15,33 @@ import com.mongodb.DB;
  * @author bhunt
  * 
  */
-public class MongoDatabaseProviderComponent implements MongoDatabaseProvider
+public class MongoDatabaseProviderComponent extends AbstractComponent implements MongoDatabaseProvider
 {
-	private MongoDatabaseConfigurationProvider databaseConfigurationProvider;
-	private MongoClientProvider mongoClientProvider;
+	private volatile String alias;
+	private volatile String databaseName;
+	private volatile String user;
+	private volatile String password;
 	private String uri;
+	private MongoClientProvider mongoClientProvider;
 
 	/**
 	 * @param databaseConfigurationProvider
 	 * @param mongoClientProvider
 	 */
-	public MongoDatabaseProviderComponent(MongoDatabaseConfigurationProvider databaseConfigurationProvider, MongoClientProvider mongoClientProvider)
+	public void activate(Map<String, Object> properties)
 	{
-		super();
-		this.databaseConfigurationProvider = databaseConfigurationProvider;
-		this.mongoClientProvider = mongoClientProvider;
-		uri = mongoClientProvider.getURIs()[0] + "/" + databaseConfigurationProvider.getDatabaseName();
-	}
+		alias = (String) properties.get(PROP_ALIAS);
+		databaseName = (String) properties.get(PROP_DATABASE);
+		user = (String) properties.get(PROP_USER);
+		password = (String) properties.get(PROP_PASSWORD);
 
-	@Override
-	public String getAlias()
-	{
-		return databaseConfigurationProvider.getAlias();
+		if (alias == null || alias.isEmpty())
+			handleIllegalConfiguration("The database alias was not found in the configuration properties");
+
+		if (databaseName == null || databaseName.isEmpty())
+			handleIllegalConfiguration("The MongoDB database name was not found in the configuration properties");
+
+		uri = mongoClientProvider.getURIs()[0] + "/" + databaseName;
 	}
 
 	@Override
@@ -46,11 +53,16 @@ public class MongoDatabaseProviderComponent implements MongoDatabaseProvider
 	@Override
 	public DB getDB()
 	{
-		DB db = mongoClientProvider.getMongoClient().getDB(databaseConfigurationProvider.getDatabaseName());
+		DB db = mongoClientProvider.getMongoClient().getDB(databaseName);
 
-		if (databaseConfigurationProvider.getUser() != null && !databaseConfigurationProvider.getUser().isEmpty())
-			db.authenticate(databaseConfigurationProvider.getUser(), databaseConfigurationProvider.getPassword().toCharArray());
+		if (user != null && !user.isEmpty())
+			db.authenticate(user, password.toCharArray());
 
 		return db;
+	}
+
+	public void bindMongoClientProvider(MongoClientProvider mongoClientProvider)
+	{
+		this.mongoClientProvider = mongoClientProvider;
 	}
 }

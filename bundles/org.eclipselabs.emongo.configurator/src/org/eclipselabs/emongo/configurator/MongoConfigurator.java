@@ -16,6 +16,7 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 
 import org.eclipselabs.emongo.MongoClientProvider;
+import org.eclipselabs.emongo.MongoDatabaseProvider;
 import org.eclipselabs.emongo.config.ConfigurationProperties;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
@@ -49,7 +50,7 @@ public class MongoConfigurator
 	{
 		try
 		{
-			Configuration config = configurationAdmin.getConfiguration("org.eclipselabs.emongo.clientProvider", null);
+			Configuration config = configurationAdmin.getConfiguration(ConfigurationProperties.CLIENT_PID, null);
 
 			Dictionary<String, Object> properties = config.getProperties();
 
@@ -70,18 +71,18 @@ public class MongoConfigurator
 	{
 		try
 		{
-			Configuration config = configurationAdmin.getConfiguration("org.eclipselabs.emongo.databaseConfigurationProvider", null);
+			Configuration config = configurationAdmin.getConfiguration(ConfigurationProperties.DATABASE_PID, null);
 
 			Dictionary<String, Object> properties = config.getProperties();
 
 			if (properties == null)
 				properties = new Hashtable<String, Object>();
 
-			properties.put(ConfigurationProperties.PROP_CLIENT_ID, clientId);
-			properties.put(ConfigurationProperties.PROP_DATABASE, databaseName);
-			properties.put(ConfigurationProperties.PROP_ALIAS, alias);
-			properties.put(ConfigurationProperties.PROP_USER, user);
-			properties.put(ConfigurationProperties.PROP_PASSWORD, password);
+			properties.put(MongoDatabaseProvider.PROP_DATABASE, databaseName);
+			properties.put(MongoDatabaseProvider.PROP_ALIAS, alias);
+			properties.put(MongoDatabaseProvider.PROP_USER, user);
+			properties.put(MongoDatabaseProvider.PROP_PASSWORD, password);
+			properties.put(MongoDatabaseProvider.PROP_CLIENT_FILTER, "(" + MongoClientProvider.PROP_CLIENT_ID + "=" + clientId + ")");
 			config.update(properties);
 		}
 		catch (IOException e)

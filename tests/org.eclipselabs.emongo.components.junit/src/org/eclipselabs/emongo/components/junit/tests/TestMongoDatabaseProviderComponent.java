@@ -18,8 +18,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipselabs.emongo.MongoClientProvider;
-import org.eclipselabs.emongo.components.MongoDatabaseConfigurationProvider;
+import org.eclipselabs.emongo.MongoDatabaseProvider;
 import org.eclipselabs.emongo.components.MongoDatabaseProviderComponent;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,44 +36,86 @@ import com.mongodb.MongoClient;
  */
 public class TestMongoDatabaseProviderComponent
 {
+	private Map<String, Object> properties;
+	private String databaseName;
+	private String alias;
+	private String user;
+	private String password;
+	private String[] clientURIs;
+
 	private MongoDatabaseProviderComponent mongoDatabaseProviderComponent;
-	private MongoDatabaseConfigurationProvider databaseConfigurationProvider;
 	private MongoClientProvider mongoClientProvider;
 
 	@Before
 	public void setUp()
 	{
-		String[] uris = { "mongodb://localhost" };
+		databaseName = "junit";
+		alias = "alias";
+		user = "user";
+		password = "password";
 
-		databaseConfigurationProvider = mock(MongoDatabaseConfigurationProvider.class);
+		properties = new HashMap<String, Object>();
+		properties.put(MongoDatabaseProvider.PROP_DATABASE, databaseName);
+		properties.put(MongoDatabaseProvider.PROP_ALIAS, alias);
+		properties.put(MongoDatabaseProvider.PROP_USER, user);
+		properties.put(MongoDatabaseProvider.PROP_PASSWORD, password);
+
+		clientURIs = new String[] { "mongodb://localhost" };
+
 		mongoClientProvider = mock(MongoClientProvider.class);
-		when(databaseConfigurationProvider.getDatabaseName()).thenReturn("junit");
-		when(mongoClientProvider.getURIs()).thenReturn(uris);
-		mongoDatabaseProviderComponent = new MongoDatabaseProviderComponent(databaseConfigurationProvider, mongoClientProvider);
+		when(mongoClientProvider.getURIs()).thenReturn(clientURIs);
+		mongoDatabaseProviderComponent = new MongoDatabaseProviderComponent();
+		mongoDatabaseProviderComponent.bindMongoClientProvider(mongoClientProvider);
 	}
 
 	@Test
-	public void testGetAlias()
+	public void testActivate()
 	{
-		String alias = "junit";
-
-		when(databaseConfigurationProvider.getAlias()).thenReturn(alias);
-
-		assertThat(mongoDatabaseProviderComponent.getAlias(), is(alias));
+		mongoDatabaseProviderComponent.activate(properties);
+		assertThat(mongoDatabaseProviderComponent.getURI(), is(clientURIs[0] + "/" + databaseName));
 	}
 
+	@Test(expected = IllegalStateException.class)
+	public void testActivateWithNullAlias()
+	{
+		properties.put(MongoDatabaseProvider.PROP_ALIAS, null);
+		mongoDatabaseProviderComponent.activate(properties);
+	}
+
+	@Test(expected = IllegalStateException.class)
+	public void testActivateWithEmptyAlias()
+	{
+		properties.put(MongoDatabaseProvider.PROP_ALIAS, "");
+		mongoDatabaseProviderComponent.activate(properties);
+	}
+
+	@Test(expected = IllegalStateException.class)
+	public void testActivateWithNullDatabaseName()
+	{
+		properties.put(MongoDatabaseProvider.PROP_DATABASE, null);
+		mongoDatabaseProviderComponent.activate(properties);
+	}
+
+	@Test(expected = IllegalStateException.class)
+	public void testActivateWithEmptyDatabaseName()
+	{
+		properties.put(MongoDatabaseProvider.PROP_DATABASE, "");
+		mongoDatabaseProviderComponent.activate(properties);
+	}
+
+	@Test
 	public void testGetDB()
 	{
 		String databaseName = "junit";
 		DB db = mock(DB.class);
 		MongoClient mongoClient = mock(MongoClient.class);
 
-		when(databaseConfigurationProvider.getDatabaseName()).thenReturn(databaseName);
 		when(mongoClientProvider.getMongoClient()).thenReturn(mongoClient);
 		when(mongoClient.getDB(databaseName)).thenReturn(db);
 
+		mongoDatabaseProviderComponent.activate(properties);
+
 		assertThat(mongoDatabaseProviderComponent.getDB(), is(sameInstance(db)));
-		verify(databaseConfigurationProvider).getDatabaseName();
 		verify(mongoClientProvider).getMongoClient();
 		verify(mongoClient).getDB(databaseName);
 	}

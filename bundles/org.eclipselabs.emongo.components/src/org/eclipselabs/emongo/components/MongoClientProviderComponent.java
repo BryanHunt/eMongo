@@ -54,7 +54,7 @@ public class MongoClientProviderComponent extends AbstractComponent implements M
 
 	public void activate(Map<String, Object> properties)
 	{
-		clientId = (String) properties.get(MongoClientProvider.PROP_CLIENT_ID);
+		clientId = (String) properties.get(PROP_CLIENT_ID);
 
 		if (clientId == null || clientId.isEmpty())
 			handleIllegalConfiguration("The MongoDB client id was not found in the configuration properties");

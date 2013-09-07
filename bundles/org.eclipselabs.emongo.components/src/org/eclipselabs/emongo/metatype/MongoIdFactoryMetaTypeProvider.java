@@ -33,7 +33,6 @@ public class MongoIdFactoryMetaTypeProvider implements MetaTypeProvider
 	public ObjectClassDefinition getObjectClassDefinition(String arg0, String arg1)
 	{
 		AttributeDefinitionImpl database = new AttributeDefinitionImpl("MongoDatabaseProvider.target", "Database", AttributeDefinition.STRING);
-		database.setCardinality(1);
 		database.setDescription("The MongoDB database");
 
 		String[] databaseAliases = new String[databases.size()];
@@ -60,12 +59,12 @@ public class MongoIdFactoryMetaTypeProvider implements MetaTypeProvider
 		return ocd;
 	}
 
-	public void bindMongoDatabaseConfigurationProvider(ServiceReference<MongoDatabaseProvider> serviceReference)
+	public void bindMongoDatabaseProvider(ServiceReference<MongoDatabaseProvider> serviceReference)
 	{
 		databases.add((String) serviceReference.getProperty(MongoDatabaseProvider.PROP_ALIAS));
 	}
 
-	public void unbindMongoDatabaseConfigurationProvider(ServiceReference<MongoDatabaseProvider> serviceReference)
+	public void unbindMongoDatabaseProvider(ServiceReference<MongoDatabaseProvider> serviceReference)
 	{
 		databases.remove((String) serviceReference.getProperty(MongoDatabaseProvider.PROP_ALIAS));
 	}

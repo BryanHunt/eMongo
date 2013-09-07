@@ -4,6 +4,6 @@
    <service>
       <provide interface="org.osgi.service.metatype.MetaTypeProvider"/>
    </service>
-   <reference bind="bindMongoDatabaseConfigurationProvider" cardinality="0..n" interface="org.eclipselabs.emongo.components.MongoDatabaseConfigurationProvider" name="MongoDatabaseConfigurationProvider" policy="dynamic" unbind="unbindMongoDatabaseConfigurationProvider"/>
+   <reference bind="bindMongoDatabaseProvider" cardinality="0..n" interface="org.eclipselabs.emongo.MongoDatabaseProvider" name="MongoDatabaseProvider" policy="dynamic" unbind="unbindMongoDatabaseProvider"/>
    <property name="metatype.factory.pid" type="String" value="org.eclipselabs.emongo.idFactory"/>
 </scr:component>

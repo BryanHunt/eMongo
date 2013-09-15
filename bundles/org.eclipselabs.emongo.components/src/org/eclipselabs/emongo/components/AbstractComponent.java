@@ -35,6 +35,9 @@ public abstract class AbstractComponent
 
 	protected void handleIllegalConfiguration(String message)
 	{
+		if (message == null)
+			return;
+
 		LogService logService = logServiceReference.get();
 
 		if (logService != null)

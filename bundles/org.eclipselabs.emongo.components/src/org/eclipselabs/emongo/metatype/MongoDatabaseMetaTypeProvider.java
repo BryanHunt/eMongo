@@ -9,6 +9,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.eclipselabs.emongo.MongoClientProvider;
 import org.eclipselabs.emongo.MongoDatabaseProvider;
+import org.eclipselabs.emongo.components.MongoDatabaseProviderComponent;
 import org.eclipselabs.emongo.config.ConfigurationProperties;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.metatype.AttributeDefinition;
@@ -32,7 +33,7 @@ public class MongoDatabaseMetaTypeProvider implements MetaTypeProvider
 	@Override
 	public ObjectClassDefinition getObjectClassDefinition(String id, String locale)
 	{
-		AttributeDefinitionImpl clientId = new AttributeDefinitionImpl("MongoClientProvider.target", "Client", AttributeDefinition.STRING);
+		AttributeDefinitionImpl clientId = new AttributeDefinitionImpl(MongoDatabaseProvider.PROP_CLIENT_FILTER, "Client", AttributeDefinition.STRING);
 		clientId.setDescription("The MongoDB database client ID");
 
 		String[] clients = new String[mongoClientProviders.size()];
@@ -49,10 +50,26 @@ public class MongoDatabaseMetaTypeProvider implements MetaTypeProvider
 		if (!mongoClientProviders.isEmpty())
 			clientId.setDefaultValue(new String[] { mongoClientProviders.iterator().next() });
 
-		AttributeDefinitionImpl alias = new AttributeDefinitionImpl(MongoDatabaseProvider.PROP_ALIAS, "Alias", AttributeDefinition.STRING);
+		AttributeDefinitionImpl alias = new AttributeDefinitionImpl(MongoDatabaseProvider.PROP_ALIAS, "Alias", AttributeDefinition.STRING)
+		{
+			@Override
+			public String validate(String value)
+			{
+				return MongoDatabaseProviderComponent.validateAlias(value);
+			}
+		};
+
 		alias.setDescription("The alias of the MongoDB database.");
 
-		AttributeDefinitionImpl database = new AttributeDefinitionImpl(MongoDatabaseProvider.PROP_DATABASE, "Database", AttributeDefinition.STRING);
+		AttributeDefinitionImpl database = new AttributeDefinitionImpl(MongoDatabaseProvider.PROP_DATABASE, "Database", AttributeDefinition.STRING)
+		{
+			@Override
+			public String validate(String value)
+			{
+				return MongoDatabaseProviderComponent.validateDatabaseName(value);
+			}
+		};
+
 		database.setDescription("The name MongoDB database.");
 
 		AttributeDefinitionImpl user = new AttributeDefinitionImpl(MongoDatabaseProvider.PROP_USER, "User", AttributeDefinition.STRING);

@@ -24,7 +24,7 @@ import com.mongodb.DBCursor;
  */
 public class ExampleComponent
 {
-	private MongoDatabaseProvider mongoDatabaseProvider;
+	private volatile MongoDatabaseProvider mongoDatabaseProvider;
 
 	public void activate()
 	{

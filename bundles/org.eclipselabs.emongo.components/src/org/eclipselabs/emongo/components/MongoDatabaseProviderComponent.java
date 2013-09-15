@@ -24,6 +24,22 @@ public class MongoDatabaseProviderComponent extends AbstractComponent implements
 	private String uri;
 	private MongoClientProvider mongoClientProvider;
 
+	public static String validateAlias(String value)
+	{
+		if (value == null || value.isEmpty())
+			return "The database alias was not found in the configuration properties";
+
+		return null;
+	}
+
+	public static String validateDatabaseName(String value)
+	{
+		if (value == null || value.isEmpty())
+			return "The MongoDB database name was not found in the configuration properties";
+
+		return null;
+	}
+
 	/**
 	 * @param databaseConfigurationProvider
 	 * @param mongoClientProvider
@@ -31,15 +47,13 @@ public class MongoDatabaseProviderComponent extends AbstractComponent implements
 	public void activate(Map<String, Object> properties)
 	{
 		alias = (String) properties.get(PROP_ALIAS);
+		handleIllegalConfiguration(validateAlias(alias));
+
 		databaseName = (String) properties.get(PROP_DATABASE);
+		handleIllegalConfiguration(validateDatabaseName(databaseName));
+
 		user = (String) properties.get(PROP_USER);
 		password = (String) properties.get(PROP_PASSWORD);
-
-		if (alias == null || alias.isEmpty())
-			handleIllegalConfiguration("The database alias was not found in the configuration properties");
-
-		if (databaseName == null || databaseName.isEmpty())
-			handleIllegalConfiguration("The MongoDB database name was not found in the configuration properties");
 
 		uri = mongoClientProvider.getURIs()[0] + "/" + databaseName;
 	}

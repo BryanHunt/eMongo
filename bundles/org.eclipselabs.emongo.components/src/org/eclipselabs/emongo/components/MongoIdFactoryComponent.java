@@ -28,7 +28,6 @@ import com.mongodb.DBObject;
  */
 public class MongoIdFactoryComponent extends AbstractComponent implements MongoIdFactory
 {
-	private volatile String alias;
 	private volatile String collectionName;
 	private volatile String uri;
 
@@ -41,37 +40,18 @@ public class MongoIdFactoryComponent extends AbstractComponent implements MongoI
 	private static final String ID = "_id";
 	private static final String LAST_ID = "_lastId";
 
-	@Override
-	public String getCollectionURI()
+	public static String validateCollectionName(String value)
 	{
-		return uri;
-	}
+		if (value == null || value.isEmpty())
+			return "The collection was not specified as part of the component configuration";
 
-	@Override
-	public String getNextId() throws IOException
-	{
-		if (collection == null)
-			return null;
-
-		DBObject result = collection.findAndModify(query, null, null, false, update, true, false);
-
-		if (!collection.getDB().getLastError().ok())
-			throw new IOException("Failed to update the id counter for collection: '" + collection.getName() + "'");
-
-		return result.get(LAST_ID).toString();
+		return null;
 	}
 
 	public void activate(Map<String, Object> properties)
 	{
-		alias = (String) properties.get(PROP_ALIAS);
-
-		if (alias == null || alias.isEmpty())
-			handleIllegalConfiguration("The alias was not specified as part of the component configuration");
-
 		collectionName = (String) properties.get(PROP_COLLECTION);
-
-		if (collectionName == null || collectionName.isEmpty())
-			handleIllegalConfiguration("The collection was not specified as part of the component configuration");
+		handleIllegalConfiguration(validateCollectionName(collectionName));
 
 		uri = mongoDatabaseProvider.getURI() + "/" + collectionName;
 
@@ -92,6 +72,26 @@ public class MongoIdFactoryComponent extends AbstractComponent implements MongoI
 			if (!db.getLastError().ok())
 				handleIllegalConfiguration("Could not initialize the id counter for collection: '" + collection.getName() + "'");
 		}
+	}
+
+	@Override
+	public String getCollectionURI()
+	{
+		return uri;
+	}
+
+	@Override
+	public String getNextId() throws IOException
+	{
+		if (collection == null)
+			return null;
+
+		DBObject result = collection.findAndModify(query, null, null, false, update, true, false);
+
+		if (!collection.getDB().getLastError().ok())
+			throw new IOException("Failed to update the id counter for collection: '" + collection.getName() + "'");
+
+		return result.get(LAST_ID).toString();
 	}
 
 	public void bindMongoDatabaseProvider(MongoDatabaseProvider mongoDatabaseProvider)

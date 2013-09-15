@@ -122,8 +122,9 @@ public interface MongoClientProvider
 	// --- Provider service specific properties ---------------------------------------------
 
 	/**
-	 * The service property key for the client URI. The value must have the form:
-	 * mongodb://host[:port]
+	 * The service property key for the client URI. The value may be a single URI for one MongoDB
+	 * server, or a CSV of URIs for a MongoDB replica set. The value must have the form:
+	 * mongodb://host[:port] [,mongodb://host[:port]]
 	 */
 	String PROP_URI = "uri";
 

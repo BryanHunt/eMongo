@@ -15,6 +15,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
 
 import org.eclipselabs.emongo.MongoClientProvider;
@@ -31,8 +32,21 @@ import com.mongodb.WriteConcern;
 public class MongoClientProviderComponent extends AbstractComponent implements MongoClientProvider
 {
 	private volatile String clientId;
-	private volatile String[] uris;
+	private volatile Collection<String> uris;
 	private volatile MongoClient mongoClient;
+
+	public static String validateClientId(String value)
+	{
+		if (value == null || value.isEmpty())
+			return "The MongoDB client id was not found in the configuration properties";
+
+		return null;
+	}
+
+	public static String validateURI(String value)
+	{
+		return validateURI(value, null);
+	}
 
 	@Override
 	public String getClientId()
@@ -49,51 +63,40 @@ public class MongoClientProviderComponent extends AbstractComponent implements M
 	@Override
 	public String[] getURIs()
 	{
-		return uris;
+		return uris.toArray(new String[0]);
 	}
 
 	public void activate(Map<String, Object> properties)
 	{
 		clientId = (String) properties.get(PROP_CLIENT_ID);
-
-		if (clientId == null || clientId.isEmpty())
-			handleIllegalConfiguration("The MongoDB client id was not found in the configuration properties");
-
-		MongoClientOptions options = createMongoClientOptions(properties);
+		handleIllegalConfiguration(validateClientId(clientId));
 
 		// The uriProperty is a single string containing one or more server URIs.
 		// When more than one URI is specified, it denotes a replica set and the
 		// URIs must be separated by a comma (CSV).
 
 		String uriProperty = (String) properties.get(PROP_URI);
+		uris = new ArrayList<String>();
+		handleIllegalConfiguration(validateURI(uriProperty, uris));
 
-		if (uriProperty == null || uriProperty.isEmpty())
-			handleIllegalConfiguration("The MongoDB URI was not found in the configuration properties");
-
-		// The regex \s matches whitepsace. The extra \ is needed because of how it's treated in java
-		// strings. The split is done on any number of whitespace chars followed by a comma followed by
-		// any number of whitespace chars. What is left is the URI(s).
-
-		uris = uriProperty.split("\\s*,\\s*");
+		MongoClientOptions options = createMongoClientOptions(properties);
 		String currentURI = null;
 
 		try
 		{
-			if (uris.length == 1)
+			if (uris.size() == 1)
 			{
-				currentURI = uris[0].trim();
-				checkURI(currentURI);
+				currentURI = uris.iterator().next();
 				ServerAddress serverAddress = createServerAddress(currentURI);
 				mongoClient = createMongoClient(options, serverAddress);
 			}
 			else
 			{
-				ArrayList<ServerAddress> serverAddresses = new ArrayList<ServerAddress>(uris.length);
+				ArrayList<ServerAddress> serverAddresses = new ArrayList<ServerAddress>(uris.size());
 
 				for (String uri : uris)
 				{
-					currentURI = uri.trim();
-					checkURI(currentURI);
+					currentURI = uri;
 					serverAddresses.add(createServerAddress(currentURI));
 				}
 
@@ -126,13 +129,27 @@ public class MongoClientProviderComponent extends AbstractComponent implements M
 		return new MongoClient(serverAddress, options);
 	}
 
-	private void checkURI(String currentURI)
+	private static String validateURI(String value, Collection<String> uris)
 	{
-		// The URI will be of the form: mongodb://host[:port]
-		// When the string is split on / the URI must have 3 parts
+		if (value == null || value.isEmpty())
+			return "The MongoDB URI was not found in the configuration properties";
 
-		if (!currentURI.startsWith("mongodb://") || currentURI.endsWith("/") || currentURI.split("/").length != 3)
-			handleIllegalConfiguration("The uri: '" + currentURI + "' does not have the form 'mongodb://host[:port]'");
+		// The regex \s matches whitepsace. The extra \ is needed because of how it's treated in java
+		// strings. The split is done on any number of whitespace chars followed by a comma followed by
+		// any number of whitespace chars. What is left is the URI(s).
+
+		for (String targetURI : value.split("\\s*,\\s*"))
+		{
+			String uri = targetURI.trim();
+
+			if (!uri.startsWith("mongodb://") || uri.endsWith("/") || uri.split("/").length != 3)
+				return "The uri: '" + uri + "' does not have the form 'mongodb://host[:port]'";
+
+			if (uris != null)
+				uris.add(uri);
+		}
+
+		return null;
 	}
 
 	private MongoClientOptions createMongoClientOptions(Map<String, Object> properties)

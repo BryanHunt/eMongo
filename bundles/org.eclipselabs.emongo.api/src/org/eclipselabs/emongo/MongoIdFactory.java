@@ -26,11 +26,9 @@ import java.io.IOException;
 public interface MongoIdFactory
 {
 	/**
-	 * The service property key for configuring the mongo database alias. The
-	 * value of the alias service property will be used to compare against the
-	 * mongo database alias property to obtain the proper database.
+	 * The service property key for the MongoDB database reference filter.
 	 */
-	String PROP_ALIAS = MongoDatabaseProvider.PROP_ALIAS;
+	String PROP_DATABASE_FILTER = "MongoDatabaseProvider.target";
 
 	/**
 	 * The service property key for configuring the database collection. Set

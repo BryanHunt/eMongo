@@ -48,7 +48,6 @@ public class TestMongoIdFactoryComponent
 	private MongoDatabaseProvider mongoDatabaseProvider;
 	private MongoIdFactoryComponent mongoIdFactoryComponent;
 	private Map<String, Object> properties;
-	private String alias;
 	private DB db;
 	private DBCollection collection;
 	private CommandResult commandResult;
@@ -57,10 +56,8 @@ public class TestMongoIdFactoryComponent
 	@Before
 	public void setUp()
 	{
-		alias = "junit";
 		collectionName = "elements";
 		properties = new HashMap<String, Object>();
-		properties.put(MongoIdFactory.PROP_ALIAS, alias);
 		properties.put(MongoIdFactory.PROP_COLLECTION, collectionName);
 
 		mongoIdFactoryComponent = new MongoIdFactoryComponent();
@@ -107,20 +104,6 @@ public class TestMongoIdFactoryComponent
 		when(commandResult.ok()).thenReturn(false);
 
 		mongoIdFactoryComponent.bindMongoDatabaseProvider(mongoDatabaseProvider);
-		mongoIdFactoryComponent.activate(properties);
-	}
-
-	@Test(expected = IllegalStateException.class)
-	public void testActivateWithNullAlias()
-	{
-		properties.put(MongoIdFactory.PROP_ALIAS, null);
-		mongoIdFactoryComponent.activate(properties);
-	}
-
-	@Test(expected = IllegalStateException.class)
-	public void testActivateWithEmptyAlias()
-	{
-		properties.put(MongoIdFactory.PROP_ALIAS, "");
 		mongoIdFactoryComponent.activate(properties);
 	}
 

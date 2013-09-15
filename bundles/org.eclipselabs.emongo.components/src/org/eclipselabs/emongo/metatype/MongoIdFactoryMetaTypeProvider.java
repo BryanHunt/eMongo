@@ -9,6 +9,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.eclipselabs.emongo.MongoDatabaseProvider;
 import org.eclipselabs.emongo.MongoIdFactory;
+import org.eclipselabs.emongo.components.MongoIdFactoryComponent;
 import org.eclipselabs.emongo.config.ConfigurationProperties;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.metatype.AttributeDefinition;
@@ -32,7 +33,7 @@ public class MongoIdFactoryMetaTypeProvider implements MetaTypeProvider
 	@Override
 	public ObjectClassDefinition getObjectClassDefinition(String arg0, String arg1)
 	{
-		AttributeDefinitionImpl database = new AttributeDefinitionImpl("MongoDatabaseProvider.target", "Database", AttributeDefinition.STRING);
+		AttributeDefinitionImpl database = new AttributeDefinitionImpl(MongoIdFactory.PROP_DATABASE_FILTER, "Database", AttributeDefinition.STRING);
 		database.setDescription("The MongoDB database");
 
 		String[] databaseAliases = new String[databases.size()];
@@ -41,7 +42,7 @@ public class MongoIdFactoryMetaTypeProvider implements MetaTypeProvider
 		databases.toArray(databaseAliases);
 
 		for (int i = 0; i < databaseAliases.length; i++)
-			targetFilters[i] = "(" + MongoIdFactory.PROP_ALIAS + "=" + databaseAliases[i] + ")";
+			targetFilters[i] = "(" + MongoDatabaseProvider.PROP_ALIAS + "=" + databaseAliases[i] + ")";
 
 		database.setOptionLabels(databaseAliases);
 		database.setOptionValues(targetFilters);
@@ -49,7 +50,15 @@ public class MongoIdFactoryMetaTypeProvider implements MetaTypeProvider
 		if (!databases.isEmpty())
 			database.setDefaultValue(new String[] { databases.iterator().next() });
 
-		AttributeDefinitionImpl collection = new AttributeDefinitionImpl(MongoIdFactory.PROP_COLLECTION, "Collection", AttributeDefinition.STRING);
+		AttributeDefinitionImpl collection = new AttributeDefinitionImpl(MongoIdFactory.PROP_COLLECTION, "Collection", AttributeDefinition.STRING)
+		{
+			@Override
+			public String validate(String value)
+			{
+				return MongoIdFactoryComponent.validateCollectionName(value);
+			}
+		};
+
 		collection.setDescription("The MongoDB collection within the database");
 
 		ObjectClassDefinitionImpl ocd = new ObjectClassDefinitionImpl(ConfigurationProperties.ID_FACTORY_PID, "MongoDB ID", "MongoDB ID Provider Configuration");

@@ -63,7 +63,6 @@ public class MongoConfiguration
 			properties = new Hashtable<String, Object>();
 
 		properties.put(MongoIdFactory.PROP_COLLECTION, "junit_id");
-		properties.put(MongoIdFactory.PROP_ALIAS, "junit");
 		config.update(properties);
 	}
 

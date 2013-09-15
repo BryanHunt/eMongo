@@ -5,6 +5,7 @@
 package org.eclipselabs.emongo.metatype;
 
 import org.eclipselabs.emongo.MongoClientProvider;
+import org.eclipselabs.emongo.components.MongoClientProviderComponent;
 import org.eclipselabs.emongo.config.ConfigurationProperties;
 import org.osgi.service.metatype.AttributeDefinition;
 import org.osgi.service.metatype.MetaTypeProvider;
@@ -25,10 +26,26 @@ public class MongoClientMetaTypeProvider implements MetaTypeProvider
 	@Override
 	public ObjectClassDefinition getObjectClassDefinition(String id, String locale)
 	{
-		AttributeDefinitionImpl clientId = new AttributeDefinitionImpl(MongoClientProvider.PROP_CLIENT_ID, "ID", AttributeDefinition.STRING);
+		AttributeDefinitionImpl clientId = new AttributeDefinitionImpl(MongoClientProvider.PROP_CLIENT_ID, "ID", AttributeDefinition.STRING)
+		{
+			@Override
+			public String validate(String value)
+			{
+				return MongoClientProviderComponent.validateClientId(value);
+			}
+		};
+
 		clientId.setDescription("The unique identifier for the client.");
 
-		AttributeDefinitionImpl uri = new AttributeDefinitionImpl(MongoClientProvider.PROP_URI, "URI", AttributeDefinition.STRING);
+		AttributeDefinitionImpl uri = new AttributeDefinitionImpl(MongoClientProvider.PROP_URI, "URI", AttributeDefinition.STRING)
+		{
+			@Override
+			public String validate(String value)
+			{
+				return MongoClientProviderComponent.validateURI(value);
+			}
+		};
+
 		uri.setDescription("The URI of the MongoDB server of the form 'mongodb://host[:port]'.  Separate URIs with a comma (CSV) for a replica set.");
 
 		AttributeDefinitionImpl description = new AttributeDefinitionImpl(MongoClientProvider.PROP_DESCRIPTION, "Description", AttributeDefinition.STRING);

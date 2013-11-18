@@ -73,10 +73,10 @@ public class MongoDatabaseMetaTypeProvider implements MetaTypeProvider
 		database.setDescription("The name MongoDB database.");
 
 		AttributeDefinitionImpl user = new AttributeDefinitionImpl(MongoDatabaseProvider.PROP_USER, "User", AttributeDefinition.STRING);
-		database.setDescription("The user id to use for authenticating to the MongoDB server (optional).");
+		user.setDescription("The user id to use for authenticating to the MongoDB server (optional).");
 
 		AttributeDefinitionImpl password = new AttributeDefinitionImpl(MongoDatabaseProvider.PROP_PASSWORD, "Password", AttributeDefinition.PASSWORD);
-		database.setDescription("The user password to use for authenticating to the MongoDB server (optional).");
+		password.setDescription("The user password to use for authenticating to the MongoDB server (optional).");
 
 		ObjectClassDefinitionImpl ocd = new ObjectClassDefinitionImpl(ConfigurationProperties.DATABASE_PID, "MongoDB Database", "MongoDB Database Configuration");
 		ocd.addAttribute(clientId);

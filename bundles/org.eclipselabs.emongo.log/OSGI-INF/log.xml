@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="activate" deactivate="deactivate" name="org.eclipselabs.emongo.log">
+   <implementation class="org.eclipselabs.emongo.log.MongoLogListener"/>
+   <reference bind="bindLogReaderService" cardinality="1..1" interface="org.osgi.service.log.LogReaderService" name="LogReaderService" policy="static"/>
+   <reference bind="bindMongoDatabaseProvider" cardinality="1..1" interface="org.eclipselabs.emongo.MongoDatabaseProvider" name="MongoDatabaseProvider" policy="static"/>
+</scr:component>

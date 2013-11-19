@@ -17,6 +17,8 @@ import java.util.Date;
 import java.util.Map;
 
 import org.eclipselabs.emongo.MongoDatabaseProvider;
+import org.osgi.framework.Constants;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.log.LogEntry;
 import org.osgi.service.log.LogListener;
 import org.osgi.service.log.LogReaderService;
@@ -70,9 +72,14 @@ public class MongoLogListener implements LogListener
 		DBObject logData = new BasicDBObject();
 		logData.put("level", entry.getLevel());
 		logData.put("bsn", entry.getBundle().getSymbolicName());
-		logData.put("pid", entry.getServiceReference().getProperty("pid"));
 		logData.put("time", new Date(entry.getTime()));
 		logData.put("message", entry.getMessage());
+
+		@SuppressWarnings("rawtypes")
+		ServiceReference serviceReference = entry.getServiceReference();
+
+		if (serviceReference != null)
+			logData.put("pid", serviceReference.getProperty(Constants.SERVICE_PID));
 
 		Throwable exception = entry.getException();
 

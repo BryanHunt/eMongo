@@ -2,7 +2,7 @@
 <feature
       id="org.eclipselabs.emongo.sdk.feature"
       label="eMongo SDK"
-      version="1.0.0.qualifier"
+      version="1.1.0.qualifier"
       provider-name="EclipseLabs">
 
    <description url="http://www.example.com/description">

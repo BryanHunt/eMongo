@@ -17,8 +17,10 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import org.eclipselabs.emongo.MongoClientProvider;
 import org.eclipselabs.emongo.MongoDatabaseProvider;
 import org.eclipselabs.emongo.components.MongoDatabaseProviderComponent;
-import org.eclipselabs.emongo.config.ConfigurationProperties;
 import org.osgi.framework.ServiceReference;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.metatype.AttributeDefinition;
 import org.osgi.service.metatype.MetaTypeProvider;
 import org.osgi.service.metatype.ObjectClassDefinition;
@@ -27,6 +29,7 @@ import org.osgi.service.metatype.ObjectClassDefinition;
  * @author bhunt
  * 
  */
+@Component(service = MetaTypeProvider.class, property = {"metatype.factory.pid=org.eclipselabs.emongo.databaseProvider"})
 public class MongoDatabaseMetaTypeProvider implements MetaTypeProvider
 {
 	private Set<String> mongoClientProviders = new CopyOnWriteArraySet<String>();
@@ -79,22 +82,15 @@ public class MongoDatabaseMetaTypeProvider implements MetaTypeProvider
 
 		database.setDescription("The name MongoDB database.");
 
-		AttributeDefinitionImpl user = new AttributeDefinitionImpl(MongoDatabaseProvider.PROP_USER, "User", AttributeDefinition.STRING);
-		user.setDescription("The user id to use for authenticating to the MongoDB server (optional).");
-
-		AttributeDefinitionImpl password = new AttributeDefinitionImpl(MongoDatabaseProvider.PROP_PASSWORD, "Password", AttributeDefinition.PASSWORD);
-		password.setDescription("The user password to use for authenticating to the MongoDB server (optional).");
-
 		ObjectClassDefinitionImpl ocd = new ObjectClassDefinitionImpl(ConfigurationProperties.DATABASE_PID, "MongoDB Database", "MongoDB Database Configuration");
 		ocd.addAttribute(clientId);
 		ocd.addAttribute(alias);
 		ocd.addAttribute(database);
-		ocd.addAttribute(user);
-		ocd.addAttribute(password);
 
 		return ocd;
 	}
 
+	@Reference(cardinality = ReferenceCardinality.MULTIPLE)
 	public void bindMongoClientProvider(ServiceReference<MongoClientProvider> serviceReference)
 	{
 		mongoClientProviders.add((String) serviceReference.getProperty(MongoClientProvider.PROP_CLIENT_ID));

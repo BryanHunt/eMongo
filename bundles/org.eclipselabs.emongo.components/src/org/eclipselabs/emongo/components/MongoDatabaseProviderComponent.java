@@ -4,23 +4,32 @@
 
 package org.eclipselabs.emongo.components;
 
-import java.util.Map;
-
 import org.eclipselabs.emongo.MongoClientProvider;
 import org.eclipselabs.emongo.MongoDatabaseProvider;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.log.LogService;
 
-import com.mongodb.DB;
+import com.mongodb.client.MongoDatabase;
 
 /**
  * @author bhunt
  * 
  */
+@Component(service = MongoDatabaseProvider.class, configurationPolicy = ConfigurationPolicy.REQUIRE, configurationPid = {"org.eclipselabs.emongo.databaseProvider"})
 public class MongoDatabaseProviderComponent extends AbstractComponent implements MongoDatabaseProvider
 {
+  public @interface DatabaseConfig
+  {
+    String alias();
+    String databaseName();
+  }
+
 	private volatile String alias;
 	private volatile String databaseName;
-	private volatile String user;
-	private volatile String password;
 	private String uri;
 	private MongoClientProvider mongoClientProvider;
 
@@ -40,20 +49,14 @@ public class MongoDatabaseProviderComponent extends AbstractComponent implements
 		return null;
 	}
 
-	/**
-	 * @param databaseConfigurationProvider
-	 * @param mongoClientProvider
-	 */
-	public void activate(Map<String, Object> properties)
+	@Activate
+	public void activate(DatabaseConfig config)
 	{
-		alias = (String) properties.get(PROP_ALIAS);
+		alias = config.alias();
 		handleIllegalConfiguration(validateAlias(alias));
 
-		databaseName = (String) properties.get(PROP_DATABASE);
+		databaseName = config.databaseName();
 		handleIllegalConfiguration(validateDatabaseName(databaseName));
-
-		user = (String) properties.get(PROP_USER);
-		password = (String) properties.get(PROP_PASSWORD);
 
 		uri = mongoClientProvider.getURIs()[0] + "/" + databaseName;
 	}
@@ -65,16 +68,23 @@ public class MongoDatabaseProviderComponent extends AbstractComponent implements
 	}
 
 	@Override
-	public DB getDB()
+	public MongoDatabase getDatabase()
 	{
-		DB db = mongoClientProvider.getMongoClient().getDB(databaseName);
-
-		if (user != null && !user.isEmpty())
-			db.authenticate(user, password.toCharArray());
-
-		return db;
+	  return mongoClientProvider.getMongoClient().getDatabase(databaseName);
 	}
 
+  @Reference(cardinality = ReferenceCardinality.OPTIONAL)
+  public void bindLogService(LogService logService)
+  {
+    super.bindLogService(logService);;
+  }
+
+  public void unbindLogService(LogService logService)
+  {
+    super.unbindLogService(logService);
+  }
+
+  @Reference(unbind = "-")
 	public void bindMongoClientProvider(MongoClientProvider mongoClientProvider)
 	{
 		this.mongoClientProvider = mongoClientProvider;

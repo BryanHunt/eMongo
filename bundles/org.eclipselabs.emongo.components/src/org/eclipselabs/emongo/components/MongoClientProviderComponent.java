@@ -16,22 +16,65 @@ import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Map;
+import java.util.List;
 
 import org.eclipselabs.emongo.MongoClientProvider;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.log.LogService;
 
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions;
+import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
 import com.mongodb.WriteConcern;
+
 
 /**
  * @author bhunt
  * 
  */
+@Component(service = MongoClientProvider.class, configurationPolicy = ConfigurationPolicy.REQUIRE, configurationPid = {"org.eclipselabs.emongo.clientProvider"})
 public class MongoClientProviderComponent extends AbstractComponent implements MongoClientProvider
 {
-	private volatile String clientId;
+  public @interface ClientConfig 
+  {
+    String clientId();
+    String uri();
+    String[] credentials();
+    boolean alwaysUseMBeans() default false;
+    int connectionsPerHost() default 100;
+    int connectTimeout() default 10000;
+    boolean cursorFinalizerEnabled() default true;
+    String description() default "";
+    int heartbeatConnectTimeout() default 20000;
+    int heartbeatFrequency() default 10000;
+    int heartbeatSocketTimeout() default 20000;
+    int localThreshold() default 15;
+    int maxConnectionIdleTime() default 0;
+    int maxConnectionLifeTime() default 0;
+    int maxWaitTime() default 120000;
+    int minConnectionsPerHost() default 0;
+    int minHeartbeatFrequency() default 500;
+//    readPreference(ReadPreference readPreference)
+    String requiredReplicaSetName() default "";
+    int serverSelectionTimeout() default 30000;
+    boolean socketKeepAlive() default false;
+    int socketTimeout() default 0;
+    boolean sslEnabled() default false;
+    boolean sslInvalidHostNameAllowed() default false;
+    int threadsAllowedToBlockForConnectionMultiplier() default 5;
+    int writeConcernW() default 1;
+    int writeConcernWtimeout() default 0;
+    boolean writeConcernFsync() default false;
+    boolean writeConcernJ() default false;
+  }
+
+  private volatile String clientId;
 	private volatile Collection<String> uris;
 	private volatile MongoClient mongoClient;
 
@@ -66,20 +109,31 @@ public class MongoClientProviderComponent extends AbstractComponent implements M
 		return uris.toArray(new String[0]);
 	}
 
-	public void activate(Map<String, Object> properties)
+	@Activate
+	public void activate(ClientConfig config)
 	{
-		clientId = (String) properties.get(PROP_CLIENT_ID);
-		handleIllegalConfiguration(validateClientId(clientId));
+		handleIllegalConfiguration(validateClientId(config.clientId()));
 
 		// The uriProperty is a single string containing one or more server URIs.
 		// When more than one URI is specified, it denotes a replica set and the
 		// URIs must be separated by a comma (CSV).
 
-		String uriProperty = (String) properties.get(PROP_URI);
 		uris = new ArrayList<String>();
-		handleIllegalConfiguration(validateURI(uriProperty, uris));
+		handleIllegalConfiguration(validateURI(config.uri(), uris));
 
-		MongoClientOptions options = createMongoClientOptions(properties);
+		List<MongoCredential> credentials = new ArrayList<MongoCredential>();
+		
+		if(config.credentials() != null)
+		{
+		  for(String entry : config.credentials())
+		  {
+		    String credential[] = entry.split(":");
+		    handleIllegalConfiguration(validateCredentials(credential));
+		    credentials.add(MongoCredential.createCredential(credential[1], credential[0], credential[2].toCharArray()));
+		  }
+		}
+		
+		MongoClientOptions options = createMongoClientOptions(config);
 		String currentURI = null;
 
 		try
@@ -88,7 +142,7 @@ public class MongoClientProviderComponent extends AbstractComponent implements M
 			{
 				currentURI = uris.iterator().next();
 				ServerAddress serverAddress = createServerAddress(currentURI);
-				mongoClient = createMongoClient(options, serverAddress);
+				mongoClient = createMongoClient(serverAddress, credentials, options);
 			}
 			else
 			{
@@ -100,7 +154,7 @@ public class MongoClientProviderComponent extends AbstractComponent implements M
 					serverAddresses.add(createServerAddress(currentURI));
 				}
 
-				mongoClient = createMongoClient(options, serverAddresses);
+				mongoClient = createMongoClient(serverAddresses, credentials, options);
 			}
 		}
 		catch (UnknownHostException e)
@@ -113,20 +167,32 @@ public class MongoClientProviderComponent extends AbstractComponent implements M
 		}
 	}
 
+	@Deactivate
 	public void deactivate()
 	{
 		if (mongoClient != null)
 			mongoClient.close();
 	}
 
-	protected MongoClient createMongoClient(MongoClientOptions options, ArrayList<ServerAddress> serverAddresses)
+	@Reference(cardinality = ReferenceCardinality.OPTIONAL)
+  public void bindLogService(LogService logService)
+  {
+    super.bindLogService(logService);;
+  }
+
+  public void unbindLogService(LogService logService)
+  {
+    super.unbindLogService(logService);
+  }
+
+	protected MongoClient createMongoClient(ArrayList<ServerAddress> serverAddresses, List<MongoCredential> credentials, MongoClientOptions options)
 	{
-		return new MongoClient(serverAddresses, options);
+		return new MongoClient(serverAddresses, credentials, options);
 	}
 
-	protected MongoClient createMongoClient(MongoClientOptions options, ServerAddress serverAddress)
+	protected MongoClient createMongoClient(ServerAddress serverAddress, List<MongoCredential> credentials, MongoClientOptions options)
 	{
-		return new MongoClient(serverAddress, options);
+		return new MongoClient(serverAddress, credentials, options);
 	}
 
 	private static String validateURI(String value, Collection<String> uris)
@@ -152,81 +218,44 @@ public class MongoClientProviderComponent extends AbstractComponent implements M
 		return null;
 	}
 
-	private MongoClientOptions createMongoClientOptions(Map<String, Object> properties)
+	private static String validateCredentials(String[] credentialData)
+	{
+	  if(credentialData.length != 3)
+	    return "A credential must be in the format 'db:userId:password'";
+	  
+	  return null;
+	}
+	
+	private MongoClientOptions createMongoClientOptions(ClientConfig config)
 	{
 		MongoClientOptions.Builder optionsBuilder = new MongoClientOptions.Builder();
 
-		String description = (String) properties.get(PROP_DESCRIPTION);
-
-		if (description != null)
-			optionsBuilder.description(description);
-
-		Integer connectionsPerHost = (Integer) properties.get(PROP_CONNECTIONS_PER_HOST);
-
-		if (connectionsPerHost != null)
-			optionsBuilder.connectionsPerHost(connectionsPerHost);
-
-		Integer threadsAllowedToBlockForConnectionMultiplier = (Integer) properties.get(PROP_THREADS_ALLOWED_TO_BLOCK_FOR_CONNECTION_MULTIPLIER);
-
-		if (threadsAllowedToBlockForConnectionMultiplier != null)
-			optionsBuilder.threadsAllowedToBlockForConnectionMultiplier(threadsAllowedToBlockForConnectionMultiplier);
-
-		Integer maxWaitTime = (Integer) properties.get(PROP_MAX_WAIT_TIME);
-
-		if (maxWaitTime != null)
-			optionsBuilder.maxWaitTime(maxWaitTime);
-
-		Integer connectTimeout = (Integer) properties.get(PROP_CONNECT_TIMEOUT);
-
-		if (connectTimeout != null)
-			optionsBuilder.connectTimeout(connectTimeout);
-
-		Integer socketTimeout = (Integer) properties.get(PROP_SOCKET_TIMEOUT);
-
-		if (socketTimeout != null)
-			optionsBuilder.socketTimeout(socketTimeout);
-
-		Boolean socketKeepAlive = (Boolean) properties.get(PROP_SOCKET_KEEP_ALIVE);
-
-		if (socketKeepAlive != null)
-			optionsBuilder.socketKeepAlive(socketKeepAlive);
-
-		Boolean autoConnectRetry = (Boolean) properties.get(PROP_AUTO_CONNECT_RETRY);
-
-		if (autoConnectRetry != null)
-			optionsBuilder.autoConnectRetry(autoConnectRetry);
-
-		Long maxAutoConnectRetryTime = (Long) properties.get(PROP_MAX_AUTO_CONNECT_RETRY_TIME);
-
-		if (maxAutoConnectRetryTime != null)
-			optionsBuilder.maxAutoConnectRetryTime(maxAutoConnectRetryTime);
-
-		Boolean continueOnInsertError = (Boolean) properties.get(PROP_CONTINUE_ON_INSERT_ERROR);
-
-		if (continueOnInsertError == null)
-			continueOnInsertError = Boolean.FALSE;
-
-		Integer w = (Integer) properties.get(PROP_W);
-
-		if (w == null)
-			w = Integer.valueOf(1);
-
-		Integer wtimeout = (Integer) properties.get(PROP_WTIMEOUT);
-
-		if (wtimeout == null)
-			wtimeout = Integer.valueOf(0);
-
-		Boolean fsync = (Boolean) properties.get(PROP_FSYNC);
-
-		if (fsync == null)
-			fsync = Boolean.FALSE;
-
-		Boolean j = (Boolean) properties.get(PROP_J);
-
-		if (j == null)
-			j = Boolean.FALSE;
-
-		WriteConcern writeConcern = new WriteConcern(w, wtimeout, fsync, j, continueOnInsertError);
+		optionsBuilder.alwaysUseMBeans(config.alwaysUseMBeans());
+		optionsBuilder.connectionsPerHost(config.connectionsPerHost());
+		optionsBuilder.connectTimeout(config.connectTimeout());
+		optionsBuilder.cursorFinalizerEnabled(config.cursorFinalizerEnabled());
+		optionsBuilder.connectionsPerHost(config.connectionsPerHost());
+		optionsBuilder.description(config.description());
+		optionsBuilder.heartbeatConnectTimeout(config.heartbeatConnectTimeout());
+		optionsBuilder.heartbeatFrequency(config.heartbeatFrequency());
+		optionsBuilder.heartbeatSocketTimeout(config.heartbeatSocketTimeout());
+		optionsBuilder.localThreshold(config.localThreshold());
+		optionsBuilder.maxConnectionIdleTime(config.maxConnectionIdleTime());
+		optionsBuilder.maxConnectionLifeTime(config.maxConnectionLifeTime());
+		optionsBuilder.maxWaitTime(config.maxWaitTime());
+		optionsBuilder.minConnectionsPerHost(config.minConnectionsPerHost());
+		optionsBuilder.minHeartbeatFrequency(config.minHeartbeatFrequency());
+		
+		if(!config.requiredReplicaSetName().isEmpty())
+		  optionsBuilder.requiredReplicaSetName(config.requiredReplicaSetName());
+		
+		optionsBuilder.serverSelectionTimeout(config.serverSelectionTimeout());
+		optionsBuilder.socketKeepAlive(config.socketKeepAlive());
+		optionsBuilder.socketTimeout(config.socketTimeout());
+		optionsBuilder.sslEnabled(config.sslEnabled());
+		optionsBuilder.sslInvalidHostNameAllowed(config.sslInvalidHostNameAllowed());
+		optionsBuilder.threadsAllowedToBlockForConnectionMultiplier(config.threadsAllowedToBlockForConnectionMultiplier());
+		WriteConcern writeConcern = new WriteConcern(config.writeConcernW(), config.writeConcernWtimeout(), config.writeConcernFsync(), config.writeConcernJ());
 		optionsBuilder.writeConcern(writeConcern);
 
 		return optionsBuilder.build();

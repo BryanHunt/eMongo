@@ -132,7 +132,7 @@ public interface MongoClientProvider
 	 * The service property key for the client id. The value must be unique to an OSGi application
 	 * instance.
 	 */
-	String PROP_CLIENT_ID = "client_id";
+	String PROP_CLIENT_ID = "clientId";
 
 	// --------------------------------------------------------------------------------------
 

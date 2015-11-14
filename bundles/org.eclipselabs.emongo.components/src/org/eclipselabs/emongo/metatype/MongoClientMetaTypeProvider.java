@@ -13,7 +13,7 @@ package org.eclipselabs.emongo.metatype;
 
 import org.eclipselabs.emongo.MongoClientProvider;
 import org.eclipselabs.emongo.components.MongoClientProviderComponent;
-import org.eclipselabs.emongo.config.ConfigurationProperties;
+import org.osgi.service.component.annotations.Component;
 import org.osgi.service.metatype.AttributeDefinition;
 import org.osgi.service.metatype.MetaTypeProvider;
 import org.osgi.service.metatype.ObjectClassDefinition;
@@ -22,6 +22,7 @@ import org.osgi.service.metatype.ObjectClassDefinition;
  * @author bhunt
  * 
  */
+@Component(service = MetaTypeProvider.class, property = {"metatype.factory.pid=org.eclipselabs.emongo.clientProvider"})
 public class MongoClientMetaTypeProvider implements MetaTypeProvider
 {
 	@Override

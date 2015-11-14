@@ -35,7 +35,7 @@ public interface MongoIdFactory
 	 * the value of the collection property to the name of the database collection
 	 * for which you want to use a sequential _id.
 	 */
-	String PROP_COLLECTION = "collection";
+	String PROP_COLLECTION = "collectionName";
 
 	/**
 	 * 
@@ -48,5 +48,5 @@ public interface MongoIdFactory
 	 * @return the next auto-increment id value to be used as the _id value
 	 * @throws IOException if the current value could not be stored to the database
 	 */
-	String getNextId() throws IOException;
+	Long getNextId() throws IOException;
 }

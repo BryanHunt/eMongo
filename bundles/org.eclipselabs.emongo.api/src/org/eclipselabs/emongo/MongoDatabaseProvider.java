@@ -11,7 +11,7 @@
 
 package org.eclipselabs.emongo;
 
-import com.mongodb.DB;
+import com.mongodb.client.MongoDatabase;
 
 /**
  * A MongoDatabaseProvider allows clients to obtain a reference to a MongoDB
@@ -40,19 +40,7 @@ public interface MongoDatabaseProvider
 	/**
 	 * The service property key for the MongoDB database name when configuring the database provider.
 	 */
-	String PROP_DATABASE = "database";
-
-	/**
-	 * The service property key for the MongoDB user when configuring the database provider. Used for
-	 * authentication (optional).
-	 */
-	String PROP_USER = "user";
-
-	/**
-	 * The service property key for the MongoDB password when configuring the database provider. Used
-	 * for authentication (optional).
-	 */
-	String PROP_PASSWORD = "password";
+	String PROP_DATABASE = "databaseName";
 
 	/**
 	 * 
@@ -64,5 +52,5 @@ public interface MongoDatabaseProvider
 	 * 
 	 * @return the MongoDB database
 	 */
-	DB getDB();
+	MongoDatabase getDatabase();
 }

@@ -17,8 +17,10 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import org.eclipselabs.emongo.MongoDatabaseProvider;
 import org.eclipselabs.emongo.MongoIdFactory;
 import org.eclipselabs.emongo.components.MongoIdFactoryComponent;
-import org.eclipselabs.emongo.config.ConfigurationProperties;
 import org.osgi.framework.ServiceReference;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.metatype.AttributeDefinition;
 import org.osgi.service.metatype.MetaTypeProvider;
 import org.osgi.service.metatype.ObjectClassDefinition;
@@ -27,6 +29,7 @@ import org.osgi.service.metatype.ObjectClassDefinition;
  * @author bhunt
  * 
  */
+@Component(service = MetaTypeProvider.class, property = {"metatype.factory.pid=org.eclipselabs.emongo.idFactory"})
 public class MongoIdFactoryMetaTypeProvider implements MetaTypeProvider
 {
 	Set<String> databases = new CopyOnWriteArraySet<String>();
@@ -75,6 +78,7 @@ public class MongoIdFactoryMetaTypeProvider implements MetaTypeProvider
 		return ocd;
 	}
 
+	@Reference(cardinality = ReferenceCardinality.MULTIPLE)
 	public void bindMongoDatabaseProvider(ServiceReference<MongoDatabaseProvider> serviceReference)
 	{
 		databases.add((String) serviceReference.getProperty(MongoDatabaseProvider.PROP_ALIAS));

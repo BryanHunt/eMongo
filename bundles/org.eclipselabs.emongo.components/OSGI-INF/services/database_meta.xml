@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="org.eclipselabs.emongo.components.database.metatype">
-   <implementation class="org.eclipselabs.emongo.metatype.MongoDatabaseMetaTypeProvider"/>
-   <service>
-      <provide interface="org.osgi.service.metatype.MetaTypeProvider"/>
-   </service>
-   <reference bind="bindMongoClientProvider" cardinality="0..n" interface="org.eclipselabs.emongo.MongoClientProvider" name="MongoClientProvider" policy="dynamic" unbind="unbindMongoClientProvider"/>
-   <property name="metatype.factory.pid" type="String" value="org.eclipselabs.emongo.databaseProvider"/>
-</scr:component>

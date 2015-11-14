@@ -17,14 +17,18 @@ import java.util.Hashtable;
 
 import org.eclipselabs.emongo.MongoClientProvider;
 import org.eclipselabs.emongo.MongoDatabaseProvider;
-import org.eclipselabs.emongo.config.ConfigurationProperties;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author bhunt
  * 
  */
+@Component(service = Object.class, property = {"osgi.command.scope=mongodb", "osgi.command.function=configureClient", "osgi.command.function=configureDatabase"})
 public class MongoConfigurator
 {
 	private static volatile MongoConfigurator mongoConfigurator;
@@ -36,11 +40,13 @@ public class MongoConfigurator
 		return mongoConfigurator;
 	}
 
+	@Activate
 	void activate()
 	{
 		mongoConfigurator = this;
 	}
 
+	@Deactivate
 	void deactivate()
 	{
 		mongoConfigurator = null;
@@ -50,7 +56,7 @@ public class MongoConfigurator
 	{
 		try
 		{
-			Configuration config = configurationAdmin.getConfiguration(ConfigurationProperties.CLIENT_PID, null);
+			Configuration config = configurationAdmin.getConfiguration("org.eclipselabs.emongo.clientProvider", null);
 
 			Dictionary<String, Object> properties = config.getProperties();
 
@@ -67,11 +73,11 @@ public class MongoConfigurator
 		}
 	}
 
-	public void configureDatabase(String clientId, String databaseName, String alias, String user, String password) throws ConfigurationException
+	public void configureDatabase(String clientId, String databaseName, String alias) throws ConfigurationException
 	{
 		try
 		{
-			Configuration config = configurationAdmin.getConfiguration(ConfigurationProperties.DATABASE_PID, null);
+			Configuration config = configurationAdmin.getConfiguration("org.eclipselabs.emongo.databaseProvider", null);
 
 			Dictionary<String, Object> properties = config.getProperties();
 
@@ -80,8 +86,6 @@ public class MongoConfigurator
 
 			properties.put(MongoDatabaseProvider.PROP_DATABASE, databaseName);
 			properties.put(MongoDatabaseProvider.PROP_ALIAS, alias);
-			properties.put(MongoDatabaseProvider.PROP_USER, user);
-			properties.put(MongoDatabaseProvider.PROP_PASSWORD, password);
 			properties.put(MongoDatabaseProvider.PROP_CLIENT_FILTER, "(" + MongoClientProvider.PROP_CLIENT_ID + "=" + clientId + ")");
 			config.update(properties);
 		}
@@ -91,6 +95,7 @@ public class MongoConfigurator
 		}
 	}
 
+	@Reference(unbind = "-")
 	void bindConfigurationAdmin(ConfigurationAdmin configurationAdmin)
 	{
 		this.configurationAdmin = configurationAdmin;

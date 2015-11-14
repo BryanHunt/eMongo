@@ -16,22 +16,26 @@ import java.io.StringWriter;
 import java.util.Date;
 import java.util.Map;
 
+import org.bson.Document;
 import org.eclipselabs.emongo.MongoDatabaseProvider;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.log.LogEntry;
 import org.osgi.service.log.LogListener;
 import org.osgi.service.log.LogReaderService;
 import org.osgi.service.log.LogService;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
+import com.mongodb.client.MongoCollection;
 
 /**
  * @author bhunt
  * 
  */
+@Component(configurationPid = {"org.eclipselabs.emongo.log"})
 public class MongoLogListener implements LogListener
 {
 	public static final String PROP_DATABASE_FILTER = "MongoDatabaseProvider.target";
@@ -40,9 +44,10 @@ public class MongoLogListener implements LogListener
 
 	private volatile LogReaderService logReaderService;
 	private volatile MongoDatabaseProvider mongoDatabaseProvider;
-	private volatile DBCollection logCollection;
+	private volatile MongoCollection<Document> logCollection;
 	private volatile Integer maxLevel;
 
+	@Activate
 	public void activate(Map<String, Object> properties)
 	{
 		String collection = (String) properties.get(PROP_COLLECTION);
@@ -54,10 +59,11 @@ public class MongoLogListener implements LogListener
 		if (maxLevel == null)
 			maxLevel = LogService.LOG_ERROR;
 
-		logCollection = mongoDatabaseProvider.getDB().getCollection(collection);
+		logCollection = mongoDatabaseProvider.getDatabase().getCollection(collection);
 		logReaderService.addLogListener(this);
 	}
 
+	@Deactivate
 	public void deactivate()
 	{
 		logReaderService.removeLogListener(this);
@@ -69,11 +75,7 @@ public class MongoLogListener implements LogListener
 		if (entry.getLevel() > maxLevel)
 			return;
 
-		DBObject logData = new BasicDBObject();
-		logData.put("level", entry.getLevel());
-		logData.put("bsn", entry.getBundle().getSymbolicName());
-		logData.put("time", new Date(entry.getTime()));
-		logData.put("message", entry.getMessage());
+		Document logData = new Document("level", entry.getLevel()).append("bsn", entry.getBundle().getSymbolicName()).append("time", new Date(entry.getTime())).append("message", entry.getMessage());
 
 		@SuppressWarnings("rawtypes")
 		ServiceReference serviceReference = entry.getServiceReference();
@@ -85,24 +87,26 @@ public class MongoLogListener implements LogListener
 
 		if (exception != null)
 		{
-			DBObject exceptionData = new BasicDBObject();
-			exceptionData.put("message", exception.getMessage());
+
 			StringWriter stringWriter = new StringWriter();
 			PrintWriter printWriter = new PrintWriter(stringWriter);
 			exception.printStackTrace(printWriter);
-			exceptionData.put("stack", stringWriter.toString());
+
+			Document exceptionData = new Document("message", exception.getMessage()).append("stack", stringWriter.toString());
 
 			logData.put("exception", exceptionData);
 		}
 
-		logCollection.insert(logData);
+		logCollection.insertOne(logData);
 	}
 
+	@Reference(unbind = "-")
 	public void bindLogReaderService(LogReaderService logReaderService)
 	{
 		this.logReaderService = logReaderService;
 	}
 
+  @Reference(unbind = "-")
 	public void bindMongoDatabaseProvider(MongoDatabaseProvider mongoDatabaseProvider)
 	{
 		this.mongoDatabaseProvider = mongoDatabaseProvider;

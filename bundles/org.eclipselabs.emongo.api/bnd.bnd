@@ -1,0 +1,2 @@
+Export-Package: org.eclipselabs.emongo
+-buildpath: org.mongodb.mongo-java-driver;version=3.1

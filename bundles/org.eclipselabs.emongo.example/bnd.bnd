@@ -1,0 +1,6 @@
+-buildpath: \
+	org.mongodb.mongo-java-driver;version=3.1,\
+	org.eclipselabs.emongo.api;version=latest,\
+	osgi.cmpn;version=6.0
+Private-Package: org.eclipselabs.emongo.example
+-dsannotations: *

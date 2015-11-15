@@ -28,7 +28,10 @@ import org.osgi.service.component.annotations.Reference;
  * @author bhunt
  * 
  */
-@Component(service = Object.class, property = {"osgi.command.scope=mongodb", "osgi.command.function=configureClient", "osgi.command.function=configureDatabase"})
+@Component(service = Object.class, property = {"osgi.command.scope=mongodb", 
+    "osgi.command.function=configureClient", 
+    "osgi.command.function=configureDatabase",
+    "osgi.command.function=configureMonitor"})
 public class MongoConfigurator
 {
 	private static volatile MongoConfigurator mongoConfigurator;
@@ -108,6 +111,27 @@ public class MongoConfigurator
 		}
 	}
 
+	public void configureMonitor(String databaseAlias, Integer updateInterval) throws ConfigurationException
+	{
+    try
+    {
+      Configuration config = configurationAdmin.getConfiguration("org.eclipselabs.emongo.monitor.databaseMonitor", null);
+
+      Dictionary<String, Object> properties = config.getProperties();
+
+      if (properties == null)
+        properties = new Hashtable<String, Object>();
+
+      properties.put("updateInterval", updateInterval);
+      properties.put("MongoDatabaseProvider.target", "(" + MongoDatabaseProvider.PROP_ALIAS + "=" + databaseAlias + ")");
+      config.update(properties);
+    }
+    catch (IOException e)
+    {
+      throw new ConfigurationException(e);
+    }	  
+	}
+	
 	@Reference(unbind = "-")
 	void bindConfigurationAdmin(ConfigurationAdmin configurationAdmin)
 	{

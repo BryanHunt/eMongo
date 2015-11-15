@@ -99,7 +99,7 @@ public class TestMongoClientProviderComponent
 	@Test(expected = IllegalStateException.class)
 	public void testActivateWithTooManuURISegments() throws Exception
 	{
-    properties.put(MongoClientProvider.PROP_URI , "mongodd://localhost/");
+    properties.put(MongoClientProvider.PROP_URI , "mongodd://localhost/database/");
 
 		mongoClientProviderComponent.activate(aQute.lib.converter.Converter.cnv(ClientConfig.class, properties));
 	}

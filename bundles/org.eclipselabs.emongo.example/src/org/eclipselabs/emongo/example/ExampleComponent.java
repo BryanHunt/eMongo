@@ -37,9 +37,13 @@ public class ExampleComponent
 		MongoCollection<Document> collection = database.getCollection("items");
 		collection.drop();
 
+		System.out.println("Inserting documents...");
+		
 		for (int i = 0; i < 10; i++)
 			collection.insertOne(new Document("x", i));
 
+		System.out.println("Quering documents...");
+		
 		FindIterable<Document> documents = collection.find();
 
 		for (Document document : documents)

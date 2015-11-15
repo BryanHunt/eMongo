@@ -14,7 +14,6 @@ package org.eclipselabs.emongo.log;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Date;
-import java.util.Map;
 
 import org.bson.Document;
 import org.eclipselabs.emongo.MongoDatabaseProvider;
@@ -38,6 +37,12 @@ import com.mongodb.client.MongoCollection;
 @Component(configurationPid = {"org.eclipselabs.emongo.log"})
 public class MongoLogListener implements LogListener
 {
+  public @interface LogConfig
+  {
+    String collection();
+    int maxLevel() default LogService.LOG_ERROR;
+  }
+  
 	public static final String PROP_DATABASE_FILTER = "MongoDatabaseProvider.target";
 	public static final String PROP_COLLECTION = "collection";
 	public static final String PROP_MAX_LEVEL = "maxLevel";
@@ -48,16 +53,13 @@ public class MongoLogListener implements LogListener
 	private volatile Integer maxLevel;
 
 	@Activate
-	public void activate(Map<String, Object> properties)
+	public void activate(LogConfig config)
 	{
-		String collection = (String) properties.get(PROP_COLLECTION);
-		maxLevel = (Integer) properties.get(PROP_MAX_LEVEL);
+		String collection = config.collection();
+		maxLevel = config.maxLevel();
 
 		if (collection == null || collection.isEmpty())
 			throw new IllegalStateException("The collection property cannot be empty");
-
-		if (maxLevel == null)
-			maxLevel = LogService.LOG_ERROR;
 
 		logCollection = mongoDatabaseProvider.getDatabase().getCollection(collection);
 		logReaderService.addLogListener(this);

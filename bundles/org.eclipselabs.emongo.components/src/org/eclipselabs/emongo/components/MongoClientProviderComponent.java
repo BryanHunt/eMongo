@@ -207,9 +207,10 @@ public class MongoClientProviderComponent extends AbstractComponent implements M
 		for (String targetURI : value.split("\\s*,\\s*"))
 		{
 			String uri = targetURI.trim();
-
-			if (!uri.startsWith("mongodb://") || uri.endsWith("/") || uri.split("/").length != 3)
-				return "The uri: '" + uri + "' does not have the form 'mongodb://host[:port]'";
+			String[] segments = uri.split("/");
+			
+			if (!uri.startsWith("mongodb://") || uri.endsWith("/") || segments.length < 3 || segments.length > 4)
+				return "The uri: '" + uri + "' does not have the form 'mongodb://host[:port]/[database]'";
 
 			if (uris != null)
 				uris.add(uri);

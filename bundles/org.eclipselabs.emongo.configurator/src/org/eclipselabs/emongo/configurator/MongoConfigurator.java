@@ -52,6 +52,12 @@ public class MongoConfigurator
 		mongoConfigurator = null;
 	}
 
+	/**
+	 * Configures a MongoClientProvider
+	 * @param clientId the client id
+	 * @param clientURI the client URI
+	 * @throws ConfigurationException if there is a problem configuring the service
+	 */
 	public void configureClient(String clientId, String clientURI) throws ConfigurationException
 	{
 		try
@@ -73,6 +79,13 @@ public class MongoConfigurator
 		}
 	}
 
+	/**
+	 * Configures a MongoDatabaseProvider
+	 * @param clientId the client id
+	 * @param databaseName the database name
+	 * @param alias the database alias
+	 * @throws ConfigurationException if thre was a problem configuring the service
+	 */
 	public void configureDatabase(String clientId, String databaseName, String alias) throws ConfigurationException
 	{
 		try

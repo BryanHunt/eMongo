@@ -25,7 +25,9 @@ import org.osgi.service.metatype.ObjectClassDefinition;
  */
 public class ObjectClassDefinitionImpl implements ObjectClassDefinition
 {
-	private Collection<AttributeDefinition> attributeDefinitions = new ArrayList<AttributeDefinition>();
+  private Collection<AttributeDefinition> allAttributeDefinitions = new ArrayList<AttributeDefinition>();  
+	private Collection<AttributeDefinition> requiredAttributeDefinitions = new ArrayList<AttributeDefinition>();
+  private Collection<AttributeDefinition> optionalAttributeDefinitions = new ArrayList<AttributeDefinition>();
 	private String description;
 	private String id;
 	private String name;
@@ -37,15 +39,31 @@ public class ObjectClassDefinitionImpl implements ObjectClassDefinition
 		this.description = description;
 	}
 
-	public void addAttribute(AttributeDefinition attributeDefinition)
+	public void addRequiredAttribute(AttributeDefinition attributeDefinition)
 	{
-		attributeDefinitions.add(attributeDefinition);
+    allAttributeDefinitions.add(attributeDefinition);
+	  requiredAttributeDefinitions.add(attributeDefinition);
 	}
 
-	@Override
-	public AttributeDefinition[] getAttributeDefinitions(int arg0)
+  public void addOptionalAttribute(AttributeDefinition attributeDefinition)
+  {
+    allAttributeDefinitions.add(attributeDefinition);
+    optionalAttributeDefinitions.add(attributeDefinition);
+  }
+
+  @Override
+	public AttributeDefinition[] getAttributeDefinitions(int filter)
 	{
-		return attributeDefinitions.toArray(new AttributeDefinition[0]);
+    switch(filter)
+    {
+      case ObjectClassDefinition.REQUIRED:
+        return requiredAttributeDefinitions.toArray(new AttributeDefinition[0]);
+      case ObjectClassDefinition.OPTIONAL:
+        return optionalAttributeDefinitions.toArray(new AttributeDefinition[0]);
+      case ObjectClassDefinition.ALL:
+      default:
+        return allAttributeDefinitions.toArray(new AttributeDefinition[0]);
+    }
 	}
 
 	@Override

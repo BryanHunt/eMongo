@@ -71,8 +71,8 @@ public class MongoDatabaseMonitorMetaTypeProvider implements MetaTypeProvider
 		updateInterval.setDescription("The interval in which to sample the database stats in minutes");
 
 		ObjectClassDefinitionImpl ocd = new ObjectClassDefinitionImpl(MongoDatabaseMonitorComponent.ID_FACTORY_PID, "MongoDB ID", "MongoDB ID Provider Configuration");
-		ocd.addAttribute(database);
-		ocd.addAttribute(updateInterval);
+		ocd.addRequiredAttribute(database);
+		ocd.addOptionalAttribute(updateInterval);
 
 		return ocd;
 	}

@@ -83,9 +83,9 @@ public class MongoDatabaseMetaTypeProvider implements MetaTypeProvider
 		database.setDescription("The name MongoDB database.");
 
 		ObjectClassDefinitionImpl ocd = new ObjectClassDefinitionImpl(ConfigurationProperties.DATABASE_PID, "MongoDB Database", "MongoDB Database Configuration");
-		ocd.addAttribute(clientId);
-		ocd.addAttribute(alias);
-		ocd.addAttribute(database);
+		ocd.addRequiredAttribute(clientId);
+		ocd.addRequiredAttribute(alias);
+		ocd.addRequiredAttribute(database);
 
 		return ocd;
 	}

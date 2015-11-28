@@ -72,8 +72,8 @@ public class MongoIdFactoryMetaTypeProvider implements MetaTypeProvider
 		collection.setDescription("The MongoDB collection within the database");
 
 		ObjectClassDefinitionImpl ocd = new ObjectClassDefinitionImpl(ConfigurationProperties.ID_FACTORY_PID, "MongoDB ID", "MongoDB ID Provider Configuration");
-		ocd.addAttribute(database);
-		ocd.addAttribute(collection);
+		ocd.addRequiredAttribute(database);
+		ocd.addRequiredAttribute(collection);
 
 		return ocd;
 	}

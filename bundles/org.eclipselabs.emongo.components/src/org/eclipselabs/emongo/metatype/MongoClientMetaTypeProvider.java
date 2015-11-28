@@ -87,20 +87,6 @@ public class MongoClientMetaTypeProvider implements MetaTypeProvider
 		socketKeepAlive.setDefaultValue(new String[] { "false" });
 		socketKeepAlive.setDescription("This flag controls the socket keep alive feature that keeps a connection alive through firewalls Socket.setKeepAlive(boolean) Default is false.");
 
-		AttributeDefinitionImpl autoConnectRetry = new AttributeDefinitionImpl(MongoClientProvider.PROP_AUTO_CONNECT_RETRY, "Auto Connect Retry", AttributeDefinition.BOOLEAN);
-		autoConnectRetry.setDefaultValue(new String[] { "false" });
-		autoConnectRetry
-				.setDescription("If true, the driver will keep trying to connect to the same server in case that the socket cannot be established. There is maximum amount of time to keep retrying, which is 15s by default. This can be useful to avoid some exceptions being thrown when a server is down temporarily by blocking the operations. It also can be useful to smooth the transition to a new master (so that a new master is elected within the retry time). Note that when using this flag: - for a replica set, the driver will trying to connect to the old master for that time, instead of failing over to the new one right away - this does not prevent exception from being thrown in read/write operations on the socket, which must be handled by application Even if this flag is false, the driver already has mechanisms to automatically recreate broken connections and retry the read operations. Default is false.");
-
-		AttributeDefinitionImpl maxAutoConnectRetryTime = new LongAttributeDefinitionImpl(MongoClientProvider.PROP_MAX_AUTO_CONNECT_RETRY_TIME, "Max Auto Connect Retry Time", 0);
-		maxAutoConnectRetryTime.setDefaultValue(new String[] { "0" });
-		maxAutoConnectRetryTime
-				.setDescription("The maximum amount of time in MS to spend retrying to open connection to the same server. Default is 0, which means to use the default 15s if autoConnectRetry is on.");
-
-		AttributeDefinitionImpl continueOnInsertError = new AttributeDefinitionImpl(MongoClientProvider.PROP_CONTINUE_ON_INSERT_ERROR, "Write Concern - continueOnInsertError", AttributeDefinition.BOOLEAN);
-		continueOnInsertError.setDefaultValue(new String[] { "false" });
-		continueOnInsertError.setDescription("If batch inserts should continue after the first error. Default is false.");
-
 		AttributeDefinitionImpl w = new IntegerAttributeDefinitionImpl(MongoClientProvider.PROP_W, "Write Concern - w", 0);
 		w.setDefaultValue(new String[] { "0" });
 		w.setDescription("The 'w' value of the global WriteConcern. Default is 0.");
@@ -118,22 +104,20 @@ public class MongoClientMetaTypeProvider implements MetaTypeProvider
 		j.setDescription("The 'j' value of the global WriteConcern. Default is false.");
 
 		ObjectClassDefinitionImpl ocd = new ObjectClassDefinitionImpl(ConfigurationProperties.CLIENT_PID, "MongoDB Client", "MongoDB Client Configuration");
-		ocd.addAttribute(clientId);
-		ocd.addAttribute(uri);
-		ocd.addAttribute(description);
-		ocd.addAttribute(connectionsPerHost);
-		ocd.addAttribute(threadsAllowedToBlockForConnectionMultiplier);
-		ocd.addAttribute(maxWaitTime);
-		ocd.addAttribute(connectTimeout);
-		ocd.addAttribute(socketTimeout);
-		ocd.addAttribute(socketKeepAlive);
-		ocd.addAttribute(autoConnectRetry);
-		ocd.addAttribute(maxAutoConnectRetryTime);
-		ocd.addAttribute(continueOnInsertError);
-		ocd.addAttribute(w);
-		ocd.addAttribute(wtimeout);
-		ocd.addAttribute(fsync);
-		ocd.addAttribute(j);
+		
+		ocd.addRequiredAttribute(clientId);
+		ocd.addRequiredAttribute(uri);
+		ocd.addOptionalAttribute(description);
+		ocd.addOptionalAttribute(connectionsPerHost);
+		ocd.addOptionalAttribute(threadsAllowedToBlockForConnectionMultiplier);
+		ocd.addOptionalAttribute(maxWaitTime);
+		ocd.addOptionalAttribute(connectTimeout);
+		ocd.addOptionalAttribute(socketTimeout);
+		ocd.addOptionalAttribute(socketKeepAlive);
+		ocd.addOptionalAttribute(w);
+		ocd.addOptionalAttribute(wtimeout);
+		ocd.addOptionalAttribute(fsync);
+		ocd.addOptionalAttribute(j);
 
 		return ocd;
 	}

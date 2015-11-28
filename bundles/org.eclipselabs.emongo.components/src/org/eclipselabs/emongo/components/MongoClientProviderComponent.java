@@ -30,7 +30,10 @@ import org.osgi.service.log.LogService;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions;
 import com.mongodb.MongoCredential;
+import com.mongodb.ReadPreference;
 import com.mongodb.ServerAddress;
+import com.mongodb.Tag;
+import com.mongodb.TagSet;
 import com.mongodb.WriteConcern;
 
 
@@ -60,7 +63,8 @@ public class MongoClientProviderComponent extends AbstractComponent implements M
     int maxWaitTime() default 120000;
     int minConnectionsPerHost() default 0;
     int minHeartbeatFrequency() default 500;
-//    readPreference(ReadPreference readPreference)
+    int readPreferenceType() default 0;
+    String[] readPreferenceTags();
     String requiredReplicaSetName() default "";
     int serverSelectionTimeout() default 30000;
     boolean socketKeepAlive() default false;
@@ -235,7 +239,6 @@ public class MongoClientProviderComponent extends AbstractComponent implements M
 		optionsBuilder.connectionsPerHost(config.connectionsPerHost());
 		optionsBuilder.connectTimeout(config.connectTimeout());
 		optionsBuilder.cursorFinalizerEnabled(config.cursorFinalizerEnabled());
-		optionsBuilder.connectionsPerHost(config.connectionsPerHost());
 		optionsBuilder.description(config.description());
 		optionsBuilder.heartbeatConnectTimeout(config.heartbeatConnectTimeout());
 		optionsBuilder.heartbeatFrequency(config.heartbeatFrequency());
@@ -245,11 +248,7 @@ public class MongoClientProviderComponent extends AbstractComponent implements M
 		optionsBuilder.maxConnectionLifeTime(config.maxConnectionLifeTime());
 		optionsBuilder.maxWaitTime(config.maxWaitTime());
 		optionsBuilder.minConnectionsPerHost(config.minConnectionsPerHost());
-		optionsBuilder.minHeartbeatFrequency(config.minHeartbeatFrequency());
-		
-		if(!config.requiredReplicaSetName().isEmpty())
-		  optionsBuilder.requiredReplicaSetName(config.requiredReplicaSetName());
-		
+		optionsBuilder.minHeartbeatFrequency(config.minHeartbeatFrequency());		
 		optionsBuilder.serverSelectionTimeout(config.serverSelectionTimeout());
 		optionsBuilder.socketKeepAlive(config.socketKeepAlive());
 		optionsBuilder.socketTimeout(config.socketTimeout());
@@ -259,6 +258,38 @@ public class MongoClientProviderComponent extends AbstractComponent implements M
 		WriteConcern writeConcern = new WriteConcern(config.writeConcernW(), config.writeConcernWtimeout(), config.writeConcernFsync(), config.writeConcernJ());
 		optionsBuilder.writeConcern(writeConcern);
 
+    if(!config.requiredReplicaSetName().isEmpty())
+      optionsBuilder.requiredReplicaSetName(config.requiredReplicaSetName());
+
+    List<Tag> tags = new ArrayList<>();
+    
+    for(String tag : config.readPreferenceTags())
+    {
+      String[] elements = tag.split("=");
+      tags.add(new Tag(elements[0], elements[1]));
+    }
+    
+    TagSet tagSet = new TagSet(tags);
+    
+    switch(config.readPreferenceType())
+    {
+      case 1:
+        optionsBuilder.readPreference(ReadPreference.nearest(tagSet));
+        break;
+      case 2:
+        optionsBuilder.readPreference(ReadPreference.primary());
+        break;
+      case 3:
+        optionsBuilder.readPreference(ReadPreference.primaryPreferred(tagSet));
+        break;
+      case 4:
+        optionsBuilder.readPreference(ReadPreference.secondary(tagSet));
+        break;
+      case 5:
+        optionsBuilder.readPreference(ReadPreference.secondaryPreferred(tagSet));
+        break;
+    }
+    
 		return optionsBuilder.build();
 	}
 

@@ -1,9 +1,10 @@
 package org.eclipselabs.emongo;
 
 import java.io.File;
+import java.io.IOException;
 
 public interface MongoAdmin
 {
-  void dumpDatabase(String databaseName, File location);
-  void restoreDatabase(String databaseName, File location);
+  boolean dumpDatabase(String host, String databaseName, File location) throws IOException, InterruptedException;
+  boolean restoreDatabase(String host, String databaseName, File location) throws IOException, InterruptedException;
 }

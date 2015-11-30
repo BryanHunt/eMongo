@@ -34,4 +34,9 @@ public interface ConfigurationProperties
 	 * configuring a database component with ConfigurationAdmin.
 	 */
 	String DATABASE_PID = "org.eclipselabs.emongo.databaseProvider";
+	
+	/**
+	 * the PID of the admin component.  Use this constant when configuring an admin component.
+	 */
+	String ADMIN_PID = "org.eclipselabs.emongo.admin";
 }

@@ -1,30 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<repository increment="1448682849000" name="Release" xmlns="http://www.osgi.org/xmlns/repository/v1.0.0">
+<repository increment="1448848797000" name="Release" xmlns="http://www.osgi.org/xmlns/repository/v1.0.0">
   <resource>
     <capability namespace="osgi.identity">
       <attribute name="osgi.identity" value="org.eclipselabs.emongo.api"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" type="Version" value="2.0.0.201511280321"/>
+      <attribute name="version" type="Version" value="2.0.0.201511300015"/>
     </capability>
     <capability namespace="osgi.content">
-      <attribute name="osgi.content" value="b52f72f1e13ddb6f27c11db4a1ff1c8f8779867f28681af412580009e9a452ea"/>
+      <attribute name="osgi.content" value="fc97a0b8cccfff14edadf641023255c225acd78068f41b701c761a83aa96a684"/>
       <attribute name="url" value="org.eclipselabs.emongo.api/org.eclipselabs.emongo.api-2.0.0.jar"/>
-      <attribute name="size" type="Long" value="9772"/>
+      <attribute name="size" type="Long" value="9863"/>
       <attribute name="mime" value="application/vnd.osgi.bundle"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <attribute name="osgi.wiring.bundle" value="org.eclipselabs.emongo.api"/>
-      <attribute name="bundle-version" type="Version" value="2.0.0.201511280321"/>
+      <attribute name="bundle-version" type="Version" value="2.0.0.201511300015"/>
     </capability>
     <capability namespace="osgi.wiring.host">
       <attribute name="osgi.wiring.host" value="org.eclipselabs.emongo.api"/>
-      <attribute name="bundle-version" type="Version" value="2.0.0.201511280321"/>
+      <attribute name="bundle-version" type="Version" value="2.0.0.201511300015"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <attribute name="osgi.wiring.package" value="org.eclipselabs.emongo"/>
       <attribute name="version" type="Version" value="2.0.0"/>
       <attribute name="bundle-symbolic-name" value="org.eclipselabs.emongo.api"/>
-      <attribute name="bundle-version" type="Version" value="2.0.0.201511280321"/>
+      <attribute name="bundle-version" type="Version" value="2.0.0.201511300015"/>
       <directive name="uses" value="com.mongodb,com.mongodb.client,org.bson"/>
     </capability>
     <requirement namespace="osgi.wiring.package">
@@ -44,24 +44,27 @@
     <capability namespace="osgi.identity">
       <attribute name="osgi.identity" value="org.eclipselabs.emongo.components"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" type="Version" value="2.0.0.201511280321"/>
+      <attribute name="version" type="Version" value="2.0.0.201511300155"/>
     </capability>
     <capability namespace="osgi.content">
-      <attribute name="osgi.content" value="9e9a60bb64737e65344c3959025815d0fc0b62892be18bd58ba611bc45494236"/>
+      <attribute name="osgi.content" value="762b218e45b94e3ff4400b3ae1cb22452602229b2d4b89e3f30f215efa1642f6"/>
       <attribute name="url" value="org.eclipselabs.emongo.components/org.eclipselabs.emongo.components-2.0.0.jar"/>
-      <attribute name="size" type="Long" value="58032"/>
+      <attribute name="size" type="Long" value="63974"/>
       <attribute name="mime" value="application/vnd.osgi.bundle"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <attribute name="osgi.wiring.bundle" value="org.eclipselabs.emongo.components"/>
-      <attribute name="bundle-version" type="Version" value="2.0.0.201511280321"/>
+      <attribute name="bundle-version" type="Version" value="2.0.0.201511300155"/>
     </capability>
     <capability namespace="osgi.wiring.host">
       <attribute name="osgi.wiring.host" value="org.eclipselabs.emongo.components"/>
-      <attribute name="bundle-version" type="Version" value="2.0.0.201511280321"/>
+      <attribute name="bundle-version" type="Version" value="2.0.0.201511300155"/>
     </capability>
     <capability namespace="osgi.service">
       <attribute name="objectClass" type="List&lt;String&gt;" value="java.lang.Runnable"/>
+    </capability>
+    <capability namespace="osgi.service">
+      <attribute name="objectClass" type="List&lt;String&gt;" value="org.eclipselabs.emongo.MongoAdmin"/>
     </capability>
     <capability namespace="osgi.service">
       <attribute name="objectClass" type="List&lt;String&gt;" value="org.eclipselabs.emongo.MongoClientProvider"/>
@@ -74,6 +77,11 @@
     </capability>
     <capability namespace="osgi.service">
       <attribute name="objectClass" type="List&lt;String&gt;" value="org.osgi.service.metatype.MetaTypeProvider"/>
+    </capability>
+    <capability namespace="osgi.service">
+      <attribute name="objectClass" type="List&lt;String&gt;" value="org.eclipselabs.emongo.MongoAdmin"/>
+      <attribute name="mongodbBinDir" value=""/>
+      <directive name="uses" value="org.eclipselabs.emongo"/>
     </capability>
     <capability namespace="osgi.service">
       <attribute name="objectClass" type="List&lt;String&gt;" value="org.eclipselabs.emongo.MongoClientProvider"/>
@@ -117,6 +125,11 @@
     <capability namespace="osgi.service">
       <attribute name="objectClass" type="List&lt;String&gt;" value="org.eclipselabs.emongo.MongoIdFactory"/>
       <directive name="uses" value="org.eclipselabs.emongo"/>
+    </capability>
+    <capability namespace="osgi.service">
+      <attribute name="objectClass" type="List&lt;String&gt;" value="org.osgi.service.metatype.MetaTypeProvider"/>
+      <attribute name="metatype.pid" value="org.eclipselabs.emongo.admin"/>
+      <directive name="uses" value="org.osgi.service.metatype"/>
     </capability>
     <capability namespace="osgi.service">
       <attribute name="objectClass" type="List&lt;String&gt;" value="org.osgi.service.metatype.MetaTypeProvider"/>

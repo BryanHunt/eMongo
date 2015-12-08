@@ -48,7 +48,7 @@ public class MongoClientProviderComponent extends AbstractComponent implements M
   {
     String clientId();
     String uri();
-    String[] credentials();
+    String[] credentials() default {};
     boolean alwaysUseMBeans() default false;
     int connectionsPerHost() default 100;
     int connectTimeout() default 10000;
@@ -64,7 +64,7 @@ public class MongoClientProviderComponent extends AbstractComponent implements M
     int minConnectionsPerHost() default 0;
     int minHeartbeatFrequency() default 500;
     int readPreferenceType() default 0;
-    String[] readPreferenceTags();
+    String[] readPreferenceTags() default {};
     String requiredReplicaSetName() default "";
     int serverSelectionTimeout() default 30000;
     boolean socketKeepAlive() default false;
@@ -263,10 +263,13 @@ public class MongoClientProviderComponent extends AbstractComponent implements M
 
     List<Tag> tags = new ArrayList<>();
     
-    for(String tag : config.readPreferenceTags())
+    if(config.readPreferenceTags() != null)
     {
-      String[] elements = tag.split("=");
-      tags.add(new Tag(elements[0], elements[1]));
+      for(String tag : config.readPreferenceTags())
+      {
+        String[] elements = tag.split("=");
+        tags.add(new Tag(elements[0], elements[1]));
+      }
     }
     
     TagSet tagSet = new TagSet(tags);

@@ -5,5 +5,5 @@
 	org.apache.httpcomponents.httpclient;version=4.5,\
 	org.apache.httpcomponents.httpcore;version=4.4
 -dsannotations: *
-Bundle-Version: 0.0.0.${tstamp}
+Bundle-Version: 1.0.0.${tstamp}
 Private-Package: org.eclilpselabs.emongo.monitor.influxdb

@@ -25,7 +25,9 @@ import java.io.IOException;
  */
 public interface MongoIdFactory
 {
-	/**
+  String PID = "org.eclipselabs.emongo.idFactory";
+  
+  /**
 	 * The service property key for the MongoDB database reference filter.
 	 */
 	String PROP_DATABASE_FILTER = "MongoDatabaseProvider.target";

@@ -23,6 +23,8 @@ import com.mongodb.client.MongoDatabase;
  */
 public interface MongoClientProvider
 {
+  String PID = "org.eclipselabs.emongo.provider";
+  
 	// --- MongoClientOptions.Builder properties ---------------------------------------------------
 
   /**

@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.bson.Document;
+import org.eclipselabs.emongo.MongoAdmin;
 import org.eclipselabs.emongo.MongoClientProvider;
 import org.eclipselabs.emongo.MongoServerStatsPublisher;
 import org.osgi.service.component.annotations.Activate;
@@ -14,7 +15,7 @@ import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 
-@Component(immediate = true, configurationPolicy = ConfigurationPolicy.REQUIRE, configurationPid = {"org.eclipselabs.emongo.monitor.databaseMonitor"})
+@Component(immediate = true, configurationPolicy = ConfigurationPolicy.REQUIRE, configurationPid = {MongoAdmin.MONITOR_PID})
 public class MongoDatabaseMonitorComponent implements Runnable
 {
   public @interface MonitorConfig
@@ -25,8 +26,6 @@ public class MongoDatabaseMonitorComponent implements Runnable
   public static final String PROP_UPDATE_INTERVAL = "updateInterval";
 
   public static final String PROP_DATABASE_FILTER = "MongoDatabaseProvider.target";
-
-  public static final String ID_FACTORY_PID = "org.eclipselabs.emongo.monitor.databaseMonitor";
 
   private volatile MongoClientProvider mongoClientProvider;
   private volatile Collection<MongoServerStatsPublisher> serverStatsPublishers = Collections.newSetFromMap(new ConcurrentHashMap<>());

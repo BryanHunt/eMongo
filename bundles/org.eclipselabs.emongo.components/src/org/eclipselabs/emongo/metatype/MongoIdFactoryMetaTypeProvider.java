@@ -29,7 +29,7 @@ import org.osgi.service.metatype.ObjectClassDefinition;
  * @author bhunt
  * 
  */
-@Component(service = MetaTypeProvider.class, property = {"metatype.factory.pid=org.eclipselabs.emongo.idFactory"})
+@Component(service = MetaTypeProvider.class, property = {MetaTypeConfiguration.PROP_ID_FACTORY_PID})
 public class MongoIdFactoryMetaTypeProvider implements MetaTypeProvider
 {
 	Set<String> databases = new CopyOnWriteArraySet<String>();
@@ -71,7 +71,7 @@ public class MongoIdFactoryMetaTypeProvider implements MetaTypeProvider
 
 		collection.setDescription("The MongoDB collection within the database");
 
-		ObjectClassDefinitionImpl ocd = new ObjectClassDefinitionImpl(ConfigurationProperties.ID_FACTORY_PID, "MongoDB ID", "MongoDB ID Provider Configuration");
+		ObjectClassDefinitionImpl ocd = new ObjectClassDefinitionImpl(MongoIdFactory.PID, "MongoDB ID", "MongoDB ID Provider Configuration");
 		ocd.addRequiredAttribute(database);
 		ocd.addRequiredAttribute(collection);
 

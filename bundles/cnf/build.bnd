@@ -47,6 +47,7 @@ javac.target:          1.8
 ## example, to add one additional plugin to the list defined in
 ## ext/repositories.bnd:
 -plugin: ${ext.repositories.-plugin},\
+aQute.bnd.deployer.repository.FixedIndexedRepo;name=eUnit;locations=http://bryanhunt.github.com/eUnit/releases/1.0.0/index.xml.gz, \
 aQute.bnd.deployer.repository.FixedIndexedRepo;name=3p2;locations=http://bryanhunt.github.com/3rd-party-libs/index.xml.gz, \
 aQute.bnd.deployer.repository.FixedIndexedRepo;name=Orbit;locations=http://download.eclipse.org/tools/orbit/downloads/drops/R20150821153341/repository/index.xml.gz
 

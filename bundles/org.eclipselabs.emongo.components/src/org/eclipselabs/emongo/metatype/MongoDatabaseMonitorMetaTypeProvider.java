@@ -14,6 +14,7 @@ package org.eclipselabs.emongo.metatype;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
+import org.eclipselabs.emongo.MongoAdmin;
 import org.eclipselabs.emongo.MongoClientProvider;
 import org.eclipselabs.emongo.components.MongoDatabaseMonitorComponent;
 import org.osgi.framework.ServiceReference;
@@ -28,7 +29,7 @@ import org.osgi.service.metatype.ObjectClassDefinition;
  * @author bhunt
  * 
  */
-@Component(service = MetaTypeProvider.class, property = {"metatype.factory.pid=org.eclipselabs.emongo.monitor.databaseMonitor"})
+@Component(service = MetaTypeProvider.class, property = {MetaTypeConfiguration.PROP_MONITOR_PID})
 public class MongoDatabaseMonitorMetaTypeProvider implements MetaTypeProvider
 {
 	Set<String> databases = new CopyOnWriteArraySet<String>();
@@ -70,7 +71,7 @@ public class MongoDatabaseMonitorMetaTypeProvider implements MetaTypeProvider
 
 		updateInterval.setDescription("The interval in which to sample the database stats in minutes");
 
-		ObjectClassDefinitionImpl ocd = new ObjectClassDefinitionImpl(MongoDatabaseMonitorComponent.ID_FACTORY_PID, "MongoDB Monitor", "MongoDB Monitor Configuration");
+		ObjectClassDefinitionImpl ocd = new ObjectClassDefinitionImpl(MongoAdmin.MONITOR_PID, "MongoDB Monitor", "MongoDB Monitor Configuration");
 		ocd.addRequiredAttribute(database);
 		ocd.addOptionalAttribute(updateInterval);
 

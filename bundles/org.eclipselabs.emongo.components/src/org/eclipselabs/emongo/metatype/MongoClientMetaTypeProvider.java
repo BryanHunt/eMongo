@@ -22,7 +22,7 @@ import org.osgi.service.metatype.ObjectClassDefinition;
  * @author bhunt
  * 
  */
-@Component(service = MetaTypeProvider.class, property = {"metatype.factory.pid=org.eclipselabs.emongo.clientProvider"})
+@Component(service = MetaTypeProvider.class, property = {MetaTypeConfiguration.PROP_CLIENT_PID})
 public class MongoClientMetaTypeProvider implements MetaTypeProvider
 {
 	@Override
@@ -137,7 +137,7 @@ public class MongoClientMetaTypeProvider implements MetaTypeProvider
 		j.setDefaultValue(new String[] { "false" });
 		j.setDescription("The 'j' value of the global WriteConcern. Default is false.");
 
-		ObjectClassDefinitionImpl ocd = new ObjectClassDefinitionImpl(ConfigurationProperties.CLIENT_PID, "MongoDB Client", "MongoDB Client Configuration");
+		ObjectClassDefinitionImpl ocd = new ObjectClassDefinitionImpl(MongoClientProvider.PID, "MongoDB Client", "MongoDB Client Configuration");
 		
 		ocd.addRequiredAttribute(clientId);
 		ocd.addRequiredAttribute(uri);

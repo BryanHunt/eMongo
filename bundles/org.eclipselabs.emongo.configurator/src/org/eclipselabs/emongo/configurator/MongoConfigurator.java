@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
+import org.eclipselabs.emongo.MongoAdmin;
 import org.eclipselabs.emongo.MongoClientProvider;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
@@ -27,10 +28,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author bhunt
  * 
  */
-@Component(service = Object.class, property = {"osgi.command.scope=mongodb", 
-    "osgi.command.function=configureClient", 
-    "osgi.command.function=configureDatabase",
-    "osgi.command.function=configureMonitor"})
+@Component(service = Object.class, property = {"osgi.command.scope=mongodb", "osgi.command.function=configureClient", "osgi.command.function=configureMonitor"})
 public class MongoConfigurator
 {
 	private static volatile MongoConfigurator mongoConfigurator;
@@ -64,7 +62,7 @@ public class MongoConfigurator
 	{
 		try
 		{
-			Configuration config = configurationAdmin.getConfiguration("org.eclipselabs.emongo.clientProvider", null);
+			Configuration config = configurationAdmin.getConfiguration(MongoClientProvider.PID, null);
 
 			Dictionary<String, Object> properties = config.getProperties();
 
@@ -85,7 +83,7 @@ public class MongoConfigurator
 	{
     try
     {
-      Configuration config = configurationAdmin.getConfiguration("org.eclipselabs.emongo.monitor.databaseMonitor", null);
+      Configuration config = configurationAdmin.getConfiguration(MongoAdmin.MONITOR_PID, null);
 
       Dictionary<String, Object> properties = config.getProperties();
 

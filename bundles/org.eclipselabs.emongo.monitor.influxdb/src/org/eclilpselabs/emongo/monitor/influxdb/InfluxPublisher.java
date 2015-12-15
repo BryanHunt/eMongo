@@ -101,6 +101,8 @@ public class InfluxPublisher implements MongoServerStatsPublisher
     
     if(value instanceof String)
       buffer.append('"');
+    else if(value instanceof Integer || value instanceof Long)
+      buffer.append('i');
     
     buffer.append(value);
     

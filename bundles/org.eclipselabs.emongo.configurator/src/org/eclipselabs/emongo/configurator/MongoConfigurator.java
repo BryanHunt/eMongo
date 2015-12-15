@@ -16,7 +16,6 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 
 import org.eclipselabs.emongo.MongoClientProvider;
-import org.eclipselabs.emongo.MongoDatabaseProvider;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.component.annotations.Activate;
@@ -82,35 +81,6 @@ public class MongoConfigurator
 		}
 	}
 
-	/**
-	 * Configures a MongoDatabaseProvider
-	 * @param clientId the client id
-	 * @param databaseName the database name
-	 * @param alias the database alias
-	 * @throws ConfigurationException if thre was a problem configuring the service
-	 */
-	public void configureDatabase(String clientId, String databaseName, String alias) throws ConfigurationException
-	{
-		try
-		{
-			Configuration config = configurationAdmin.getConfiguration("org.eclipselabs.emongo.databaseProvider", null);
-
-			Dictionary<String, Object> properties = config.getProperties();
-
-			if (properties == null)
-				properties = new Hashtable<String, Object>();
-
-			properties.put(MongoDatabaseProvider.PROP_DATABASE, databaseName);
-			properties.put(MongoDatabaseProvider.PROP_ALIAS, alias);
-			properties.put(MongoDatabaseProvider.PROP_CLIENT_FILTER, "(" + MongoClientProvider.PROP_CLIENT_ID + "=" + clientId + ")");
-			config.update(properties);
-		}
-		catch (IOException e)
-		{
-			throw new ConfigurationException(e);
-		}
-	}
-
 	public void configureMonitor(String databaseAlias, Integer updateInterval) throws ConfigurationException
 	{
     try
@@ -123,7 +93,7 @@ public class MongoConfigurator
         properties = new Hashtable<String, Object>();
 
       properties.put("updateInterval", updateInterval);
-      properties.put("MongoDatabaseProvider.target", "(" + MongoDatabaseProvider.PROP_ALIAS + "=" + databaseAlias + ")");
+      properties.put("MongoDatabaseProvider.target", "(" + MongoClientProvider.PROP_CLIENT_ID + "=" + databaseAlias + ")");
       config.update(properties);
     }
     catch (IOException e)

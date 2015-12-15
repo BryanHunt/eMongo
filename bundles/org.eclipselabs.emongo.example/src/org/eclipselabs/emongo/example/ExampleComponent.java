@@ -12,7 +12,7 @@
 package org.eclipselabs.emongo.example;
 
 import org.bson.Document;
-import org.eclipselabs.emongo.MongoDatabaseProvider;
+import org.eclipselabs.emongo.MongoClientProvider;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -28,12 +28,12 @@ import com.mongodb.client.MongoDatabase;
 @Component
 public class ExampleComponent
 {
-	private volatile MongoDatabaseProvider mongoDatabaseProvider;
+	private volatile MongoClientProvider mongoClientProvider;
 
 	@Activate
 	public void activate()
 	{
-		MongoDatabase database = mongoDatabaseProvider.getDatabase();
+		MongoDatabase database = mongoClientProvider.getMongoDatabase();
 		MongoCollection<Document> collection = database.getCollection("items");
 		collection.drop();
 
@@ -54,8 +54,8 @@ public class ExampleComponent
 	}
 
 	@Reference(unbind = "-")
-	public void bindMongoDatabaseProvider(MongoDatabaseProvider mongoDatabaseProvider)
+	public void bindMongoDatabaseProvider(MongoClientProvider mongoClientProvider)
 	{
-		this.mongoDatabaseProvider = mongoDatabaseProvider;
+		this.mongoClientProvider = mongoClientProvider;
 	}
 }

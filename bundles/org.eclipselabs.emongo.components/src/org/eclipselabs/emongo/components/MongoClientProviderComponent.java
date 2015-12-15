@@ -29,159 +29,195 @@ import org.osgi.service.log.LogService;
 
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions;
-import com.mongodb.MongoCredential;
 import com.mongodb.ReadPreference;
 import com.mongodb.ServerAddress;
 import com.mongodb.Tag;
 import com.mongodb.TagSet;
 import com.mongodb.WriteConcern;
-
+import com.mongodb.client.MongoDatabase;
 
 /**
  * @author bhunt
  * 
  */
-@Component(service = MongoClientProvider.class, configurationPolicy = ConfigurationPolicy.REQUIRE, configurationPid = {"org.eclipselabs.emongo.clientProvider"})
+@Component(service = MongoClientProvider.class, configurationPolicy = ConfigurationPolicy.REQUIRE, configurationPid = { "org.eclipselabs.emongo.clientProvider" })
 public class MongoClientProviderComponent extends AbstractComponent implements MongoClientProvider
 {
-  public @interface ClientConfig 
+  public @interface ClientConfig
   {
     String clientId();
+
     String uri();
-    String[] credentials() default {};
+
+    String databaseName() default "";
+    
     boolean alwaysUseMBeans() default false;
+
     int connectionsPerHost() default 100;
+
     int connectTimeout() default 10000;
+
     boolean cursorFinalizerEnabled() default true;
+
     String description() default "";
+
     int heartbeatConnectTimeout() default 20000;
+
     int heartbeatFrequency() default 10000;
+
     int heartbeatSocketTimeout() default 20000;
+
     int localThreshold() default 15;
+
     int maxConnectionIdleTime() default 0;
+
     int maxConnectionLifeTime() default 0;
+
     int maxWaitTime() default 120000;
+
     int minConnectionsPerHost() default 0;
+
     int minHeartbeatFrequency() default 500;
+
     int readPreferenceType() default 0;
+
     String[] readPreferenceTags() default {};
+
     String requiredReplicaSetName() default "";
+
     int serverSelectionTimeout() default 30000;
+
     boolean socketKeepAlive() default false;
+
     int socketTimeout() default 0;
+
     boolean sslEnabled() default false;
+
     boolean sslInvalidHostNameAllowed() default false;
+
     int threadsAllowedToBlockForConnectionMultiplier() default 5;
+
     int writeConcernW() default 1;
+
     int writeConcernWtimeout() default 0;
+
     boolean writeConcernFsync() default false;
+
     boolean writeConcernJ() default false;
   }
 
   private volatile String clientId;
-	private volatile Collection<String> uris;
-	private volatile MongoClient mongoClient;
+  private volatile String databaseName;
+  private volatile Collection<String> uris;
+  private volatile MongoClient mongoClient;
 
-	public static String validateClientId(String value)
-	{
-		if (value == null || value.isEmpty())
-			return "The MongoDB client id was not found in the configuration properties";
+  public static String validateClientId(String value)
+  {
+    if (value == null || value.isEmpty())
+      return "The MongoDB client id was not found in the configuration properties";
 
-		return null;
-	}
+    return null;
+  }
 
-	public static String validateURI(String value)
-	{
-		return validateURI(value, null);
-	}
+  public static String validateURI(String value)
+  {
+    return validateURI(value, null);
+  }
 
-	@Override
-	public String getClientId()
-	{
-		return clientId;
-	}
+  @Override
+  public String getClientId()
+  {
+    return clientId;
+  }
 
-	@Override
-	public MongoClient getMongoClient()
-	{
-		return mongoClient;
-	}
+  @Override
+  public MongoClient getMongoClient()
+  {
+    return mongoClient;
+  }
 
-	@Override
-	public String[] getURIs()
-	{
-		return uris.toArray(new String[0]);
-	}
+  @Override
+  public MongoDatabase getMongoDatabase()
+  {
+    return getMongoClient().getDatabase(databaseName);
+  }
 
-	@Activate
-	public void activate(ClientConfig config)
-	{
-		handleIllegalConfiguration(validateClientId(config.clientId()));
+  @Override
+  public String[] getURIs()
+  {
+    return uris.toArray(new String[0]);
+  }
 
-		// The uriProperty is a single string containing one or more server URIs.
-		// When more than one URI is specified, it denotes a replica set and the
-		// URIs must be separated by a comma (CSV).
+  @Activate
+  public void activate(ClientConfig config)
+  {
+    handleIllegalConfiguration(validateClientId(config.clientId()));
 
-		uris = new ArrayList<String>();
-		handleIllegalConfiguration(validateURI(config.uri(), uris));
+    databaseName = config.databaseName();
+    
+    // The uriProperty is a single string containing one or more server URIs.
+    // When more than one URI is specified, it denotes a replica set and the
+    // URIs must be separated by a comma (CSV).
 
-		List<MongoCredential> credentials = new ArrayList<MongoCredential>();
-		
-		if(config.credentials() != null)
-		{
-		  for(String entry : config.credentials())
-		  {
-		    String credential[] = entry.split(":");
-		    handleIllegalConfiguration(validateCredentials(credential));
-		    credentials.add(MongoCredential.createCredential(credential[1], credential[0], credential[2].toCharArray()));
-		  }
-		}
-		
-		MongoClientOptions options = createMongoClientOptions(config);
-		String currentURI = null;
+    uris = new ArrayList<String>();
+    handleIllegalConfiguration(validateURI(config.uri(), uris));
 
-		try
-		{
-			if (uris.size() == 1)
-			{
-				currentURI = uris.iterator().next();
-				ServerAddress serverAddress = createServerAddress(currentURI);
-				mongoClient = createMongoClient(serverAddress, credentials, options);
-			}
-			else
-			{
-				ArrayList<ServerAddress> serverAddresses = new ArrayList<ServerAddress>(uris.size());
+    MongoClientOptions options = createMongoClientOptions(config);
+    String currentURI = null;
 
-				for (String uri : uris)
-				{
-					currentURI = uri;
-					serverAddresses.add(createServerAddress(currentURI));
-				}
+    try
+    {
+      if (uris.size() == 1)
+      {
+        currentURI = uris.iterator().next();
+        ServerAddress serverAddress = createServerAddress(currentURI);
+        mongoClient = createMongoClient(serverAddress, options);
 
-				mongoClient = createMongoClient(serverAddresses, credentials, options);
-			}
-		}
-		catch (UnknownHostException e)
-		{
-			handleConfigurationException("The URI: '" + currentURI + "' has a bad hostname", e);
-		}
-		catch (URISyntaxException e)
-		{
-			handleConfigurationException("The URI: '" + currentURI + "' is not a proper URI", e);
-		}
-	}
+        String[] segments = currentURI.split("/");
 
-	@Deactivate
-	public void deactivate()
-	{
-		if (mongoClient != null)
-			mongoClient.close();
-	}
+        if (segments.length == 4)
+          databaseName = segments[3];
+      }
+      else
+      {
+        ArrayList<ServerAddress> serverAddresses = new ArrayList<ServerAddress>(uris.size());
 
-	@Reference(cardinality = ReferenceCardinality.OPTIONAL)
+        for (String uri : uris)
+        {
+          currentURI = uri;
+          serverAddresses.add(createServerAddress(currentURI));
+          String[] segments = currentURI.split("/");
+
+          if (segments.length == 4)
+            databaseName = segments[3];
+
+        }
+
+        mongoClient = createMongoClient(serverAddresses, options);
+      }
+    }
+    catch (UnknownHostException e)
+    {
+      handleConfigurationException("The URI: '" + currentURI + "' has a bad hostname", e);
+    }
+    catch (URISyntaxException e)
+    {
+      handleConfigurationException("The URI: '" + currentURI + "' is not a proper URI", e);
+    }
+  }
+
+  @Deactivate
+  public void deactivate()
+  {
+    if (mongoClient != null)
+      mongoClient.close();
+  }
+
+  @Reference(cardinality = ReferenceCardinality.OPTIONAL)
   public void bindLogService(LogService logService)
   {
-    super.bindLogService(logService);;
+    super.bindLogService(logService);
+    ;
   }
 
   public void unbindLogService(LogService logService)
@@ -189,118 +225,112 @@ public class MongoClientProviderComponent extends AbstractComponent implements M
     super.unbindLogService(logService);
   }
 
-	protected MongoClient createMongoClient(ArrayList<ServerAddress> serverAddresses, List<MongoCredential> credentials, MongoClientOptions options)
-	{
-		return new MongoClient(serverAddresses, credentials, options);
-	}
+  protected MongoClient createMongoClient(ArrayList<ServerAddress> serverAddresses, MongoClientOptions options)
+  {
+    return new MongoClient(serverAddresses, options);
+  }
 
-	protected MongoClient createMongoClient(ServerAddress serverAddress, List<MongoCredential> credentials, MongoClientOptions options)
-	{
-		return new MongoClient(serverAddress, credentials, options);
-	}
+  protected MongoClient createMongoClient(ServerAddress serverAddress, MongoClientOptions options)
+  {
+    return new MongoClient(serverAddress, options);
+  }
 
-	private static String validateURI(String value, Collection<String> uris)
-	{
-		if (value == null || value.isEmpty())
-			return "The MongoDB URI was not found in the configuration properties";
+  private static String validateURI(String value, Collection<String> uris)
+  {
+    if (value == null || value.isEmpty())
+      return "The MongoDB URI was not found in the configuration properties";
 
-		// The regex \s matches whitepsace. The extra \ is needed because of how it's treated in java
-		// strings. The split is done on any number of whitespace chars followed by a comma followed by
-		// any number of whitespace chars. What is left is the URI(s).
+    // The regex \s matches whitepsace. The extra \ is needed because of how
+    // it's treated in java
+    // strings. The split is done on any number of whitespace chars followed by
+    // a comma followed by
+    // any number of whitespace chars. What is left is the URI(s).
 
-		for (String targetURI : value.split("\\s*,\\s*"))
-		{
-			String uri = targetURI.trim();
-			String[] segments = uri.split("/");
-			
-			if (!uri.startsWith("mongodb://") || uri.endsWith("/") || segments.length < 3 || segments.length > 4)
-				return "The uri: '" + uri + "' does not have the form 'mongodb://host[:port]/[database]'";
+    for (String targetURI : value.split("\\s*,\\s*"))
+    {
+      String uri = targetURI.trim();
+      String[] segments = uri.split("/");
 
-			if (uris != null)
-				uris.add(uri);
-		}
+      if (!uri.startsWith("mongodb://") || uri.endsWith("/") || segments.length < 4 || segments.length > 5)
+        return "The uri: '" + uri + "' does not have the form 'mongodb://host[:port]/[database]'";
 
-		return null;
-	}
+      if (uris != null)
+        uris.add(uri);
+    }
 
-	private static String validateCredentials(String[] credentialData)
-	{
-	  if(credentialData.length != 3)
-	    return "A credential must be in the format 'db:userId:password'";
-	  
-	  return null;
-	}
-	
-	private MongoClientOptions createMongoClientOptions(ClientConfig config)
-	{
-		MongoClientOptions.Builder optionsBuilder = new MongoClientOptions.Builder();
+    return null;
+  }
 
-		optionsBuilder.alwaysUseMBeans(config.alwaysUseMBeans());
-		optionsBuilder.connectionsPerHost(config.connectionsPerHost());
-		optionsBuilder.connectTimeout(config.connectTimeout());
-		optionsBuilder.cursorFinalizerEnabled(config.cursorFinalizerEnabled());
-		optionsBuilder.description(config.description());
-		optionsBuilder.heartbeatConnectTimeout(config.heartbeatConnectTimeout());
-		optionsBuilder.heartbeatFrequency(config.heartbeatFrequency());
-		optionsBuilder.heartbeatSocketTimeout(config.heartbeatSocketTimeout());
-		optionsBuilder.localThreshold(config.localThreshold());
-		optionsBuilder.maxConnectionIdleTime(config.maxConnectionIdleTime());
-		optionsBuilder.maxConnectionLifeTime(config.maxConnectionLifeTime());
-		optionsBuilder.maxWaitTime(config.maxWaitTime());
-		optionsBuilder.minConnectionsPerHost(config.minConnectionsPerHost());
-		optionsBuilder.minHeartbeatFrequency(config.minHeartbeatFrequency());		
-		optionsBuilder.serverSelectionTimeout(config.serverSelectionTimeout());
-		optionsBuilder.socketKeepAlive(config.socketKeepAlive());
-		optionsBuilder.socketTimeout(config.socketTimeout());
-		optionsBuilder.sslEnabled(config.sslEnabled());
-		optionsBuilder.sslInvalidHostNameAllowed(config.sslInvalidHostNameAllowed());
-		optionsBuilder.threadsAllowedToBlockForConnectionMultiplier(config.threadsAllowedToBlockForConnectionMultiplier());
-		WriteConcern writeConcern = new WriteConcern(config.writeConcernW(), config.writeConcernWtimeout(), config.writeConcernFsync(), config.writeConcernJ());
-		optionsBuilder.writeConcern(writeConcern);
+  private MongoClientOptions createMongoClientOptions(ClientConfig config)
+  {
+    MongoClientOptions.Builder optionsBuilder = new MongoClientOptions.Builder();
 
-    if(!config.requiredReplicaSetName().isEmpty())
+    optionsBuilder.alwaysUseMBeans(config.alwaysUseMBeans());
+    optionsBuilder.connectionsPerHost(config.connectionsPerHost());
+    optionsBuilder.connectTimeout(config.connectTimeout());
+    optionsBuilder.cursorFinalizerEnabled(config.cursorFinalizerEnabled());
+    optionsBuilder.description(config.description());
+    optionsBuilder.heartbeatConnectTimeout(config.heartbeatConnectTimeout());
+    optionsBuilder.heartbeatFrequency(config.heartbeatFrequency());
+    optionsBuilder.heartbeatSocketTimeout(config.heartbeatSocketTimeout());
+    optionsBuilder.localThreshold(config.localThreshold());
+    optionsBuilder.maxConnectionIdleTime(config.maxConnectionIdleTime());
+    optionsBuilder.maxConnectionLifeTime(config.maxConnectionLifeTime());
+    optionsBuilder.maxWaitTime(config.maxWaitTime());
+    optionsBuilder.minConnectionsPerHost(config.minConnectionsPerHost());
+    optionsBuilder.minHeartbeatFrequency(config.minHeartbeatFrequency());
+    optionsBuilder.serverSelectionTimeout(config.serverSelectionTimeout());
+    optionsBuilder.socketKeepAlive(config.socketKeepAlive());
+    optionsBuilder.socketTimeout(config.socketTimeout());
+    optionsBuilder.sslEnabled(config.sslEnabled());
+    optionsBuilder.sslInvalidHostNameAllowed(config.sslInvalidHostNameAllowed());
+    optionsBuilder.threadsAllowedToBlockForConnectionMultiplier(config.threadsAllowedToBlockForConnectionMultiplier());
+    WriteConcern writeConcern = new WriteConcern(config.writeConcernW(), config.writeConcernWtimeout(), config.writeConcernFsync(), config.writeConcernJ());
+    optionsBuilder.writeConcern(writeConcern);
+
+    if (!config.requiredReplicaSetName().isEmpty())
       optionsBuilder.requiredReplicaSetName(config.requiredReplicaSetName());
 
     List<Tag> tags = new ArrayList<>();
-    
-    if(config.readPreferenceTags() != null)
+
+    if (config.readPreferenceTags() != null)
     {
-      for(String tag : config.readPreferenceTags())
+      for (String tag : config.readPreferenceTags())
       {
         String[] elements = tag.split("=");
         tags.add(new Tag(elements[0], elements[1]));
       }
     }
-    
-    TagSet tagSet = new TagSet(tags);
-    
-    switch(config.readPreferenceType())
-    {
-      case 1:
-        optionsBuilder.readPreference(ReadPreference.nearest(tagSet));
-        break;
-      case 2:
-        optionsBuilder.readPreference(ReadPreference.primary());
-        break;
-      case 3:
-        optionsBuilder.readPreference(ReadPreference.primaryPreferred(tagSet));
-        break;
-      case 4:
-        optionsBuilder.readPreference(ReadPreference.secondary(tagSet));
-        break;
-      case 5:
-        optionsBuilder.readPreference(ReadPreference.secondaryPreferred(tagSet));
-        break;
-    }
-    
-		return optionsBuilder.build();
-	}
 
-	private ServerAddress createServerAddress(String uriProperty) throws URISyntaxException, UnknownHostException
-	{
-		URI uri = new URI(uriProperty);
-		int port = uri.getPort();
-		ServerAddress serverAddress = port == -1 ? new ServerAddress(uri.getHost()) : new ServerAddress(uri.getHost(), uri.getPort());
-		return serverAddress;
-	}
+    TagSet tagSet = new TagSet(tags);
+
+    switch (config.readPreferenceType())
+    {
+    case 1:
+      optionsBuilder.readPreference(ReadPreference.nearest(tagSet));
+      break;
+    case 2:
+      optionsBuilder.readPreference(ReadPreference.primary());
+      break;
+    case 3:
+      optionsBuilder.readPreference(ReadPreference.primaryPreferred(tagSet));
+      break;
+    case 4:
+      optionsBuilder.readPreference(ReadPreference.secondary(tagSet));
+      break;
+    case 5:
+      optionsBuilder.readPreference(ReadPreference.secondaryPreferred(tagSet));
+      break;
+    }
+
+    return optionsBuilder.build();
+  }
+
+  private ServerAddress createServerAddress(String uriProperty) throws URISyntaxException, UnknownHostException
+  {
+    URI uri = new URI(uriProperty);
+    int port = uri.getPort();
+    ServerAddress serverAddress = port == -1 ? new ServerAddress(uri.getHost()) : new ServerAddress(uri.getHost(), uri.getPort());
+    return serverAddress;
+  }
 }

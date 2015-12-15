@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bson.Document;
-import org.eclipselabs.emongo.MongoDatabaseProvider;
+import org.eclipselabs.emongo.MongoClientProvider;
 import org.eclipselabs.emongo.MongoIdFactory;
 import org.eclipselabs.emongo.components.MongoIdFactoryComponent;
 import org.eclipselabs.emongo.components.MongoIdFactoryComponent.IdConfig;
@@ -45,7 +45,7 @@ import com.mongodb.client.MongoDatabase;
 @SuppressWarnings("restriction")
 public class TestMongoIdFactoryComponent
 {
-	private MongoDatabaseProvider mongoDatabaseProvider;
+	private MongoClientProvider mongoClientProvider;
 	private MongoIdFactoryComponent mongoIdFactoryComponent;
 	private Map<String, Object> properties;
 	private MongoDatabase db;
@@ -67,10 +67,10 @@ public class TestMongoIdFactoryComponent
 		db = mock(MongoDatabase.class);
 		collection = mock(MongoCollection.class);
 		commandResult = mock(CommandResult.class);
-		mongoDatabaseProvider = mock(MongoDatabaseProvider.class);
+		mongoClientProvider = mock(MongoClientProvider.class);
 		cursor = mock(FindIterable.class);
 		
-		when(mongoDatabaseProvider.getDatabase()).thenReturn(db);
+		when(mongoClientProvider.getMongoDatabase()).thenReturn(db);
 		when(db.getCollection("elements")).thenReturn(collection);
 		when(collection.withWriteConcern(any(WriteConcern.class))).thenReturn(collection);
 		when(collection.find(any(Document.class))).thenReturn(cursor);
@@ -83,7 +83,7 @@ public class TestMongoIdFactoryComponent
 	@Test
 	public void testActivate() throws Exception
 	{
-		mongoIdFactoryComponent.bindMongoDatabaseProvider(mongoDatabaseProvider);
+		mongoIdFactoryComponent.bindMongoClientProvider(mongoClientProvider);
 		mongoIdFactoryComponent.activate(aQute.lib.converter.Converter.cnv(IdConfig.class, properties));
 
 		ArgumentCaptor<Document> argument = ArgumentCaptor.forClass(Document.class);
@@ -97,7 +97,7 @@ public class TestMongoIdFactoryComponent
 	public void testActivateWithExistingId() throws Exception
 	{
 		when(cursor.first()).thenReturn(new Document());
-		mongoIdFactoryComponent.bindMongoDatabaseProvider(mongoDatabaseProvider);
+		mongoIdFactoryComponent.bindMongoClientProvider(mongoClientProvider);
 		mongoIdFactoryComponent.activate(aQute.lib.converter.Converter.cnv(IdConfig.class, properties));
 
 		verify(collection).find(any(Document.class));
@@ -123,7 +123,7 @@ public class TestMongoIdFactoryComponent
 	@Test
 	public void testGetNextId() throws Exception
 	{
-		mongoIdFactoryComponent.bindMongoDatabaseProvider(mongoDatabaseProvider);
+		mongoIdFactoryComponent.bindMongoClientProvider(mongoClientProvider);
 		mongoIdFactoryComponent.activate(aQute.lib.converter.Converter.cnv(IdConfig.class, properties));
 
 		Document result = new Document("_lastId", Long.valueOf(1));

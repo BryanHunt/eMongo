@@ -12,6 +12,7 @@
 package org.eclipselabs.emongo;
 
 import com.mongodb.MongoClient;
+import com.mongodb.client.MongoDatabase;
 
 /**
  * This OSGi service provides access to a configured MongoDB driver. The MongoDB driver
@@ -191,6 +192,12 @@ public interface MongoClientProvider
 	 */
 	MongoClient getMongoClient();
 
+	/**
+	 * 
+	 * @return the MongoDB database configured by the service properties
+	 */
+	MongoDatabase getMongoDatabase();
+	
 	/**
 	 * 
 	 * @return list of URIs configured on the client. A single URI will be returned for a single

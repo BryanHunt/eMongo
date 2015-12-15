@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.bson.Document;
-import org.eclipselabs.emongo.MongoDatabaseProvider;
+import org.eclipselabs.emongo.MongoClientProvider;
 import org.eclipselabs.emongo.MongoServerStatsPublisher;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -28,7 +28,7 @@ public class MongoDatabaseMonitorComponent implements Runnable
 
   public static final String ID_FACTORY_PID = "org.eclipselabs.emongo.monitor.databaseMonitor";
 
-  private volatile MongoDatabaseProvider mongoDatabaseProvider;
+  private volatile MongoClientProvider mongoClientProvider;
   private volatile Collection<MongoServerStatsPublisher> serverStatsPublishers = Collections.newSetFromMap(new ConcurrentHashMap<>());
   private int updateInterval;
   private volatile boolean done = false;
@@ -71,7 +71,7 @@ public class MongoDatabaseMonitorComponent implements Runnable
   {
     while (!done)
     {
-      Document result = mongoDatabaseProvider.getDatabase().runCommand(new Document("serverStatus", 1));
+      Document result = mongoClientProvider.getMongoDatabase().runCommand(new Document("serverStatus", 1));
       serverStatsPublishers.forEach((publisher) -> {publisher.publishStats(result);});
       
       try
@@ -83,9 +83,9 @@ public class MongoDatabaseMonitorComponent implements Runnable
   }
 
   @Reference(unbind = "-")
-  public void bindMongoDatabaseProvider(MongoDatabaseProvider mongoDatabaseProvider)
+  public void bindMongoClientProvider(MongoClientProvider mongoClientProvider)
   {
-    this.mongoDatabaseProvider = mongoDatabaseProvider;
+    this.mongoClientProvider = mongoClientProvider;
   }
   
   @Reference(cardinality = ReferenceCardinality.MULTIPLE)

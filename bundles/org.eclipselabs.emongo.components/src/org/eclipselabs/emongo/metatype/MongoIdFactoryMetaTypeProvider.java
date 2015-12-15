@@ -14,7 +14,7 @@ package org.eclipselabs.emongo.metatype;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-import org.eclipselabs.emongo.MongoDatabaseProvider;
+import org.eclipselabs.emongo.MongoClientProvider;
 import org.eclipselabs.emongo.MongoIdFactory;
 import org.eclipselabs.emongo.components.MongoIdFactoryComponent;
 import org.osgi.framework.ServiceReference;
@@ -52,7 +52,7 @@ public class MongoIdFactoryMetaTypeProvider implements MetaTypeProvider
 		databases.toArray(databaseAliases);
 
 		for (int i = 0; i < databaseAliases.length; i++)
-			targetFilters[i] = "(" + MongoDatabaseProvider.PROP_ALIAS + "=" + databaseAliases[i] + ")";
+			targetFilters[i] = "(" + MongoClientProvider.PROP_CLIENT_ID + "=" + databaseAliases[i] + ")";
 
 		database.setOptionLabels(databaseAliases);
 		database.setOptionValues(targetFilters);
@@ -79,13 +79,13 @@ public class MongoIdFactoryMetaTypeProvider implements MetaTypeProvider
 	}
 
 	@Reference(cardinality = ReferenceCardinality.MULTIPLE)
-	public void bindMongoDatabaseProvider(ServiceReference<MongoDatabaseProvider> serviceReference)
+	public void bindMongoClientProvider(ServiceReference<MongoClientProvider> serviceReference)
 	{
-		databases.add((String) serviceReference.getProperty(MongoDatabaseProvider.PROP_ALIAS));
+		databases.add((String) serviceReference.getProperty(MongoClientProvider.PROP_CLIENT_ID));
 	}
 
-	public void unbindMongoDatabaseProvider(ServiceReference<MongoDatabaseProvider> serviceReference)
+	public void unbindMongoClientProvider(ServiceReference<MongoClientProvider> serviceReference)
 	{
-		databases.remove((String) serviceReference.getProperty(MongoDatabaseProvider.PROP_ALIAS));
+		databases.remove((String) serviceReference.getProperty(MongoClientProvider.PROP_CLIENT_ID));
 	}
 }

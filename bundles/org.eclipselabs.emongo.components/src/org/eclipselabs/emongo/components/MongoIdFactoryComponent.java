@@ -17,7 +17,7 @@ import static com.mongodb.client.model.Updates.inc;
 import java.io.IOException;
 
 import org.bson.Document;
-import org.eclipselabs.emongo.MongoDatabaseProvider;
+import org.eclipselabs.emongo.MongoClientProvider;
 import org.eclipselabs.emongo.MongoIdFactory;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -46,7 +46,7 @@ public class MongoIdFactoryComponent extends AbstractComponent implements MongoI
 	private volatile String uri;
 
 	private volatile MongoCollection<Document> collection;
-	private volatile MongoDatabaseProvider mongoDatabaseProvider;
+	private volatile MongoClientProvider mongoClientProvider;
 
 	private static final String ID = "_id";
 	private static final String LAST_ID = "_lastId";
@@ -65,9 +65,9 @@ public class MongoIdFactoryComponent extends AbstractComponent implements MongoI
 		collectionName = config.collectionName();
 		handleIllegalConfiguration(validateCollectionName(collectionName));
 
-		uri = mongoDatabaseProvider.getURI() + "/" + collectionName;
+		uri = mongoClientProvider.getURIs()[0] + "/" + collectionName;
 
-		MongoDatabase db = mongoDatabaseProvider.getDatabase();
+		MongoDatabase db = mongoClientProvider.getMongoDatabase();
 		collection = db.getCollection(collectionName).withWriteConcern(WriteConcern.MAJORITY);
 		Document object = collection.find(eq(ID, "0")).first();
 
@@ -103,8 +103,8 @@ public class MongoIdFactoryComponent extends AbstractComponent implements MongoI
   }
 
   @Reference(unbind = "-")
-	public void bindMongoDatabaseProvider(MongoDatabaseProvider mongoDatabaseProvider)
+	public void bindMongoClientProvider(MongoClientProvider mongoClientProvider)
 	{
-		this.mongoDatabaseProvider = mongoDatabaseProvider;
+		this.mongoClientProvider = mongoClientProvider;
 	}
 }

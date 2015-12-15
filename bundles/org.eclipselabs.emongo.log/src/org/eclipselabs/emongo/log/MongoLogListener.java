@@ -16,7 +16,7 @@ import java.io.StringWriter;
 import java.util.Date;
 
 import org.bson.Document;
-import org.eclipselabs.emongo.MongoDatabaseProvider;
+import org.eclipselabs.emongo.MongoClientProvider;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.annotations.Activate;
@@ -48,7 +48,7 @@ public class MongoLogListener implements LogListener
 	public static final String PROP_MAX_LEVEL = "maxLevel";
 
 	private volatile LogReaderService logReaderService;
-	private volatile MongoDatabaseProvider mongoDatabaseProvider;
+	private volatile MongoClientProvider mongoClientProvider;
 	private volatile MongoCollection<Document> logCollection;
 	private volatile Integer maxLevel;
 
@@ -61,7 +61,7 @@ public class MongoLogListener implements LogListener
 		if (collection == null || collection.isEmpty())
 			throw new IllegalStateException("The collection property cannot be empty");
 
-		logCollection = mongoDatabaseProvider.getDatabase().getCollection(collection);
+		logCollection = mongoClientProvider.getMongoDatabase().getCollection(collection);
 		logReaderService.addLogListener(this);
 	}
 
@@ -109,8 +109,8 @@ public class MongoLogListener implements LogListener
 	}
 
   @Reference(unbind = "-")
-	public void bindMongoDatabaseProvider(MongoDatabaseProvider mongoDatabaseProvider)
+	public void bindMongoClientProvider(MongoClientProvider mongoClientProvider)
 	{
-		this.mongoDatabaseProvider = mongoDatabaseProvider;
+		this.mongoClientProvider = mongoClientProvider;
 	}
 }

@@ -14,7 +14,7 @@ package org.eclipselabs.emongo.metatype;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-import org.eclipselabs.emongo.MongoDatabaseProvider;
+import org.eclipselabs.emongo.MongoClientProvider;
 import org.eclipselabs.emongo.components.MongoDatabaseMonitorComponent;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.annotations.Component;
@@ -51,7 +51,7 @@ public class MongoDatabaseMonitorMetaTypeProvider implements MetaTypeProvider
 		databases.toArray(databaseAliases);
 
 		for (int i = 0; i < databaseAliases.length; i++)
-			targetFilters[i] = "(" + MongoDatabaseProvider.PROP_ALIAS + "=" + databaseAliases[i] + ")";
+			targetFilters[i] = "(" + MongoClientProvider.PROP_CLIENT_ID + "=" + databaseAliases[i] + ")";
 
 		database.setOptionLabels(databaseAliases);
 		database.setOptionValues(targetFilters);
@@ -70,7 +70,7 @@ public class MongoDatabaseMonitorMetaTypeProvider implements MetaTypeProvider
 
 		updateInterval.setDescription("The interval in which to sample the database stats in minutes");
 
-		ObjectClassDefinitionImpl ocd = new ObjectClassDefinitionImpl(MongoDatabaseMonitorComponent.ID_FACTORY_PID, "MongoDB ID", "MongoDB ID Provider Configuration");
+		ObjectClassDefinitionImpl ocd = new ObjectClassDefinitionImpl(MongoDatabaseMonitorComponent.ID_FACTORY_PID, "MongoDB Monitor", "MongoDB Monitor Configuration");
 		ocd.addRequiredAttribute(database);
 		ocd.addOptionalAttribute(updateInterval);
 
@@ -78,13 +78,13 @@ public class MongoDatabaseMonitorMetaTypeProvider implements MetaTypeProvider
 	}
 
 	@Reference(cardinality = ReferenceCardinality.MULTIPLE)
-	public void bindMongoDatabaseProvider(ServiceReference<MongoDatabaseProvider> serviceReference)
+	public void bindMongoClientProvider(ServiceReference<MongoClientProvider> serviceReference)
 	{
-		databases.add((String) serviceReference.getProperty(MongoDatabaseProvider.PROP_ALIAS));
+		databases.add((String) serviceReference.getProperty(MongoClientProvider.PROP_CLIENT_ID));
 	}
 
-	public void unbindMongoDatabaseProvider(ServiceReference<MongoDatabaseProvider> serviceReference)
+	public void unbindMongoClientProvider(ServiceReference<MongoClientProvider> serviceReference)
 	{
-		databases.remove((String) serviceReference.getProperty(MongoDatabaseProvider.PROP_ALIAS));
+		databases.remove((String) serviceReference.getProperty(MongoClientProvider.PROP_CLIENT_ID));
 	}
 }

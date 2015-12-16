@@ -34,7 +34,7 @@ import com.mongodb.client.MongoDatabase;
  * @author bhunt
  * 
  */
-@Component(service = MongoIdFactory.class, configurationPolicy = ConfigurationPolicy.REQUIRE, configurationPid = {"org.eclipselabs.emongo.idFactory"})
+@Component(service = MongoIdFactory.class, configurationPolicy = ConfigurationPolicy.REQUIRE, configurationPid = MongoIdFactory.PID)
 public class MongoIdFactoryComponent extends AbstractComponent implements MongoIdFactory
 {
   public @interface IdConfig
@@ -49,7 +49,7 @@ public class MongoIdFactoryComponent extends AbstractComponent implements MongoI
 	private volatile MongoProvider mongoClientProvider;
 
 	private static final String ID = "_id";
-	private static final String LAST_ID = "_lastId";
+	private static final String NEXT_ID = "_nextId";
 
 	public static String validateCollectionName(String value)
 	{
@@ -72,7 +72,7 @@ public class MongoIdFactoryComponent extends AbstractComponent implements MongoI
 		Document object = collection.find(eq(ID, "0")).first();
 
 		if (object == null)
-			collection.insertOne(new Document(ID, "0").append(LAST_ID, Long.valueOf(0)));
+			collection.insertOne(new Document(ID, "0").append(NEXT_ID, Long.valueOf(0)));
 	}
 
 	@Override
@@ -87,8 +87,8 @@ public class MongoIdFactoryComponent extends AbstractComponent implements MongoI
 		if (collection == null)
 			return null;
 
-		Document result = collection.findOneAndUpdate(eq(ID, "0"), inc(LAST_ID, 1));
-		return result.getLong(LAST_ID);
+		Document result = collection.findOneAndUpdate(eq(ID, "0"), inc(NEXT_ID, 1));
+		return result.getLong(NEXT_ID);
 	}
 
   @Reference(cardinality = ReferenceCardinality.OPTIONAL)

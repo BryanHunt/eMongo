@@ -40,7 +40,7 @@ import com.mongodb.client.MongoDatabase;
  * @author bhunt
  * 
  */
-@Component(service = MongoProvider.class, configurationPolicy = ConfigurationPolicy.REQUIRE, configurationPid = { MongoProvider.PID })
+@Component(service = MongoProvider.class, configurationPolicy = ConfigurationPolicy.REQUIRE, configurationPid = MongoProvider.PID)
 public class MongoProviderComponent extends AbstractComponent implements MongoProvider
 {
   public @interface ClientConfig

@@ -10,7 +10,7 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
 
-@Component(service = MongoAdmin.class, configurationPolicy = ConfigurationPolicy.OPTIONAL, configurationPid = "org.eclipselabs.emongo.admin")
+@Component(service = MongoAdmin.class, configurationPolicy = ConfigurationPolicy.OPTIONAL, configurationPid = MongoAdmin.PID)
 public class MongoAdminComponent extends AbstractComponent implements MongoAdmin
 {
   private File mongodump;

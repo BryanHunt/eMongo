@@ -15,7 +15,7 @@ import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 
-@Component(immediate = true, configurationPolicy = ConfigurationPolicy.REQUIRE, configurationPid = {MongoAdmin.MONITOR_PID})
+@Component(immediate = true, configurationPolicy = ConfigurationPolicy.REQUIRE, configurationPid = MongoAdmin.MONITOR_PID)
 public class MongoDatabaseMonitorComponent implements Runnable
 {
   public @interface MonitorConfig

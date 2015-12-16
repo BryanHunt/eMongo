@@ -20,8 +20,8 @@ import static org.mockito.Mockito.mock;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipselabs.emongo.MongoClientProvider;
-import org.eclipselabs.emongo.components.MongoClientProviderComponent.ClientConfig;
+import org.eclipselabs.emongo.MongoProvider;
+import org.eclipselabs.emongo.components.MongoProviderComponent.ClientConfig;
 import org.eclipselabs.emongo.components.junit.support.MongoClientProviderComponentTestHarness;
 import org.junit.Before;
 import org.junit.Test;
@@ -48,8 +48,8 @@ public class TestMongoClientProviderComponent
 		mongoClientProviderComponent = new MongoClientProviderComponentTestHarness(mongoClient);
 
 		properties = new HashMap<>();
-    properties.put(MongoClientProvider.PROP_CLIENT_ID, "junit");
-    properties.put(MongoClientProvider.PROP_URI , "mongodb://localhost, mongodb://www.google.com, mongodb://www.apple.com");
+    properties.put(MongoProvider.PROP_CLIENT_ID, "junit");
+    properties.put(MongoProvider.PROP_URI , "mongodb://localhost, mongodb://www.google.com, mongodb://www.apple.com");
     properties.put("credentials", new String[0]);
     properties.put("connectionsPerHost", 100);
     properties.put("heartbeatFrequency", 10000);
@@ -62,7 +62,7 @@ public class TestMongoClientProviderComponent
 	@SuppressWarnings("unchecked")
 	public void testActivateWithSingleURI() throws Exception
 	{
-	  properties.put(MongoClientProvider.PROP_URI , "mongodb://localhost");
+	  properties.put(MongoProvider.PROP_URI , "mongodb://localhost");
 	  
 		mongoClientProviderComponent.activate(aQute.lib.converter.Converter.cnv(ClientConfig.class, properties));
 
@@ -83,7 +83,7 @@ public class TestMongoClientProviderComponent
 	@Test(expected = IllegalStateException.class)
 	public void testActivateWithEmptyURI() throws Exception
 	{
-    properties.put(MongoClientProvider.PROP_URI , "");
+    properties.put(MongoProvider.PROP_URI , "");
 
 		mongoClientProviderComponent.activate(aQute.lib.converter.Converter.cnv(ClientConfig.class, properties));
 	}
@@ -91,7 +91,7 @@ public class TestMongoClientProviderComponent
 	@Test(expected = IllegalStateException.class)
 	public void testActivateWithBadURIScheme() throws Exception
 	{
-    properties.put(MongoClientProvider.PROP_URI , "mongodd://localhost");
+    properties.put(MongoProvider.PROP_URI , "mongodd://localhost");
 
 		mongoClientProviderComponent.activate(aQute.lib.converter.Converter.cnv(ClientConfig.class, properties));
 	}
@@ -99,7 +99,7 @@ public class TestMongoClientProviderComponent
 	@Test(expected = IllegalStateException.class)
 	public void testActivateWithTooManuURISegments() throws Exception
 	{
-    properties.put(MongoClientProvider.PROP_URI , "mongodd://localhost/database/");
+    properties.put(MongoProvider.PROP_URI , "mongodd://localhost/database/");
 
 		mongoClientProviderComponent.activate(aQute.lib.converter.Converter.cnv(ClientConfig.class, properties));
 	}
@@ -107,8 +107,8 @@ public class TestMongoClientProviderComponent
   @Test(expected = IllegalStateException.class)
 	public void testActivateWithEmptyClientId() throws Exception
 	{
-    properties.put(MongoClientProvider.PROP_CLIENT_ID, "");
-    properties.put(MongoClientProvider.PROP_URI , "mongodb://localhost");
+    properties.put(MongoProvider.PROP_CLIENT_ID, "");
+    properties.put(MongoProvider.PROP_URI , "mongodb://localhost");
 
 		mongoClientProviderComponent.activate(aQute.lib.converter.Converter.cnv(ClientConfig.class, properties));
 	}

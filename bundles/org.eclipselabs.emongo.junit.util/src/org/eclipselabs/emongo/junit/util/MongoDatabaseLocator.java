@@ -19,7 +19,7 @@ import static org.junit.Assert.fail;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import org.eclipselabs.emongo.MongoClientProvider;
+import org.eclipselabs.emongo.MongoProvider;
 import org.eclipselabs.eunit.junit.utils.ServiceLocator;
 
 import com.mongodb.client.MongoDatabase;
@@ -40,7 +40,7 @@ import com.mongodb.client.MongoDatabase;
  * @author bhunt
  * 
  */
-public class MongoDatabaseLocator extends ServiceLocator<MongoClientProvider>
+public class MongoDatabaseLocator extends ServiceLocator<MongoProvider>
 {
   private MongoDatabase db;
   private String baseURI;
@@ -111,7 +111,7 @@ public class MongoDatabaseLocator extends ServiceLocator<MongoClientProvider>
    */
   public MongoDatabaseLocator(String hostname, int port, String database, String clientId, boolean dropDatabaseBefore, boolean dropDatabaseAfter)
   {
-    super(MongoClientProvider.class, (clientId != null ? "(clientId=" + clientId + ")" : null));
+    super(MongoProvider.class, (clientId != null ? "(clientId=" + clientId + ")" : null));
     baseURI = "mongodb://" + hostname + (port == 27017 ? "" : ":" + port) + "/" + database;
     this.dropDatabaseBefore = dropDatabaseBefore;
     this.dropDatabaseAfter = dropDatabaseAfter;

@@ -1,5 +1,6 @@
 -buildpath: \
 	osgi.cmpn;version=6.0,\
-	org.eclipselabs.emongo.api;version=latest
+	org.eclipselabs.emongo.api;version=latest,\
+	org.apache.felix.gogo.runtime;version=0.16
 Private-Package: org.eclipselabs.emongo.configurator
 Bundle-Version: 2.0.0.${tstamp}

@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.eclipselabs.emongo.MongoClientProvider;
+import org.eclipselabs.emongo.MongoProvider;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
@@ -40,8 +40,8 @@ import com.mongodb.client.MongoDatabase;
  * @author bhunt
  * 
  */
-@Component(service = MongoClientProvider.class, configurationPolicy = ConfigurationPolicy.REQUIRE, configurationPid = { MongoClientProvider.PID })
-public class MongoClientProviderComponent extends AbstractComponent implements MongoClientProvider
+@Component(service = MongoProvider.class, configurationPolicy = ConfigurationPolicy.REQUIRE, configurationPid = { MongoProvider.PID })
+public class MongoProviderComponent extends AbstractComponent implements MongoProvider
 {
   public @interface ClientConfig
   {

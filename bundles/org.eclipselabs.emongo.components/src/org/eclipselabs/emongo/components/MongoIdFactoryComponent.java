@@ -17,7 +17,7 @@ import static com.mongodb.client.model.Updates.inc;
 import java.io.IOException;
 
 import org.bson.Document;
-import org.eclipselabs.emongo.MongoClientProvider;
+import org.eclipselabs.emongo.MongoProvider;
 import org.eclipselabs.emongo.MongoIdFactory;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -46,7 +46,7 @@ public class MongoIdFactoryComponent extends AbstractComponent implements MongoI
 	private volatile String uri;
 
 	private volatile MongoCollection<Document> collection;
-	private volatile MongoClientProvider mongoClientProvider;
+	private volatile MongoProvider mongoClientProvider;
 
 	private static final String ID = "_id";
 	private static final String LAST_ID = "_lastId";
@@ -103,7 +103,7 @@ public class MongoIdFactoryComponent extends AbstractComponent implements MongoI
   }
 
   @Reference(unbind = "-")
-	public void bindMongoClientProvider(MongoClientProvider mongoClientProvider)
+	public void bindMongoClientProvider(MongoProvider mongoClientProvider)
 	{
 		this.mongoClientProvider = mongoClientProvider;
 	}

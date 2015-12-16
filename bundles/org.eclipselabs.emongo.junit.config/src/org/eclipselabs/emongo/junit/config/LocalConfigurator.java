@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
-import org.eclipselabs.emongo.MongoClientProvider;
+import org.eclipselabs.emongo.MongoProvider;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.component.annotations.Activate;
@@ -27,12 +27,12 @@ public class LocalConfigurator
 	@Activate
 	public void activate() throws IOException
 	{
-		Configuration config = configurationAdmin.createFactoryConfiguration(MongoClientProvider.PID, null);
+		Configuration config = configurationAdmin.createFactoryConfiguration(MongoProvider.PID, null);
 
 		Dictionary<String, Object> properties = new Hashtable<String, Object>();
 
-		properties.put(MongoClientProvider.PROP_CLIENT_ID, "junit");
-		properties.put(MongoClientProvider.PROP_URI, "mongodb://localhost/junit");
+		properties.put(MongoProvider.PROP_CLIENT_ID, "junit");
+		properties.put(MongoProvider.PROP_URI, "mongodb://localhost/junit");
 		properties.put("type", "mongo");
 		config.update(properties);
 	}

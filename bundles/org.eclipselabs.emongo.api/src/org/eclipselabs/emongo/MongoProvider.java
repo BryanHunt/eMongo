@@ -21,7 +21,7 @@ import com.mongodb.client.MongoDatabase;
  * @author bhunt
  * 
  */
-public interface MongoClientProvider
+public interface MongoProvider
 {
   String PID = "org.eclipselabs.emongo.provider";
   

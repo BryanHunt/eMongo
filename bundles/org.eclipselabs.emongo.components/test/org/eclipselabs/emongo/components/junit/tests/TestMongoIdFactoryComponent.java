@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bson.Document;
-import org.eclipselabs.emongo.MongoClientProvider;
+import org.eclipselabs.emongo.MongoProvider;
 import org.eclipselabs.emongo.MongoIdFactory;
 import org.eclipselabs.emongo.components.MongoIdFactoryComponent;
 import org.eclipselabs.emongo.components.MongoIdFactoryComponent.IdConfig;
@@ -45,7 +45,7 @@ import com.mongodb.client.MongoDatabase;
 @SuppressWarnings("restriction")
 public class TestMongoIdFactoryComponent
 {
-	private MongoClientProvider mongoClientProvider;
+	private MongoProvider mongoClientProvider;
 	private MongoIdFactoryComponent mongoIdFactoryComponent;
 	private Map<String, Object> properties;
 	private MongoDatabase db;
@@ -67,7 +67,7 @@ public class TestMongoIdFactoryComponent
 		db = mock(MongoDatabase.class);
 		collection = mock(MongoCollection.class);
 		commandResult = mock(CommandResult.class);
-		mongoClientProvider = mock(MongoClientProvider.class);
+		mongoClientProvider = mock(MongoProvider.class);
 		cursor = mock(FindIterable.class);
 		
 		when(mongoClientProvider.getMongoDatabase()).thenReturn(db);

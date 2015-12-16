@@ -7,7 +7,7 @@ package org.eclipselabs.emongo.components.junit.support;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.eclipselabs.emongo.components.MongoClientProviderComponent;
+import org.eclipselabs.emongo.components.MongoProviderComponent;
 
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions;
@@ -17,7 +17,7 @@ import com.mongodb.ServerAddress;
  * @author bhunt
  * 
  */
-public class MongoClientProviderComponentTestHarness extends MongoClientProviderComponent
+public class MongoClientProviderComponentTestHarness extends MongoProviderComponent
 {
 	private MongoClient mongoClient;
 	private Collection<ServerAddress> serverAddresses;

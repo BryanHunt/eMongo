@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.bson.Document;
 import org.eclipselabs.emongo.MongoAdmin;
-import org.eclipselabs.emongo.MongoClientProvider;
+import org.eclipselabs.emongo.MongoProvider;
 import org.eclipselabs.emongo.MongoServerStatsPublisher;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -27,7 +27,7 @@ public class MongoDatabaseMonitorComponent implements Runnable
 
   public static final String PROP_DATABASE_FILTER = "MongoDatabaseProvider.target";
 
-  private volatile MongoClientProvider mongoClientProvider;
+  private volatile MongoProvider mongoClientProvider;
   private volatile Collection<MongoServerStatsPublisher> serverStatsPublishers = Collections.newSetFromMap(new ConcurrentHashMap<>());
   private int updateInterval;
   private volatile boolean done = false;
@@ -82,7 +82,7 @@ public class MongoDatabaseMonitorComponent implements Runnable
   }
 
   @Reference(unbind = "-")
-  public void bindMongoClientProvider(MongoClientProvider mongoClientProvider)
+  public void bindMongoClientProvider(MongoProvider mongoClientProvider)
   {
     this.mongoClientProvider = mongoClientProvider;
   }

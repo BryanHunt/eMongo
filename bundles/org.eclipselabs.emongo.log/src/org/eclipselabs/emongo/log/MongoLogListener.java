@@ -16,7 +16,7 @@ import java.io.StringWriter;
 import java.util.Date;
 
 import org.bson.Document;
-import org.eclipselabs.emongo.MongoClientProvider;
+import org.eclipselabs.emongo.MongoProvider;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.annotations.Activate;
@@ -48,7 +48,7 @@ public class MongoLogListener implements LogListener
 	public static final String PROP_MAX_LEVEL = "maxLevel";
 
 	private volatile LogReaderService logReaderService;
-	private volatile MongoClientProvider mongoClientProvider;
+	private volatile MongoProvider mongoClientProvider;
 	private volatile MongoCollection<Document> logCollection;
 	private volatile Integer maxLevel;
 
@@ -109,7 +109,7 @@ public class MongoLogListener implements LogListener
 	}
 
   @Reference(unbind = "-")
-	public void bindMongoClientProvider(MongoClientProvider mongoClientProvider)
+	public void bindMongoClientProvider(MongoProvider mongoClientProvider)
 	{
 		this.mongoClientProvider = mongoClientProvider;
 	}

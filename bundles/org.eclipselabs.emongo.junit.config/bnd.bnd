@@ -1,4 +1,0 @@
--buildpath: \
-	osgi.cmpn;version=6.0,\
-	org.eclipselabs.emongo.api;version=latest
-Private-Package: org.eclipselabs.emongo.junit.config

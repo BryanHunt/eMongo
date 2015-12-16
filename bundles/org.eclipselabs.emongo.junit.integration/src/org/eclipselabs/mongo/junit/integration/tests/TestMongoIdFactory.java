@@ -22,9 +22,11 @@ import org.bson.Document;
 import org.eclipselabs.emongo.MongoIdFactory;
 import org.eclipselabs.emongo.junit.util.MongoDatabaseLocator;
 import org.eclipselabs.eunit.junit.utils.ServiceConfigurator;
+import org.eclipselabs.eunit.junit.utils.ServiceLocator;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.RuleChain;
 
 import com.mongodb.client.MongoCollection;
 
@@ -42,13 +44,13 @@ public class TestMongoIdFactory
     config.put(MongoIdFactory.PROP_COLLECTION, "junit_id");
   }
   
-	@Rule
-	public MongoDatabaseLocator databaseLocator = new MongoDatabaseLocator("localhost", 27017, "junit", "junit", false, true);
+  private MongoIdFactory mongoId;
+  private MongoDatabaseLocator databaseLocator = new MongoDatabaseLocator("localhost", 27017, "junit", "junit", false, true);
+  private ServiceLocator<MongoIdFactory> mongoIdFactoryLocator = new ServiceConfigurator<MongoIdFactory>(MongoIdFactory.class, MongoIdFactory.PID, config);
 
-	@Rule
-	public ServiceConfigurator<MongoIdFactory> mongoIdFactoryLocator = new ServiceConfigurator<MongoIdFactory>(MongoIdFactory.class, MongoIdFactory.PID, config);
+  @Rule
+	public RuleChain chain = RuleChain.outerRule(databaseLocator).around(mongoIdFactoryLocator);
 
-	private MongoIdFactory mongoId;
 
 	@Before
 	public void setUp()

@@ -14,7 +14,11 @@ package org.eclipselabs.mongo.junit.integration.tests;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+import java.util.Dictionary;
+import java.util.Hashtable;
+
 import org.eclipselabs.emongo.MongoProvider;
+import org.eclipselabs.eunit.junit.utils.ServiceConfigurator;
 import org.eclipselabs.eunit.junit.utils.ServiceLocator;
 import org.junit.Before;
 import org.junit.Rule;
@@ -28,8 +32,16 @@ import com.mongodb.MongoClient;
  */
 public class TestMongoProvider
 {
-	@Rule
-	public ServiceLocator<MongoProvider> mongoClientProviderLocator = new ServiceLocator<MongoProvider>(MongoProvider.class);
+  private static Dictionary<String, Object> config = new Hashtable<>();
+
+  static
+  {
+    config.put(MongoProvider.PROP_CLIENT_ID, "junit");
+    config.put(MongoProvider.PROP_URI, "mongodb://localhost/junit");
+  }
+
+  @Rule
+	public ServiceLocator<MongoProvider> mongoClientProviderLocator = new ServiceConfigurator<MongoProvider>(MongoProvider.class, MongoProvider.PID, config);
 
 	private MongoProvider mongoProvider;
 

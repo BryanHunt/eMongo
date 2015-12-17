@@ -251,7 +251,7 @@ public class MongoProviderComponent extends AbstractComponent implements MongoPr
       String uri = targetURI.trim();
       String[] segments = uri.split("/");
 
-      if (!uri.startsWith("mongodb://") || uri.endsWith("/") || segments.length < 4 || segments.length > 5)
+      if (!uri.startsWith("mongodb://") || uri.endsWith("/") || segments.length < 3 || segments.length > 5)
         return "The uri: '" + uri + "' does not have the form 'mongodb://host[:port]/[database]'";
 
       if (uris != null)

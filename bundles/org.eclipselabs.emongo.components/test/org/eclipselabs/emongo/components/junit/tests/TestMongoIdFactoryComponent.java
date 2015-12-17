@@ -70,6 +70,7 @@ public class TestMongoIdFactoryComponent
 		mongoClientProvider = mock(MongoProvider.class);
 		cursor = mock(FindIterable.class);
 		
+		when(mongoClientProvider.getURIs()).thenReturn(new String[] {"mongodb://localhost/junit"});
 		when(mongoClientProvider.getMongoDatabase()).thenReturn(db);
 		when(db.getCollection("elements")).thenReturn(collection);
 		when(collection.withWriteConcern(any(WriteConcern.class))).thenReturn(collection);
@@ -90,7 +91,7 @@ public class TestMongoIdFactoryComponent
 		verify(collection).find(any(Document.class));
 		verify(cursor).first();
 		verify(collection).insertOne(argument.capture());
-		assertThat((Long) argument.getValue().get("_lastId"), is(0L));
+		assertThat((Long) argument.getValue().get("_nextId"), is(0L));
 	}
 
 	@Test
@@ -126,7 +127,7 @@ public class TestMongoIdFactoryComponent
 		mongoIdFactoryComponent.bindMongoClientProvider(mongoClientProvider);
 		mongoIdFactoryComponent.activate(aQute.lib.converter.Converter.cnv(IdConfig.class, properties));
 
-		Document result = new Document("_lastId", Long.valueOf(1));
+		Document result = new Document("_nextId", Long.valueOf(1));
 		when(collection.findOneAndUpdate(any(Document.class), any(Document.class))).thenReturn(result);
 		assertThat(mongoIdFactoryComponent.getNextId(), is(1L));
 	}

@@ -46,7 +46,7 @@ public class MongoIdFactoryComponent extends AbstractComponent implements MongoI
 	private volatile String uri;
 
 	private volatile MongoCollection<Document> collection;
-	private volatile MongoProvider mongoClientProvider;
+	private volatile MongoProvider mongoProvider;
 
 	private static final String ID = "_id";
 	private static final String NEXT_ID = "_nextId";
@@ -65,9 +65,9 @@ public class MongoIdFactoryComponent extends AbstractComponent implements MongoI
 		collectionName = config.collectionName();
 		handleIllegalConfiguration(validateCollectionName(collectionName));
 
-		uri = mongoClientProvider.getURIs()[0] + "/" + collectionName;
+		uri = mongoProvider.getURIs()[0] + "/" + collectionName;
 
-		MongoDatabase db = mongoClientProvider.getMongoDatabase();
+		MongoDatabase db = mongoProvider.getMongoDatabase();
 		collection = db.getCollection(collectionName).withWriteConcern(WriteConcern.MAJORITY);
 		Document object = collection.find(eq(ID, "0")).first();
 
@@ -105,6 +105,6 @@ public class MongoIdFactoryComponent extends AbstractComponent implements MongoI
   @Reference(unbind = "-")
 	public void bindMongoClientProvider(MongoProvider mongoClientProvider)
 	{
-		this.mongoClientProvider = mongoClientProvider;
+		this.mongoProvider = mongoClientProvider;
 	}
 }

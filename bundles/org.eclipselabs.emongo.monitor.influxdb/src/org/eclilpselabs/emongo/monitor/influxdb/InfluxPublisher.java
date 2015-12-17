@@ -20,7 +20,7 @@ public class InfluxPublisher implements MongoServerStatsPublisher
 {
   public @interface PublisherConfig
   {
-    String influxURI() default "http://localhost:8086/write?db=mongodb";
+    String uri();
   }
   
   private CloseableHttpClient client;
@@ -30,7 +30,7 @@ public class InfluxPublisher implements MongoServerStatsPublisher
   public void activate(PublisherConfig config)
   {
     client = HttpClients.createDefault();
-    request = new HttpPost(config.influxURI());
+    request = new HttpPost(config.uri());
   }
 
   @Deactivate
@@ -50,11 +50,8 @@ public class InfluxPublisher implements MongoServerStatsPublisher
     builder.setText(metrics.toString());
     request.setEntity(builder.build());
 
-    try
-    {
-      CloseableHttpResponse response = client.execute(request);
-      response.close();
-    } 
+    try(CloseableHttpResponse response = client.execute(request))
+    {} 
     catch (IOException e)
     {
       // TODO Auto-generated catch block
@@ -101,14 +98,14 @@ public class InfluxPublisher implements MongoServerStatsPublisher
     
     if(value instanceof String)
       buffer.append('"');
-    else if(value instanceof Integer || value instanceof Long)
-      buffer.append('i');
     
     buffer.append(value);
     
     if(value instanceof String)
       buffer.append('"');
-
+    else if(value instanceof Integer || value instanceof Long)
+      buffer.append('i');
+    
     buffer.append(' ');
     buffer.append(timestamp * 1000);    
   }

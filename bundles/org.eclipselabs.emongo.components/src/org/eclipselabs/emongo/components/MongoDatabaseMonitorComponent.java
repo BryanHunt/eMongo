@@ -28,10 +28,10 @@ public class MongoDatabaseMonitorComponent implements Runnable
 
   public static final String PROP_DATABASE_FILTER = "MongoDatabaseProvider.target";
 
-  private volatile MongoProvider mongoClientProvider;
-  private volatile Collection<MongoServerStatsPublisher> serverStatsPublishers = Collections.newSetFromMap(new ConcurrentHashMap<>());
-  private int updateInterval;
   private volatile boolean done = false;
+  private volatile MongoProvider mongoClientProvider;
+  private Collection<MongoServerStatsPublisher> serverStatsPublishers = Collections.newSetFromMap(new ConcurrentHashMap<>());
+  private int updateInterval;
   private Thread thread;
 
   public static String validateUpdateInterval(String stringValue)

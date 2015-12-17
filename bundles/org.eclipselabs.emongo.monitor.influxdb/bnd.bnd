@@ -7,3 +7,4 @@
 -dsannotations: *
 Bundle-Version: 1.0.0.${tstamp}
 Private-Package: org.eclilpselabs.emongo.monitor.influxdb
+Include-Resource: OSGI-INF/metatype=OSGI-INF/metatype

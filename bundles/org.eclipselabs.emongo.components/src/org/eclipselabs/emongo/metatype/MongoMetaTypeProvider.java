@@ -54,7 +54,7 @@ public class MongoMetaTypeProvider implements MetaTypeProvider
 			}
 		};
 
-		uri.setDescription("The URI of the MongoDB server of the form 'mongodb://host[:port]'.  Separate URIs with a comma (CSV) for a replica set.");
+		uri.setDescription("The URI of the MongoDB server of the form 'mongodb://[username:password@]host[:port][/database]'.  Separate URIs with a comma (CSV) for a replica set.");
 
 		// alwaysUseMBeans
 		

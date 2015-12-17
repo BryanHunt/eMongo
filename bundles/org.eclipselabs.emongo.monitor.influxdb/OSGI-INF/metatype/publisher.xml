@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MetaData xmlns="http://www.osgi.org/xmlns/metatype/v1.1.0">
+	<OCD name="MongoDB -> InfluxDB" id="org.eclilpselabs.emongo.monitor.influxdb.InfluxPublisher" description="MongoDB stats publisher to InfluxDB">
+		<AD name="URI" id="uri" type="String" description="The InfluxDB URI (example: http://localhost:8086/write?db=mongodb)"/>
+	</OCD>
+	<Designate pid="org.eclilpselabs.emongo.monitor.influxdb.InfluxPublisher">
+		<Object ocdref="org.eclilpselabs.emongo.monitor.influxdb.InfluxPublisher"/>
+	</Designate>
+</MetaData>

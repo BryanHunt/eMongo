@@ -14,6 +14,7 @@ import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 
 @Component(immediate = true, configurationPolicy = ConfigurationPolicy.REQUIRE, configurationPid = MongoAdmin.MONITOR_PID)
 public class MongoDatabaseMonitorComponent implements Runnable
@@ -87,7 +88,7 @@ public class MongoDatabaseMonitorComponent implements Runnable
     this.mongoClientProvider = mongoClientProvider;
   }
   
-  @Reference(cardinality = ReferenceCardinality.MULTIPLE)
+  @Reference(cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC)
   public void bindServerStatsPublisher(MongoServerStatsPublisher serverStatsPublisher)
   {
     serverStatsPublishers.add(serverStatsPublisher);

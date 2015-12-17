@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<repository increment="1450311172000" name="Release" xmlns="http://www.osgi.org/xmlns/repository/v1.0.0">
+<repository increment="1450319785000" name="Release" xmlns="http://www.osgi.org/xmlns/repository/v1.0.0">
   <resource>
     <capability namespace="osgi.identity">
       <attribute name="osgi.identity" value="org.eclipselabs.emongo.api"/>
@@ -96,21 +96,21 @@
     <capability namespace="osgi.identity">
       <attribute name="osgi.identity" value="org.eclipselabs.emongo.components"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" type="Version" value="2.0.0.201512170005"/>
+      <attribute name="version" type="Version" value="2.0.0.201512170235"/>
     </capability>
     <capability namespace="osgi.content">
-      <attribute name="osgi.content" value="a9aa45b7c243c4b0957a48e9333e82da312a0d46816e50e616226b333d22cbf4"/>
+      <attribute name="osgi.content" value="99ac1642d51d271cc31e10367d30fa1c04dd03a243ccc755e38d0367d74d281a"/>
       <attribute name="url" value="org.eclipselabs.emongo.components/org.eclipselabs.emongo.components-2.0.0.jar"/>
       <attribute name="size" type="Long" value="53964"/>
       <attribute name="mime" value="application/vnd.osgi.bundle"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <attribute name="osgi.wiring.bundle" value="org.eclipselabs.emongo.components"/>
-      <attribute name="bundle-version" type="Version" value="2.0.0.201512170005"/>
+      <attribute name="bundle-version" type="Version" value="2.0.0.201512170235"/>
     </capability>
     <capability namespace="osgi.wiring.host">
       <attribute name="osgi.wiring.host" value="org.eclipselabs.emongo.components"/>
-      <attribute name="bundle-version" type="Version" value="2.0.0.201512170005"/>
+      <attribute name="bundle-version" type="Version" value="2.0.0.201512170235"/>
     </capability>
     <capability namespace="osgi.service">
       <attribute name="objectClass" type="List&lt;String&gt;" value="java.lang.Runnable"/>

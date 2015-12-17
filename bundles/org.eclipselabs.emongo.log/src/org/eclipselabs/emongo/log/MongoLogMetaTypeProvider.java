@@ -19,6 +19,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.metatype.AttributeDefinition;
 import org.osgi.service.metatype.MetaTypeProvider;
 import org.osgi.service.metatype.ObjectClassDefinition;
@@ -76,13 +77,13 @@ public class MongoLogMetaTypeProvider implements MetaTypeProvider
 		return ocd;
 	}
 
-	@Reference(cardinality = ReferenceCardinality.MULTIPLE)
-	public void bindMongoClientProvider(ServiceReference<MongoProvider> serviceReference)
+	@Reference(cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC)
+	public void bindMongoProvider(ServiceReference<MongoProvider> serviceReference)
 	{
 		mongoDatabaseProviders.add((String) serviceReference.getProperty(MongoProvider.PROP_CLIENT_ID));
 	}
 
-	public void unbindMongoClientProvider(ServiceReference<MongoProvider> serviceReference)
+	public void unbindMongoProvider(ServiceReference<MongoProvider> serviceReference)
 	{
 		mongoDatabaseProviders.remove((String) serviceReference.getProperty(MongoProvider.PROP_CLIENT_ID));
 	}

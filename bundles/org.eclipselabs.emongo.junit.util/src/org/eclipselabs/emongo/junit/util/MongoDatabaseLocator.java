@@ -58,7 +58,8 @@ public class MongoDatabaseLocator extends ServiceConfigurator<MongoProvider>
   }
 
   /**
-   * Connects to the specified database on localhost:27017
+   * Connects to the specified database on localhost:27017 and defaults to
+   * dropping the database before each test
    * 
    * @param database
    *          the name of the database to use for unit testing
@@ -70,7 +71,7 @@ public class MongoDatabaseLocator extends ServiceConfigurator<MongoProvider>
 
   /**
    * Connects to the specified database on the specified host using the default
-   * port 27017
+   * port 27017 and defaults to dropping the database before each test
    * 
    * @param hostname
    *          the host running MongoDB
@@ -83,7 +84,8 @@ public class MongoDatabaseLocator extends ServiceConfigurator<MongoProvider>
   }
 
   /**
-   * Connects to the specified database on the specified host and port
+   * Connects to the specified database on the specified host and port and
+   * defaults to dropping the database before each test
    * 
    * @param hostname
    *          the host running MongoDB
@@ -110,6 +112,11 @@ public class MongoDatabaseLocator extends ServiceConfigurator<MongoProvider>
    *          the name of the database to use for unit testing
    * @param alias
    *          the alias configured on the MongoDB provider service
+   * @param dropDatabaseBefore
+   *          set to true if you want the database dropped before each test; false otherwise
+   * @param dropDatabaseAfter
+   *          set to true if you want the database dropped after each test; false otherwise
+   *          
    */
   public MongoDatabaseLocator(String hostname, int port, String database, String clientId, boolean dropDatabaseBefore, boolean dropDatabaseAfter)
   {
@@ -178,7 +185,16 @@ public class MongoDatabaseLocator extends ServiceConfigurator<MongoProvider>
     assertThat("No database configured for: " + baseURI, db, is(notNullValue()));
     
     if(dropDatabaseBefore)
-      db.drop();
+    {
+      try
+      {
+        db.drop();
+      }
+      catch (Exception e)
+      {
+        fail("Failed to drop database: " + baseURI + "\n\n" + e.getMessage());
+      }
+    }
   }
 
   @Override
@@ -192,7 +208,7 @@ public class MongoDatabaseLocator extends ServiceConfigurator<MongoProvider>
       }
       catch (Exception e)
       {
-        fail("Failed to clean up database: " + baseURI + "\n\n" + e.getMessage());
+        fail("Failed to drop database: " + baseURI + "\n\n" + e.getMessage());
       }
     }
 

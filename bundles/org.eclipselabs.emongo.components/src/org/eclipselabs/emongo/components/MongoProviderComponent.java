@@ -29,6 +29,7 @@ import org.osgi.service.log.LogService;
 
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions;
+import com.mongodb.MongoCredential;
 import com.mongodb.ReadPreference;
 import com.mongodb.ServerAddress;
 import com.mongodb.Tag;
@@ -50,7 +51,7 @@ public class MongoProviderComponent extends AbstractComponent implements MongoPr
     String uri();
 
     String databaseName() default "";
-    
+
     boolean alwaysUseMBeans() default false;
 
     int connectionsPerHost() default 100;
@@ -154,7 +155,7 @@ public class MongoProviderComponent extends AbstractComponent implements MongoPr
     handleIllegalConfiguration(validateClientId(config.clientId()));
 
     databaseName = config.databaseName();
-    
+
     // The uriProperty is a single string containing one or more server URIs.
     // When more than one URI is specified, it denotes a replica set and the
     // URIs must be separated by a comma (CSV).
@@ -163,47 +164,7 @@ public class MongoProviderComponent extends AbstractComponent implements MongoPr
     handleIllegalConfiguration(validateURI(config.uri(), uris));
 
     MongoClientOptions options = createMongoClientOptions(config);
-    String currentURI = null;
-
-    try
-    {
-      if (uris.size() == 1)
-      {
-        currentURI = uris.iterator().next();
-        ServerAddress serverAddress = createServerAddress(currentURI);
-        mongoClient = createMongoClient(serverAddress, options);
-
-        String[] segments = currentURI.split("/");
-
-        if (segments.length == 4)
-          databaseName = segments[3];
-      }
-      else
-      {
-        ArrayList<ServerAddress> serverAddresses = new ArrayList<ServerAddress>(uris.size());
-
-        for (String uri : uris)
-        {
-          currentURI = uri;
-          serverAddresses.add(createServerAddress(currentURI));
-          String[] segments = currentURI.split("/");
-
-          if (segments.length == 4)
-            databaseName = segments[3];
-
-        }
-
-        mongoClient = createMongoClient(serverAddresses, options);
-      }
-    }
-    catch (UnknownHostException e)
-    {
-      handleConfigurationException("The URI: '" + currentURI + "' has a bad hostname", e);
-    }
-    catch (URISyntaxException e)
-    {
-      handleConfigurationException("The URI: '" + currentURI + "' is not a proper URI", e);
-    }
+    mongoClient = createMongoClient(uris, options);
   }
 
   @Deactivate
@@ -225,14 +186,45 @@ public class MongoProviderComponent extends AbstractComponent implements MongoPr
     super.unbindLogService(logService);
   }
 
-  protected MongoClient createMongoClient(ArrayList<ServerAddress> serverAddresses, MongoClientOptions options)
+  protected MongoClient createMongoClient(Collection<String> uris, MongoClientOptions options)
   {
-    return new MongoClient(serverAddresses, options);
-  }
+    String currentURI = null;
 
-  protected MongoClient createMongoClient(ServerAddress serverAddress, MongoClientOptions options)
-  {
-    return new MongoClient(serverAddress, options);
+    try
+    {
+      List<ServerAddress> serverAddresses = new ArrayList<>(uris.size());
+      List<MongoCredential> mongoCredentials = new ArrayList<>();
+      
+      for (String uri : uris)
+      {
+        currentURI = uri;
+        serverAddresses.add(createServerAddress(currentURI));
+        String[] segments = currentURI.split("/");
+        String host = segments[2];
+        int authIndex = host.indexOf('@');
+        
+        if (segments.length == 4)
+          databaseName = segments[3];
+
+        if(authIndex > 0)
+        {
+          String[] credentials = host.substring(0, authIndex).split(":");
+          mongoCredentials.add(MongoCredential.createCredential(credentials[0], databaseName, credentials[1].toCharArray()));
+        }
+      }
+      
+      return new MongoClient(serverAddresses, mongoCredentials, options);
+    }
+    catch (UnknownHostException e)
+    {
+      handleConfigurationException("The URI: '" + currentURI + "' has a bad hostname", e);
+    }
+    catch (URISyntaxException e)
+    {
+      handleConfigurationException("The URI: '" + currentURI + "' is not a proper URI", e);
+    }
+    
+    return null;
   }
 
   private static String validateURI(String value, Collection<String> uris)
@@ -287,7 +279,7 @@ public class MongoProviderComponent extends AbstractComponent implements MongoPr
     optionsBuilder.threadsAllowedToBlockForConnectionMultiplier(config.threadsAllowedToBlockForConnectionMultiplier());
     WriteConcern writeConcern = new WriteConcern(config.writeConcernW(), config.writeConcernWtimeout(), config.writeConcernFsync(), config.writeConcernJ());
     optionsBuilder.writeConcern(writeConcern);
-
+    
     if (!config.requiredReplicaSetName().isEmpty())
       optionsBuilder.requiredReplicaSetName(config.requiredReplicaSetName());
 

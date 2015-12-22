@@ -67,7 +67,6 @@ public class TestMongoClientProviderComponent
 		mongoClientProviderComponent.activate(aQute.lib.converter.Converter.cnv(ClientConfig.class, properties));
 
 		assertThat(mongoClientProviderComponent.getURIs(), is(arrayContainingInAnyOrder(equalTo(uris[0]))));
-		assertThat(mongoClientProviderComponent.getServerAddresses().iterator().next().getHost(), is("localhost"));
 	}
 
 	@Test
@@ -77,7 +76,6 @@ public class TestMongoClientProviderComponent
 		mongoClientProviderComponent.activate(aQute.lib.converter.Converter.cnv(ClientConfig.class, properties));
 
 		assertThat(mongoClientProviderComponent.getURIs(), is(arrayContainingInAnyOrder(equalTo(uris[0]), equalTo(uris[1]), equalTo(uris[2]))));
-		assertThat(mongoClientProviderComponent.getServerAddresses().size(), is(3));
 	}
 
 	@Test(expected = IllegalStateException.class)

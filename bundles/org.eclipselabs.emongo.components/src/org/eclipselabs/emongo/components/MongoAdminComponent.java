@@ -53,7 +53,7 @@ public class MongoAdminComponent extends AbstractComponent implements MongoAdmin
     command.add(host);
     command.add("-d");
     command.add(databaseName);
-    command.add(location.getAbsolutePath());
+    command.add(new File(location, databaseName).getAbsolutePath());
 
     Process process = new ProcessBuilder(command).start();
     return process.waitFor() == 0;    

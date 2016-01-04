@@ -1,30 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<repository increment="1451317725000" name="Release" xmlns="http://www.osgi.org/xmlns/repository/v1.0.0">
+<repository increment="1451933568000" name="Release" xmlns="http://www.osgi.org/xmlns/repository/v1.0.0">
   <resource>
     <capability namespace="osgi.identity">
       <attribute name="osgi.identity" value="org.eclipselabs.emongo.api"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" type="Version" value="2.0.0.201512241544"/>
+      <attribute name="version" type="Version" value="2.0.0.201601041846"/>
     </capability>
     <capability namespace="osgi.content">
-      <attribute name="osgi.content" value="a21e5f86434a220684a09bf26c3e3ce8d17004e7404cb5308051a80b0d4ee646"/>
+      <attribute name="osgi.content" value="a97f8044d7e13451258ca4e19b1111f2b1ef177229b3d88718f9bb57439718dc"/>
       <attribute name="url" value="org.eclipselabs.emongo.api/org.eclipselabs.emongo.api-2.0.0.jar"/>
-      <attribute name="size" type="Long" value="9184"/>
+      <attribute name="size" type="Long" value="9269"/>
       <attribute name="mime" value="application/vnd.osgi.bundle"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <attribute name="osgi.wiring.bundle" value="org.eclipselabs.emongo.api"/>
-      <attribute name="bundle-version" type="Version" value="2.0.0.201512241544"/>
+      <attribute name="bundle-version" type="Version" value="2.0.0.201601041846"/>
     </capability>
     <capability namespace="osgi.wiring.host">
       <attribute name="osgi.wiring.host" value="org.eclipselabs.emongo.api"/>
-      <attribute name="bundle-version" type="Version" value="2.0.0.201512241544"/>
+      <attribute name="bundle-version" type="Version" value="2.0.0.201601041846"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <attribute name="osgi.wiring.package" value="org.eclipselabs.emongo"/>
       <attribute name="version" type="Version" value="2.0.0"/>
       <attribute name="bundle-symbolic-name" value="org.eclipselabs.emongo.api"/>
-      <attribute name="bundle-version" type="Version" value="2.0.0.201512241544"/>
+      <attribute name="bundle-version" type="Version" value="2.0.0.201601041846"/>
       <directive name="uses" value="com.mongodb,com.mongodb.client,org.bson"/>
     </capability>
     <requirement namespace="osgi.wiring.package">
@@ -96,21 +96,21 @@
     <capability namespace="osgi.identity">
       <attribute name="osgi.identity" value="org.eclipselabs.emongo.components"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" type="Version" value="2.0.0.201512281547"/>
+      <attribute name="version" type="Version" value="2.0.0.201601041846"/>
     </capability>
     <capability namespace="osgi.content">
-      <attribute name="osgi.content" value="7f1682efa58954cfbca937929f12d2bc71afd7e9cd7f57a04521579d70462a1c"/>
+      <attribute name="osgi.content" value="b763a4c236e70ca2053deda46ed380e95e1bc5adc358c4d87e9f19c91272601e"/>
       <attribute name="url" value="org.eclipselabs.emongo.components/org.eclipselabs.emongo.components-2.0.0.jar"/>
-      <attribute name="size" type="Long" value="54397"/>
+      <attribute name="size" type="Long" value="57643"/>
       <attribute name="mime" value="application/vnd.osgi.bundle"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <attribute name="osgi.wiring.bundle" value="org.eclipselabs.emongo.components"/>
-      <attribute name="bundle-version" type="Version" value="2.0.0.201512281547"/>
+      <attribute name="bundle-version" type="Version" value="2.0.0.201601041846"/>
     </capability>
     <capability namespace="osgi.wiring.host">
       <attribute name="osgi.wiring.host" value="org.eclipselabs.emongo.components"/>
-      <attribute name="bundle-version" type="Version" value="2.0.0.201512281547"/>
+      <attribute name="bundle-version" type="Version" value="2.0.0.201601041846"/>
     </capability>
     <capability namespace="osgi.service">
       <attribute name="objectClass" type="List&lt;String&gt;" value="java.lang.Runnable"/>

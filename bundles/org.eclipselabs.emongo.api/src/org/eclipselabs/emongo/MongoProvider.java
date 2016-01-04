@@ -131,6 +131,11 @@ public interface MongoProvider
   String PROP_READ_PREFERENCE_TAGS = "readPreferenceTags";
   
   /**
+   * The service property key for: The required replica set name.
+   */
+  String REQUIRED_REPLICA_SET_NAME = "requiredReplicaSetName";
+
+  /**
    * The service property key for: Sets the server selection timeout in milliseconds, 
    * which defines how long the driver will wait for server selection to succeed before 
    * throwing an exception.
@@ -188,7 +193,7 @@ public interface MongoProvider
 	 */
 	String PROP_J = "j";
 
-	/**
+  /**
 	 * 
 	 * @return the MongoDB client driver configured by the service properties
 	 */

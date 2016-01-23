@@ -45,7 +45,7 @@ public class InfluxPublisher implements MongoServerStatsPublisher
   {
     StringBuilder metrics = new StringBuilder();
 
-    createMetrics(metrics, "", stats, System.currentTimeMillis());
+    createMetrics(metrics, "", stats, System.currentTimeMillis() * 1000);
     EntityBuilder builder = EntityBuilder.create();
     builder.setText(metrics.toString());
     request.setEntity(builder.build());

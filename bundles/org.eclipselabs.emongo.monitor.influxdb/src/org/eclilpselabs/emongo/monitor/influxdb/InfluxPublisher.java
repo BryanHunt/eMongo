@@ -2,6 +2,10 @@ package org.eclilpselabs.emongo.monitor.influxdb;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.http.client.entity.EntityBuilder;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -25,12 +29,18 @@ public class InfluxPublisher implements MongoServerStatsPublisher
   
   private CloseableHttpClient client;
   private HttpPost request;
+  private Map<String, Object> previousValues = new HashMap<>();
+  private Set<String> statsThatNeedDeltas = new HashSet<>();
   
   @Activate
   public void activate(PublisherConfig config)
   {
     client = HttpClients.createDefault();
     request = new HttpPost(config.uri());
+    
+    statsThatNeedDeltas.add("extra_info_page_faults");
+    statsThatNeedDeltas.add("network_bytesIn");
+    statsThatNeedDeltas.add("network_bytesOut");
   }
 
   @Deactivate
@@ -98,6 +108,28 @@ public class InfluxPublisher implements MongoServerStatsPublisher
     
     if(value instanceof String)
       buffer.append('"');
+    
+    if(statsThatNeedDeltas.contains(name))
+    {
+      Object previousValue = previousValues.get(name);
+      
+      if(previousValue == null)
+      {
+        previousValue = value;
+        previousValues.put(name, value);
+      }
+
+      previousValues.put(name, value);
+      
+      if(value instanceof Integer)
+        value = (Integer) value - (Integer) previousValue;
+      else if(value instanceof Long)
+        value = (Long) value - (Long) previousValue;
+      else if(value instanceof Float)
+        value = (Float) value - (Float) previousValue;
+      else if(value instanceof Double)
+        value = (Double) value - (Double) previousValue;
+    }
     
     buffer.append(value);
     

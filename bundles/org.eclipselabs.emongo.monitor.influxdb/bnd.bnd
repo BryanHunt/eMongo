@@ -3,8 +3,9 @@
 	org.eclipselabs.emongo.api;version=latest,\
 	org.mongodb.mongo-java-driver;version=3.1,\
 	org.apache.httpcomponents.httpclient;version=4.5,\
-	org.apache.httpcomponents.httpcore;version=4.4
+	org.apache.httpcomponents.httpcore;version=4.4,\
+	osgi.core;version=6.0
 -dsannotations: *
-Bundle-Version: 1.0.3.${tstamp}
+Bundle-Version: 1.0.11.${tstamp}
 Private-Package: org.eclilpselabs.emongo.monitor.influxdb
 Include-Resource: OSGI-INF/metatype=OSGI-INF/metatype

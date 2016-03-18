@@ -38,21 +38,30 @@ public abstract class AbstractComponent
 		if (message == null)
 			return;
 
-		LogService logService = logServiceReference.get();
-
-		if (logService != null)
-			logService.log(LogService.LOG_ERROR, message);
-
+		log(LogService.LOG_ERROR, message);
 		throw new IllegalStateException(message);
 	}
 
 	protected void handleConfigurationException(String message, Exception e)
 	{
-		LogService logService = logServiceReference.get();
-
-		if (logService != null)
-			logService.log(LogService.LOG_ERROR, message, e);
-
+	  log(LogService.LOG_ERROR, message, e);
 		throw new IllegalStateException(e);
+	}
+	
+	protected void log(int level, String message)
+	{
+    LogService logService = logServiceReference.get();
+
+    if (logService != null)
+      logService.log(level, message);	  
+	}
+	
+	protected void log(int level, String message, Exception e)
+	{
+    LogService logService = logServiceReference.get();
+
+    if (logService != null)
+      logService.log(level, message, e);
+	  
 	}
 }

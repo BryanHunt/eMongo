@@ -2,6 +2,7 @@
 <MetaData xmlns="http://www.osgi.org/xmlns/metatype/v1.1.0">
 	<OCD name="MongoDB -> InfluxDB" id="org.eclilpselabs.emongo.monitor.influxdb.InfluxPublisher" description="MongoDB stats publisher to InfluxDB">
 		<AD name="URI" id="uri" type="String" description="The InfluxDB URI (example: http://localhost:8086/write?db=mongodb)"/>
+		<AD name="Timeout" id="timeout" type="Integer" description="The HTTP connection timeout (ms)" default="5000"/>
 	</OCD>
 	<Designate pid="org.eclilpselabs.emongo.monitor.influxdb.InfluxPublisher">
 		<Object ocdref="org.eclilpselabs.emongo.monitor.influxdb.InfluxPublisher"/>

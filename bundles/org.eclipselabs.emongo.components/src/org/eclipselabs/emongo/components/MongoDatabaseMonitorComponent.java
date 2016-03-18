@@ -15,9 +15,10 @@ import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.log.LogService;
 
 @Component(immediate = true, configurationPolicy = ConfigurationPolicy.REQUIRE, configurationPid = MongoAdmin.MONITOR_PID)
-public class MongoDatabaseMonitorComponent implements Runnable
+public class MongoDatabaseMonitorComponent extends AbstractComponent implements Runnable
 {
   public @interface MonitorConfig
   {
@@ -55,7 +56,7 @@ public class MongoDatabaseMonitorComponent implements Runnable
   public void activate(MonitorConfig config)
   {
     updateInterval = config.updateInterval() * 60 * 1000; // convert config value from minutes to milliseconds
-    thread = new Thread(this);
+    thread = new Thread(this, "MongoDB Monitor");
     thread.start();
   }
 
@@ -69,10 +70,29 @@ public class MongoDatabaseMonitorComponent implements Runnable
   @Override
   public void run()
   {
+    log(LogService.LOG_INFO, "MongoDB stats monitor is starting");
+    
     while (!done)
     {
-      Document result = mongoClientProvider.getMongoDatabase().runCommand(new Document("serverStatus", 1));
-      serverStatsPublishers.forEach((publisher) -> {publisher.publishStats(result);});
+      try
+      {
+        Document result = mongoClientProvider.getMongoDatabase().runCommand(new Document("serverStatus", 1));
+        
+        serverStatsPublishers.forEach((publisher) -> {
+          try
+          {
+            publisher.publishStats(result);
+          }
+          catch (Exception e)
+          {
+            log(LogService.LOG_WARNING, "MongoDB stats publisher threw unexpected exception", e);
+          }
+        });
+      }
+      catch(Exception e)
+      {
+        log(LogService.LOG_WARNING, "MongoDB stats monitor caught unexpected exception", e);
+      }
       
       try
       {
@@ -80,6 +100,8 @@ public class MongoDatabaseMonitorComponent implements Runnable
       } catch (InterruptedException e)
       {}
     }
+
+    log(LogService.LOG_INFO, "MongoDB stats monitor is terminating");
   }
 
   @Reference(unbind = "-")
@@ -97,5 +119,16 @@ public class MongoDatabaseMonitorComponent implements Runnable
   public void unbindServerStatsPublisher(MongoServerStatsPublisher serverStatsPublisher)
   {
     serverStatsPublishers.remove(serverStatsPublisher);
+  }
+  
+  @Reference(cardinality = ReferenceCardinality.OPTIONAL)
+  public void bindLogService(LogService logService)
+  {
+    super.bindLogService(logService);;
+  }
+
+  public void unbindLogService(LogService logService)
+  {
+    super.unbindLogService(logService);
   }
 }

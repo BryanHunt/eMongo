@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MetaData xmlns="http://www.osgi.org/xmlns/metatype/v1.1.0">
+	<OCD name="MongoDB -> ElasticSearch" id="org.eclipselabs.emongo.monitor.elasticsearch.ElasticSearchPublisher" description="MongoDB stats publisher to ElasticSearch">
+		<AD name="URI" id="uri" type="String" description="The InfluxDB URI (example: http://localhost:9200/mongodb/)"/>
+		<AD name="Timeout" id="timeout" type="Integer" description="The HTTP connection timeout (ms)" default="5000"/>
+	</OCD>
+	<Designate pid="org.eclipselabs.emongo.monitor.elasticsearch.ElasticSearchPublisher">
+		<Object ocdref="org.eclipselabs.emongo.monitor.elasticsearch.ElasticSearchPublisher"/>
+	</Designate>
+</MetaData>

@@ -1,0 +1,39 @@
+-buildpath: \
+	osgi.cmpn;version=6.0,\
+	org.eclipselabs.emongo.api;version=latest,\
+	org.mongodb.mongo-java-driver;version=3.1,\
+	org.apache.httpcomponents.httpclient;version=4.5,\
+	org.apache.httpcomponents.httpcore;version=4.4,\
+	osgi.core;version=6.0,\
+	org.json
+
+-testpath: \
+	junit; version=4,\
+	hamcrest-core; version=1.3
+
+Bundle-Version: 1.0.14.${tstamp}
+Private-Package: org.eclipselabs.emongo.monitor.elasticsearch
+Include-Resource: OSGI-INF/metatype=OSGI-INF/metatype
+-dsannotations: *
+-runfw: org.apache.felix.framework;version='[5.2.0,5.2.0]'
+-runee: JavaSE-1.8
+-runbundles: \
+	org.eclipselabs.emongo.api;version=latest,\
+	org.eclipselabs.emongo.components;version=latest,\
+	org.eclipselabs.emongo.monitor.elasticsearch;version=latest,\
+	org.apache.felix.gogo.command,\
+	org.apache.felix.gogo.runtime,\
+	org.apache.felix.gogo.shell,\
+	org.mongodb.mongo-java-driver;version=3.1.1,\
+	org.apache.httpcomponents.httpclient;version=4.5.1,\
+	org.apache.httpcomponents.httpcore;version=4.4.4,\
+	org.apache.commons.logging,\
+	org.apache.felix.http.servlet-api,\
+	org.apache.felix.scr,\
+	org.apache.felix.configadmin,\
+	org.apache.felix.metatype,\
+	org.apache.felix.http.jetty,\
+	org.apache.felix.eventadmin,\
+	org.apache.felix.webconsole,\
+	org.json
+-runproperties: org.osgi.http.service.port=8080

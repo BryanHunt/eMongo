@@ -1,11 +1,11 @@
-package org.eclilpselabs.emongo.monitor.influxdb;
+package org.eclipselabs.emongo.monitor.elasticsearch;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -17,6 +17,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.bson.Document;
 import org.eclipselabs.emongo.MongoServerStatsPublisher;
+import org.json.JSONObject;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
@@ -27,7 +28,7 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.log.LogService;
 
 @Component(configurationPolicy = ConfigurationPolicy.REQUIRE)
-public class InfluxPublisher implements MongoServerStatsPublisher
+public class ElasticSearchPublisher implements MongoServerStatsPublisher
 {
   public @interface PublisherConfig
   {
@@ -54,9 +55,9 @@ public class InfluxPublisher implements MongoServerStatsPublisher
     request = new HttpPost(config.uri());
     request.setConfig(requestConfig);
     
-    statsThatNeedDeltas.add("extra_info_page_faults");
-    statsThatNeedDeltas.add("network_bytesIn");
-    statsThatNeedDeltas.add("network_bytesOut");
+    statsThatNeedDeltas.add("extra_info.l_page_faults");
+    statsThatNeedDeltas.add("network.l_bytesIn");
+    statsThatNeedDeltas.add("network.l_bytesOut");
   }
 
   @Deactivate
@@ -69,15 +70,12 @@ public class InfluxPublisher implements MongoServerStatsPublisher
   @Override
   public void publishStats(Document stats)
   {
-    log(LogService.LOG_DEBUG, "Publishing MongoDB stats to InfluxDB: '" + request.getURI() + "'");
-    log(LogService.LOG_DEBUG, stats.toJson());
-    StringBuilder metrics = new StringBuilder();
-
-    createMetrics(metrics, "", stats, System.currentTimeMillis() * 1000);
-    log(LogService.LOG_DEBUG, metrics.toString());
-
+    log(LogService.LOG_DEBUG, "Publishing MongoDB stats to ElasticSearch: '" + request.getURI() + "'");
+    String metrics = buildMetrics(stats);    
+    log(LogService.LOG_DEBUG, metrics);
+    
     EntityBuilder builder = EntityBuilder.create();
-    builder.setText(metrics.toString());
+    builder.setText(metrics);
     request.setEntity(builder.build());
 
     try(CloseableHttpResponse response = client.execute(request))
@@ -85,14 +83,15 @@ public class InfluxPublisher implements MongoServerStatsPublisher
       log(LogService.LOG_DEBUG, "Response from publish: " + response.getStatusLine().getStatusCode() + " '" + response.getStatusLine().getReasonPhrase() + "'");
       
       if(response.getStatusLine().getStatusCode() >= 400)
-        log(LogService.LOG_WARNING, "Failed to publish: " + response.getStatusLine().getStatusCode() + " '" + response.getStatusLine().getReasonPhrase() + "'");      
+        log(LogService.LOG_WARNING, "Failed to publish: " + response.getStatusLine().getStatusCode() + " '" + response.getStatusLine().getReasonPhrase() + "'");
+        
     } 
     catch (IOException e)
     {
       log(LogService.LOG_WARNING, "HTTP POST threw unexpected exception", e);
     }
   }
-
+  
   @Reference(cardinality=ReferenceCardinality.OPTIONAL, policy=ReferencePolicy.DYNAMIC)
   public void bindLogService(LogService logService)
   {
@@ -104,55 +103,35 @@ public class InfluxPublisher implements MongoServerStatsPublisher
     this.logService.compareAndSet(logService, null);
   }
   
-  private void createMetrics(StringBuilder metrics, String hierarchyName, Document stats, long timestamp)
+  private String buildMetrics(Document stats)
   {
-    for(String key : stats.keySet())
-      createMetrics(metrics, hierarchyName, key, stats, timestamp);
-  }
-  
-  private void createMetrics(StringBuilder metrics, String hierarchyName, String name, Document stats, long timestamp)
-  {
-    Object target = stats.get(name);
-    
-    if(target instanceof Date)
-      return;
-    
-    if(target instanceof Document)
-    {
-      String nextHierarchy = hierarchyName.isEmpty() ? name :  hierarchyName + "_" + name; 
-      createMetrics(metrics, nextHierarchy, (Document) target, timestamp);
-    }
-    else
-    {
-      String metricName = hierarchyName.isEmpty() ? name :  hierarchyName + "_" + name;
-      createMetric(metrics, metricName, target, timestamp);
-    }
-  }
-  
-  private void createMetric(StringBuilder buffer, String name, Object value, long timestamp)
-  {
-    if(value == null)
-      return;
-    
-    if(value instanceof Collection)
-      return;
+    log(LogService.LOG_DEBUG, "Mapping field names");    
+    Document mappedStats = mapFieldNames(stats);
 
-    boolean treatAsString = !(value instanceof Integer) && !(value instanceof Boolean) && !(value instanceof Long) && !(value instanceof Float) && !(value instanceof Double);
+    log(LogService.LOG_DEBUG, "Building deltas");    
+    buildDeltas(mappedStats);
+
+    mappedStats.put("ts_timestamp", new Date().getTime());
     
-    if(buffer.length() > 0)
-      buffer.append('\n');
-    
-    buffer.append(name);
-    buffer.append(' ');
-    buffer.append("value=");
-    
-    if(treatAsString) 
-      buffer.append('"');
-    
-    if(statsThatNeedDeltas.contains(name))
-    {
-      Object previousValue = previousValues.get(name);
+    return new JSONObject(mappedStats).toString();
+  }
+  
+  private void buildDeltas(Document stats)
+  {
+    statsThatNeedDeltas.forEach((stat) -> {
+      String[] split = stat.split("\\.");
+      String[] hierarchy = new String[split.length - 1];
+      System.arraycopy(split, 0, hierarchy, 0, hierarchy.length);
+      String name = split[hierarchy.length];
       
+      Document target = stats;
+      
+      for(String level : hierarchy)
+        target = target.get(level, Document.class);
+      
+      Object value = target.get(name);
+      Object previousValue = previousValues.get(name);
+       
       if(previousValue == null)
       {
         previousValue = value;
@@ -169,19 +148,34 @@ public class InfluxPublisher implements MongoServerStatsPublisher
         value = (Float) value - (Float) previousValue;
       else if(value instanceof Double)
         value = (Double) value - (Double) previousValue;
-    }
-    
-    buffer.append(value);
-    
-    if(treatAsString)
-      buffer.append('"');
-    else if(value instanceof Integer || value instanceof Long)
-      buffer.append('i');
-    
-    buffer.append(' ');
-    buffer.append(timestamp * 1000);    
+
+      target.put(name, value);
+    });    
   }
 
+  private Document mapFieldNames(Document stats)
+  {
+    Document mappedStats = new Document();
+    
+    for(Entry<String, Object> item: stats.entrySet())
+    {
+      Object value = item.getValue();
+
+      if(value instanceof Document)
+        mappedStats.put(item.getKey(), mapFieldNames((Document) value));
+      else if(value instanceof Integer || value instanceof Long)
+        mappedStats.put("l_" + item.getKey(), value);
+      else if(value instanceof Float || value instanceof Double)
+        mappedStats.put("d_" + item.getKey(), value);
+      else if(value instanceof String)
+        mappedStats.put("t_" + item.getKey(), value);
+      else if(value instanceof Date)
+        mappedStats.put("ts_" + item.getKey(), ((Date) value).getTime());
+    }
+    
+    return mappedStats;
+  }
+  
   private void log(int level, String message)
   {
     LogService logService = this.logService.get();

@@ -213,7 +213,11 @@ public class MongoProviderComponent extends AbstractComponent implements MongoPr
         }
       }
       
-      return new MongoClient(serverAddresses, mongoCredentials, options);
+      if(serverAddresses.size() == 1)
+        return new MongoClient(serverAddresses.get(0), mongoCredentials, options);
+      else
+        return new MongoClient(serverAddresses, mongoCredentials, options);
+        
     }
     catch (UnknownHostException e)
     {

@@ -12,4 +12,4 @@ Private-Package: \
 	org.eclipselabs.emongo.components,\
 	org.eclipselabs.emongo.metatype
 -dsannotations: *
-Bundle-Version: 2.0.4.${tstamp}
+Bundle-Version: 2.0.6.${tstamp}

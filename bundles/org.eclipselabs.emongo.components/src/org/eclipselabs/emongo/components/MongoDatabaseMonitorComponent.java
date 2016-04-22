@@ -26,11 +26,10 @@ public class MongoDatabaseMonitorComponent extends AbstractComponent implements 
   }
 
   public static final String PROP_UPDATE_INTERVAL = "updateInterval";
-
   public static final String PROP_DATABASE_FILTER = "MongoDatabaseProvider.target";
 
   private volatile boolean done = false;
-  private volatile MongoProvider mongoClientProvider;
+  private volatile Collection<MongoProvider> mongoClientProviders = Collections.newSetFromMap(new ConcurrentHashMap<>());
   private Collection<MongoServerStatsPublisher> serverStatsPublishers = Collections.newSetFromMap(new ConcurrentHashMap<>());
   private int updateInterval;
   private Thread thread;
@@ -40,12 +39,12 @@ public class MongoDatabaseMonitorComponent extends AbstractComponent implements 
     try
     {
       int value = Integer.parseInt(stringValue);
-      
+
       if (value < 1)
         return "The update interval must be > 0";
 
       return null;
-    } 
+    }
     catch (NumberFormatException e)
     {
       return "The update interval must be an integer > 0";
@@ -71,60 +70,68 @@ public class MongoDatabaseMonitorComponent extends AbstractComponent implements 
   public void run()
   {
     log(LogService.LOG_INFO, "MongoDB stats monitor is starting");
-    
+
     while (!done)
     {
-      try
+      for (MongoProvider mongoClientProvider : mongoClientProviders)
       {
-        Document result = mongoClientProvider.getMongoDatabase().runCommand(new Document("serverStatus", 1));
-        
-        serverStatsPublishers.forEach((publisher) -> {
-          try
-          {
-            publisher.publishStats(result);
-          }
-          catch (Exception e)
-          {
-            log(LogService.LOG_WARNING, "MongoDB stats publisher threw unexpected exception", e);
-          }
-        });
+        try
+        {
+          Document result = mongoClientProvider.getMongoDatabase().runCommand(new Document("serverStatus", 1));
+
+          serverStatsPublishers.forEach((publisher) -> {
+            try
+            {
+              publisher.publishStats(result);
+            }
+            catch (Exception e)
+            {
+              log(LogService.LOG_WARNING, "MongoDB stats publisher threw unexpected exception", e);
+            }
+          });
+        }
+        catch (Exception e)
+        {
+          log(LogService.LOG_WARNING, "MongoDB stats monitor caught unexpected exception", e);
+        }
       }
-      catch(Exception e)
-      {
-        log(LogService.LOG_WARNING, "MongoDB stats monitor caught unexpected exception", e);
-      }
-      
       try
       {
         Thread.sleep(updateInterval);
-      } catch (InterruptedException e)
+      }
+      catch (InterruptedException e)
       {}
     }
 
     log(LogService.LOG_INFO, "MongoDB stats monitor is terminating");
   }
 
-  @Reference(unbind = "-")
+  @Reference(cardinality = ReferenceCardinality.AT_LEAST_ONE, policy = ReferencePolicy.DYNAMIC, target = "(clientId=monitor)")
   public void bindMongoClientProvider(MongoProvider mongoClientProvider)
   {
-    this.mongoClientProvider = mongoClientProvider;
+    mongoClientProviders.add(mongoClientProvider);
   }
-  
+
+  public void unbindMongoClientProvider(MongoProvider mongoClientProvider)
+  {
+    mongoClientProviders.remove(mongoClientProvider);
+  }
+
   @Reference(cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC)
   public void bindServerStatsPublisher(MongoServerStatsPublisher serverStatsPublisher)
   {
     serverStatsPublishers.add(serverStatsPublisher);
   }
-  
+
   public void unbindServerStatsPublisher(MongoServerStatsPublisher serverStatsPublisher)
   {
     serverStatsPublishers.remove(serverStatsPublisher);
   }
-  
+
   @Reference(cardinality = ReferenceCardinality.OPTIONAL)
   public void bindLogService(LogService logService)
   {
-    super.bindLogService(logService);;
+    super.bindLogService(logService);
   }
 
   public void unbindLogService(LogService logService)

@@ -37,7 +37,7 @@ public class InfluxPublisher implements MongoServerStatsPublisher
   
   private CloseableHttpClient client;
   private HttpPost request;
-  private Map<String, Object> previousValues = new HashMap<>();
+  private Map<String, Map<String, Object>> previousValuesByHost = new HashMap<>();
   private Set<String> statsThatNeedDeltas = new HashSet<>();
   private AtomicReference<LogService> logService = new AtomicReference<>();
   
@@ -73,7 +73,9 @@ public class InfluxPublisher implements MongoServerStatsPublisher
     log(LogService.LOG_DEBUG, stats.toJson());
     StringBuilder metrics = new StringBuilder();
 
-    createMetrics(metrics, "", stats, System.currentTimeMillis() * 1000);
+    String host = stats.getString("host");
+    
+   createMetrics(metrics, "", host, stats, System.currentTimeMillis() * 1000);
     log(LogService.LOG_DEBUG, metrics.toString());
 
     EntityBuilder builder = EntityBuilder.create();
@@ -104,13 +106,13 @@ public class InfluxPublisher implements MongoServerStatsPublisher
     this.logService.compareAndSet(logService, null);
   }
   
-  private void createMetrics(StringBuilder metrics, String hierarchyName, Document stats, long timestamp)
+  private void createMetrics(StringBuilder metrics, String hierarchyName, String host, Document stats, long timestamp)
   {
     for(String key : stats.keySet())
-      createMetrics(metrics, hierarchyName, key, stats, timestamp);
+      createMetrics(metrics, hierarchyName, key, host, stats, timestamp);
   }
   
-  private void createMetrics(StringBuilder metrics, String hierarchyName, String name, Document stats, long timestamp)
+  private void createMetrics(StringBuilder metrics, String hierarchyName, String name, String host, Document stats, long timestamp)
   {
     Object target = stats.get(name);
     
@@ -120,16 +122,16 @@ public class InfluxPublisher implements MongoServerStatsPublisher
     if(target instanceof Document)
     {
       String nextHierarchy = hierarchyName.isEmpty() ? name :  hierarchyName + "_" + name; 
-      createMetrics(metrics, nextHierarchy, (Document) target, timestamp);
+      createMetrics(metrics, nextHierarchy, host, (Document) target, timestamp);
     }
     else
     {
       String metricName = hierarchyName.isEmpty() ? name :  hierarchyName + "_" + name;
-      createMetric(metrics, metricName, target, timestamp);
+      createMetric(metrics, metricName, host, target, timestamp);
     }
   }
   
-  private void createMetric(StringBuilder buffer, String name, Object value, long timestamp)
+  private void createMetric(StringBuilder buffer, String name, String host, Object value, long timestamp)
   {
     if(value == null)
       return;
@@ -143,6 +145,8 @@ public class InfluxPublisher implements MongoServerStatsPublisher
       buffer.append('\n');
     
     buffer.append(name);
+    buffer.append(",host=");
+    buffer.append(host);
     buffer.append(' ');
     buffer.append("value=");
     
@@ -151,13 +155,18 @@ public class InfluxPublisher implements MongoServerStatsPublisher
     
     if(statsThatNeedDeltas.contains(name))
     {
+      Map<String, Object> previousValues = previousValuesByHost.get(host);
+      
+      if(previousValues == null)
+      {
+        previousValues = new HashMap<>();
+        previousValuesByHost.put(host, previousValues);
+      }
+      
       Object previousValue = previousValues.get(name);
       
       if(previousValue == null)
-      {
         previousValue = value;
-        previousValues.put(name, value);
-      }
 
       previousValues.put(name, value);
       

@@ -9,10 +9,12 @@
  *    Bryan Hunt - initial API and implementation
  *******************************************************************************/
 
-package org.eclipselabs.emongo.metatype;
+package org.eclipselabs.emongo.metatype.components;
 
 import org.eclipselabs.emongo.MongoProvider;
-import org.eclipselabs.emongo.components.MongoProviderComponent;
+import org.eclipselabs.emongo.metatype.AttributeDefinitionImpl;
+import org.eclipselabs.emongo.metatype.IntegerAttributeDefinitionImpl;
+import org.eclipselabs.emongo.metatype.ObjectClassDefinitionImpl;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.metatype.AttributeDefinition;
 import org.osgi.service.metatype.MetaTypeProvider;
@@ -43,7 +45,7 @@ public class MongoMetaTypeProvider implements MetaTypeProvider
 			@Override
 			public String validate(String value)
 			{
-				return MongoProviderComponent.validateClientId(value);
+				return validateClientId(value);
 			}
 		};
 
@@ -57,7 +59,7 @@ public class MongoMetaTypeProvider implements MetaTypeProvider
 			@Override
 			public String validate(String value)
 			{
-				return MongoProviderComponent.validateURI(value);
+				return validateURI(value);
 			}
 		};
 
@@ -258,4 +260,35 @@ public class MongoMetaTypeProvider implements MetaTypeProvider
 
 		return ocd;
 	}
+	
+  private String validateURI(String value)
+  {
+    if (value == null || value.isEmpty())
+      return "The MongoDB URI was not found in the configuration properties";
+
+    // The regex \s matches whitepsace. The extra \ is needed because of how
+    // it's treated in java
+    // strings. The split is done on any number of whitespace chars followed by
+    // a comma followed by
+    // any number of whitespace chars. What is left is the URI(s).
+
+    for (String targetURI : value.split("\\s*,\\s*"))
+    {
+      String uri = targetURI.trim();
+      String[] segments = uri.split("/");
+
+      if (!uri.startsWith("mongodb://") || uri.endsWith("/") || segments.length < 3 || segments.length > 5)
+        return "The uri: '" + uri + "' does not have the form 'mongodb://host[:port]/[database]'";
+    }
+
+    return null;
+  }
+
+  private String validateClientId(String value)
+  {
+    if (value == null || value.isEmpty())
+      return "The MongoDB client id was not found in the configuration properties";
+
+    return null;
+  }
 }

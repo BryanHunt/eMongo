@@ -34,23 +34,6 @@ public class MongoDatabaseMonitorComponent extends AbstractComponent implements 
   private int updateInterval;
   private Thread thread;
 
-  public static String validateUpdateInterval(String stringValue)
-  {
-    try
-    {
-      int value = Integer.parseInt(stringValue);
-
-      if (value < 1)
-        return "The update interval must be > 0";
-
-      return null;
-    }
-    catch (NumberFormatException e)
-    {
-      return "The update interval must be an integer > 0";
-    }
-  }
-
   @Activate
   public void activate(MonitorConfig config)
   {

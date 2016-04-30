@@ -9,14 +9,13 @@
  *    Bryan Hunt - initial API and implementation
  *******************************************************************************/
 
-package org.eclipselabs.emongo.metatype;
-
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
+package org.eclipselabs.emongo.metatype.components;
 
 import org.eclipselabs.emongo.MongoAdmin;
 import org.eclipselabs.emongo.MongoProvider;
-import org.eclipselabs.emongo.components.MongoDatabaseMonitorComponent;
+import org.eclipselabs.emongo.metatype.AttributeDefinitionImpl;
+import org.eclipselabs.emongo.metatype.DatabaseSelectorMetatypeProvider;
+import org.eclipselabs.emongo.metatype.ObjectClassDefinitionImpl;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -31,49 +30,24 @@ import org.osgi.service.metatype.ObjectClassDefinition;
  * 
  */
 @Component(service = MetaTypeProvider.class, property = {MetaTypeConfiguration.PROP_MONITOR_PID})
-public class MongoDatabaseMonitorMetaTypeProvider implements MetaTypeProvider
+public class MongoDatabaseMonitorMetaTypeProvider extends DatabaseSelectorMetatypeProvider
 {
-	Set<String> databases = new CopyOnWriteArraySet<String>();
-
-	@Override
-	public String[] getLocales()
-	{
-		return null;
-	}
-
 	@Override
 	public ObjectClassDefinition getObjectClassDefinition(String arg0, String arg1)
 	{
-		AttributeDefinitionImpl database = new AttributeDefinitionImpl(MongoDatabaseMonitorComponent.PROP_DATABASE_FILTER, "Database", AttributeDefinition.STRING);
-		database.setDescription("The MongoDB database");
-
-		String[] databaseAliases = new String[databases.size()];
-		String[] targetFilters = new String[databases.size()];
-
-		databases.toArray(databaseAliases);
-
-		for (int i = 0; i < databaseAliases.length; i++)
-			targetFilters[i] = "(" + MongoProvider.PROP_CLIENT_ID + "=" + databaseAliases[i] + ")";
-
-		database.setOptionLabels(databaseAliases);
-		database.setOptionValues(targetFilters);
-
-		if (!databases.isEmpty())
-			database.setDefaultValue(new String[] { databases.iterator().next() });
-
-		AttributeDefinitionImpl updateInterval = new AttributeDefinitionImpl(MongoDatabaseMonitorComponent.PROP_UPDATE_INTERVAL, "Update Interval", AttributeDefinition.INTEGER)
+		AttributeDefinitionImpl updateInterval = new AttributeDefinitionImpl("updateInterval", "Update Interval", AttributeDefinition.INTEGER)
 		{
 			@Override
 			public String validate(String value)
 			{
-				return MongoDatabaseMonitorComponent.validateUpdateInterval(value);
+				return validateUpdateInterval(value);
 			}
 		};
 
 		updateInterval.setDescription("The interval in which to sample the database stats in minutes");
 
 		ObjectClassDefinitionImpl ocd = new ObjectClassDefinitionImpl(MongoAdmin.MONITOR_PID, "MongoDB Monitor", "MongoDB Monitor Configuration");
-		ocd.addRequiredAttribute(database);
+		ocd.addRequiredAttribute(createDatabaseSelector());
 		ocd.addOptionalAttribute(updateInterval);
 
 		return ocd;
@@ -82,11 +56,30 @@ public class MongoDatabaseMonitorMetaTypeProvider implements MetaTypeProvider
 	@Reference(cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC)
 	public void bindMongoProvider(ServiceReference<MongoProvider> serviceReference)
 	{
-		databases.add((String) serviceReference.getProperty(MongoProvider.PROP_CLIENT_ID));
+		super.bindMongoProvider(serviceReference);
 	}
 
 	public void unbindMongoProvider(ServiceReference<MongoProvider> serviceReference)
 	{
-		databases.remove((String) serviceReference.getProperty(MongoProvider.PROP_CLIENT_ID));
+		super.unbindMongoProvider(serviceReference);
 	}
+	
+  private String validateUpdateInterval(String stringValue)
+  {
+    try
+    {
+      int value = Integer.parseInt(stringValue);
+
+      if (value < 1)
+        return "The update interval must be > 0";
+
+      return null;
+    }
+    catch (NumberFormatException e)
+    {
+      return "The update interval must be an integer > 0";
+    }
+  }
+
+
 }

@@ -8,8 +8,6 @@
 	org.mockito.mockito-core;version=1.9,\
 	com.springsource.org.objenesis,\
 	biz.aQute.bndlib
-Private-Package: \
-	org.eclipselabs.emongo.components,\
-	org.eclipselabs.emongo.metatype
+Private-Package: org.eclipselabs.emongo.components
 -dsannotations: *
-Bundle-Version: 2.0.6.${tstamp}
+Bundle-Version: 2.0.7.${tstamp}

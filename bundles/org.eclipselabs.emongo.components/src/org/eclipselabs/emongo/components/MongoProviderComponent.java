@@ -112,19 +112,6 @@ public class MongoProviderComponent extends AbstractComponent implements MongoPr
   private volatile Collection<String> uris;
   private volatile MongoClient mongoClient;
 
-  public static String validateClientId(String value)
-  {
-    if (value == null || value.isEmpty())
-      return "The MongoDB client id was not found in the configuration properties";
-
-    return null;
-  }
-
-  public static String validateURI(String value)
-  {
-    return validateURI(value, null);
-  }
-
   @Override
   public String getClientId()
   {
@@ -231,7 +218,7 @@ public class MongoProviderComponent extends AbstractComponent implements MongoPr
     return null;
   }
 
-  private static String validateURI(String value, Collection<String> uris)
+  private String validateURI(String value, Collection<String> uris)
   {
     if (value == null || value.isEmpty())
       return "The MongoDB URI was not found in the configuration properties";
@@ -253,6 +240,14 @@ public class MongoProviderComponent extends AbstractComponent implements MongoPr
       if (uris != null)
         uris.add(uri);
     }
+
+    return null;
+  }
+
+  private String validateClientId(String value)
+  {
+    if (value == null || value.isEmpty())
+      return "The MongoDB client id was not found in the configuration properties";
 
     return null;
   }

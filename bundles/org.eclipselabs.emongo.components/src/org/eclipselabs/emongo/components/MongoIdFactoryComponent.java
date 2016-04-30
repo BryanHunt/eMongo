@@ -51,14 +51,6 @@ public class MongoIdFactoryComponent extends AbstractComponent implements MongoI
 	private static final String ID = "_id";
 	private static final String NEXT_ID = "_nextId";
 
-	public static String validateCollectionName(String value)
-	{
-		if (value == null || value.isEmpty())
-			return "The collection was not specified as part of the component configuration";
-
-		return null;
-	}
-
 	@Activate
 	public void activate(IdConfig config)
 	{
@@ -107,4 +99,12 @@ public class MongoIdFactoryComponent extends AbstractComponent implements MongoI
 	{
 		this.mongoProvider = mongoClientProvider;
 	}
+
+  private String validateCollectionName(String value)
+  {
+  	if (value == null || value.isEmpty())
+  		return "The collection was not specified as part of the component configuration";
+  
+  	return null;
+  }
 }

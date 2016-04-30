@@ -9,14 +9,13 @@
  *    Bryan Hunt - initial API and implementation
  *******************************************************************************/
 
-package org.eclipselabs.emongo.metatype;
+package org.eclipselabs.emongo.metatype.components;
 
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
-
-import org.eclipselabs.emongo.MongoProvider;
 import org.eclipselabs.emongo.MongoIdFactory;
-import org.eclipselabs.emongo.components.MongoIdFactoryComponent;
+import org.eclipselabs.emongo.MongoProvider;
+import org.eclipselabs.emongo.metatype.AttributeDefinitionImpl;
+import org.eclipselabs.emongo.metatype.DatabaseSelectorMetatypeProvider;
+import org.eclipselabs.emongo.metatype.ObjectClassDefinitionImpl;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -31,49 +30,24 @@ import org.osgi.service.metatype.ObjectClassDefinition;
  * 
  */
 @Component(service = MetaTypeProvider.class, property = {MetaTypeConfiguration.PROP_ID_FACTORY_PID})
-public class MongoIdFactoryMetaTypeProvider implements MetaTypeProvider
+public class MongoIdFactoryMetaTypeProvider extends DatabaseSelectorMetatypeProvider
 {
-	Set<String> databases = new CopyOnWriteArraySet<String>();
-
-	@Override
-	public String[] getLocales()
-	{
-		return null;
-	}
-
 	@Override
 	public ObjectClassDefinition getObjectClassDefinition(String arg0, String arg1)
 	{
-		AttributeDefinitionImpl database = new AttributeDefinitionImpl(MongoIdFactory.PROP_DATABASE_FILTER, "Database", AttributeDefinition.STRING);
-		database.setDescription("The MongoDB database");
-
-		String[] databaseAliases = new String[databases.size()];
-		String[] targetFilters = new String[databases.size()];
-
-		databases.toArray(databaseAliases);
-
-		for (int i = 0; i < databaseAliases.length; i++)
-			targetFilters[i] = "(" + MongoProvider.PROP_CLIENT_ID + "=" + databaseAliases[i] + ")";
-
-		database.setOptionLabels(databaseAliases);
-		database.setOptionValues(targetFilters);
-
-		if (!databases.isEmpty())
-			database.setDefaultValue(new String[] { databases.iterator().next() });
-
 		AttributeDefinitionImpl collection = new AttributeDefinitionImpl(MongoIdFactory.PROP_COLLECTION, "Collection", AttributeDefinition.STRING)
 		{
 			@Override
 			public String validate(String value)
 			{
-				return MongoIdFactoryComponent.validateCollectionName(value);
+				return validateCollectionName(value);
 			}
 		};
 
 		collection.setDescription("The MongoDB collection within the database");
 
 		ObjectClassDefinitionImpl ocd = new ObjectClassDefinitionImpl(MongoIdFactory.PID, "MongoDB ID", "MongoDB ID Provider Configuration");
-		ocd.addRequiredAttribute(database);
+		ocd.addRequiredAttribute(createDatabaseSelector());
 		ocd.addRequiredAttribute(collection);
 
 		return ocd;
@@ -82,11 +56,19 @@ public class MongoIdFactoryMetaTypeProvider implements MetaTypeProvider
 	@Reference(cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC )
 	public void bindMongoProvider(ServiceReference<MongoProvider> serviceReference)
 	{
-		databases.add((String) serviceReference.getProperty(MongoProvider.PROP_CLIENT_ID));
+		super.bindMongoProvider(serviceReference);
 	}
 
 	public void unbindMongoProvider(ServiceReference<MongoProvider> serviceReference)
 	{
-		databases.remove((String) serviceReference.getProperty(MongoProvider.PROP_CLIENT_ID));
+		super.unbindMongoProvider(serviceReference);
 	}
+	
+  private String validateCollectionName(String value)
+  {
+    if (value == null || value.isEmpty())
+      return "The collection was not specified as part of the component configuration";
+  
+    return null;
+  }
 }

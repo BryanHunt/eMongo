@@ -1,6 +1,8 @@
 package org.eclilpselabs.emongo.monitor.influxdb;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -87,7 +89,22 @@ public class InfluxPublisher implements MongoServerStatsPublisher
       log(LogService.LOG_DEBUG, "Response from publish: " + response.getStatusLine().getStatusCode() + " '" + response.getStatusLine().getReasonPhrase() + "'");
       
       if(response.getStatusLine().getStatusCode() >= 400)
-        log(LogService.LOG_WARNING, "Failed to publish: " + response.getStatusLine().getStatusCode() + " '" + response.getStatusLine().getReasonPhrase() + "'");      
+      {
+        StringBuilder reason = new StringBuilder();
+        
+        try(BufferedReader in = new BufferedReader(new InputStreamReader(response.getEntity().getContent())))
+        {
+          String line = null;
+          
+          while((line = in.readLine()) != null)
+            reason.append(line);
+        }
+        
+        log(LogService.LOG_WARNING, "Failed to publish: " + response.getStatusLine().getStatusCode() + " '" + response.getStatusLine().getReasonPhrase() + "'\n " + reason.toString());
+        
+        if(response.getStatusLine().getStatusCode() == 400)
+          log(LogService.LOG_WARNING, "Influx did not like the format of the following stats:\n" + metrics.toString());
+      }
     } 
     catch (IOException e)
     {

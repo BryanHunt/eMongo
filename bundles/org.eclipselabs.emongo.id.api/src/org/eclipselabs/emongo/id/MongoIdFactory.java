@@ -41,12 +41,6 @@ public interface MongoIdFactory
 
 	/**
 	 * 
-	 * @return the URI of the collection in the form mongodb://host[:port]/database/collection
-	 */
-	String getCollectionURI();
-
-	/**
-	 * 
 	 * @return the next auto-increment id value to be used as the _id value
 	 * @throws IOException if the current value could not be stored to the database
 	 */

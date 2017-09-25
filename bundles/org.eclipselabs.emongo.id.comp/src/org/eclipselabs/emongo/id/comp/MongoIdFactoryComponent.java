@@ -19,7 +19,7 @@ import java.io.IOException;
 import org.bson.Document;
 import org.eclipselabs.emongo.MongoProvider;
 import org.eclipselabs.emongo.comp.AbstractComponent;
-import org.eclipselabs.emongo.MongoIdFactory;
+import org.eclipselabs.emongo.id.MongoIdFactory;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
@@ -44,7 +44,6 @@ public class MongoIdFactoryComponent extends AbstractComponent implements MongoI
   }
 
 	private volatile String collectionName;
-	private volatile String uri;
 
 	private volatile MongoCollection<Document> collection;
 	private volatile MongoProvider mongoProvider;
@@ -58,20 +57,12 @@ public class MongoIdFactoryComponent extends AbstractComponent implements MongoI
 		collectionName = config.collectionName();
 		handleIllegalConfiguration(validateCollectionName(collectionName));
 
-		uri = mongoProvider.getURIs()[0] + "/" + collectionName;
-
 		MongoDatabase db = mongoProvider.getMongoDatabase();
 		collection = db.getCollection(collectionName).withWriteConcern(WriteConcern.MAJORITY);
 		Document object = collection.find(eq(ID, "0")).first();
 
 		if (object == null)
 			collection.insertOne(new Document(ID, "0").append(NEXT_ID, Long.valueOf(0)));
-	}
-
-	@Override
-	public String getCollectionURI()
-	{
-		return uri;
 	}
 
 	@Override

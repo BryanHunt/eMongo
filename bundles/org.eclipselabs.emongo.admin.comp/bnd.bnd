@@ -1,0 +1,13 @@
+-buildpath: \
+	osgi.annotation; version=6.0.1,\
+	osgi.core; version=6.0,\
+	osgi.cmpn; version=6.0
+
+-testpath: \
+	${junit}
+
+javac.source: 1.8
+javac.target: 1.8
+
+Bundle-Version: 3.0.0.${tstamp}
+Private-Package: org.eclipselabs.emongo.admin.comp

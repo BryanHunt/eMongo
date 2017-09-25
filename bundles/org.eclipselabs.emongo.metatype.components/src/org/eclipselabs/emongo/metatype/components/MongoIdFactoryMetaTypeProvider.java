@@ -11,8 +11,8 @@
 
 package org.eclipselabs.emongo.metatype.components;
 
-import org.eclipselabs.emongo.MongoIdFactory;
 import org.eclipselabs.emongo.MongoProvider;
+import org.eclipselabs.emongo.id.MongoIdFactory;
 import org.eclipselabs.emongo.metatype.AttributeDefinitionImpl;
 import org.eclipselabs.emongo.metatype.DatabaseSelectorMetatypeProvider;
 import org.eclipselabs.emongo.metatype.ObjectClassDefinitionImpl;

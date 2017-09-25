@@ -1,61 +1,47 @@
-########################
-## BND BUILD SETTINGS ##
-########################
+# Configure Repositories
+-plugin.01.Local: \
+	aQute.bnd.deployer.repository.LocalIndexedRepo; \
+		name = Local; \
+		pretty = true; \
+		local = ${build}/local
 
+-plugin.02.Templates: \
+	aQute.bnd.deployer.repository.LocalIndexedRepo; \
+		name = Templates; \
+		pretty = true; \
+		local = ${build}/templates
 
-## Global defaults are loaded from the bnd library (as shown below), place your
-## specific settings here. Additional settings are inherited from ext/*.bnd and
-## they will be overridden by anything you specify in this file.
+-plugin.03.Release: \
+	aQute.bnd.deployer.repository.LocalIndexedRepo; \
+		name = Release; \
+		pretty = true; \
+		local = ${build}/release
 
-## General Options
-#project.dependson:     ${p-dependson;:}
-#project.bootclasspath: ${p-bootclasspath;:}
-#project.buildpath:     ${p-buildpath;:}
-#project.sourcepath:    ${p-sourcepath;:}
-#project.allsourcepath: ${p-allsourcepath;:}
-#project.output:        ${p-output}
-#project.testpath:      ${p-testpath;:}
+-plugin.04.Felix: \
+	aQute.bnd.repository.maven.pom.provider.BndPomRepository; \
+	  name = "Felix"; \
+	  releaseUrls=https://repo.maven.apache.org/maven2/; \
+	  pom=${build}/ext/felix.xml
 
-#-verbose:              false
-#project:               ${basedir}
-#src:                   src
-#bin:                   bin
-#testsrc:               test
-#testbin:               bin_test
-#test-reports:          test-reports
-#target-dir:            generated
-#target:                ${project}/${target-dir}
-#build:                 ${workspace}/cnf
-#p:                     ${basename;${project}}
-#project.name:          ${p}
-#plugin-dir:            ${build}/plugins
+-plugin.04.Test: \
+	aQute.bnd.repository.maven.pom.provider.BndPomRepository; \
+	  name = "Test"; \
+	  releaseUrls=https://repo.maven.apache.org/maven2/; \
+	  pom=${build}/ext/test.xml
 
-## Java Compiler Options
-#java:                  java
-#javac:                 javac
-javac.source:          1.8
-javac.target:          1.8
-#javac.profile:
-#javac.debug:           on
+-plugin.06.Libs: \
+	aQute.bnd.deployer.repository.FixedIndexedRepo; \
+	  name          = Libs; \
+	  locations     = http://bryanhunt.github.io/releases/libs/index.xml
 
-## Bnd Options
-#-sources:              true
-#-sourcepath:           ${project}/src
+-plugin.07.MongoDB: \
+	aQute.bnd.repository.maven.pom.provider.BndPomRepository; \
+	  name = "MongoDB"; \
+	  releaseUrls=https://repo.maven.apache.org/maven2/; \
+	  pom=${build}/ext/mongo.xml
 
+-releaserepo: Release
+-baselinerepo: Release
 
-## Properties from ext/*.bnd can be referenced in order to extend them. For
-## example, to add one additional plugin to the list defined in
-## ext/repositories.bnd:
--plugin: ${ext.repositories.-plugin},\
-aQute.bnd.deployer.repository.FixedIndexedRepo;name=eUnit;locations=http://bryanhunt.github.com/eUnit/releases/2.0.0/bundles/index.xml.gz, \
-aQute.bnd.deployer.repository.FixedIndexedRepo;name=Orbit;locations=http://download.eclipse.org/tools/orbit/downloads/drops/R20150821153341/repository/index.xml.gz, \
-aQute.bnd.deployer.repository.FixedIndexedRepo;name=3p2;locations=http://bryanhunt.github.com/3rd-party-libs/bundles/index.xml.gz
-
-## To enable baselining, uncomment the following lines:
-# -baseline: *
-
-
-## If you use git, you might want to uncomment the following lines:
-# Git-Descriptor:       ${system-allow-fail;git describe --dirty --always}
-# Git-SHA:              ${system-allow-fail;git rev-list -1 HEAD}
-# -diffignore:          Git-Descriptor,Git-SHA
+# JUnit
+junit: org.junit; version=4.12.1, org.hamcrest; version=1.3, org.mockito.mockito-core; version=2.10.0, org.objenesis; version=2.6.0, net.bytebuddy.byte-buddy; version=1.7.4

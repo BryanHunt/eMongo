@@ -1,6 +1,6 @@
 package org.eclipselabs.emongo.metatype.components;
 
-import org.eclipselabs.emongo.MongoAdmin;
+import org.eclipselabs.emongo.admin.MongoAdmin;
 import org.eclipselabs.emongo.metatype.AttributeDefinitionImpl;
 import org.eclipselabs.emongo.metatype.ObjectClassDefinitionImpl;
 import org.osgi.service.component.annotations.Component;

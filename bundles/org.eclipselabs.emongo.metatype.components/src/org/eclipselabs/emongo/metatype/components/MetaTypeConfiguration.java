@@ -1,8 +1,8 @@
 package org.eclipselabs.emongo.metatype.components;
 
-import org.eclipselabs.emongo.MongoAdmin;
 import org.eclipselabs.emongo.MongoProvider;
-import org.eclipselabs.emongo.MongoIdFactory;
+import org.eclipselabs.emongo.admin.MongoAdmin;
+import org.eclipselabs.emongo.id.MongoIdFactory;
 
 public interface MetaTypeConfiguration
 {

@@ -19,7 +19,7 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 
 import org.bson.Document;
-import org.eclipselabs.emongo.MongoIdFactory;
+import org.eclipselabs.emongo.id.MongoIdFactory;
 import org.eclipselabs.emongo.junit.util.MongoDatabaseLocator;
 import org.eclipselabs.eunit.junit.utils.ServiceConfigurator;
 import org.eclipselabs.eunit.junit.utils.ServiceLocator;

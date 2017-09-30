@@ -16,7 +16,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.bson.Document;
-import org.eclipselabs.emongo.MongoServerStatsPublisher;
+import org.eclipselabs.emongo.stats.MongoServerStatsPublisher;
 import org.json.JSONObject;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;

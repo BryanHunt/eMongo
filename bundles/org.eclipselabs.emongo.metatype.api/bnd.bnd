@@ -1,9 +1,0 @@
--buildpath: \
-	osgi.annotation;version=6.0,\
-	osgi.cmpn;version=6.0,\
-	osgi.core;version=6.0,\
-	org.eclipselabs.emongo.api;version=latest
--baseline: *
-
-Bundle-Version: 1.0.0.${tstamp}
-Export-Package: org.eclipselabs.emongo.metatype

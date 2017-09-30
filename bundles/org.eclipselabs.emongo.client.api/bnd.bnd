@@ -1,4 +1,4 @@
-Export-Package: org.eclipselabs.emongo
+Export-Package: org.eclipselabs.emongo.client
 -buildpath: \
 	osgi.annotation;version=6.0,\
 	org.mongodb.mongo-java-driver;version=3.5

@@ -20,7 +20,7 @@ import static org.mockito.Mockito.mock;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipselabs.emongo.MongoProvider;
+import org.eclipselabs.emongo.client.MongoProvider;
 import org.eclipselabs.emongo.components.junit.support.MongoProviderComponentTestHarness;
 import org.junit.Before;
 import org.junit.Test;

@@ -11,7 +11,7 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 
 import org.bson.Document;
-import org.eclipselabs.emongo.MongoAdmin;
+import org.eclipselabs.emongo.admin.MongoAdmin;
 import org.eclipselabs.emongo.junit.util.MongoDatabaseLocator;
 import org.eclipselabs.eunit.junit.utils.ServiceConfigurator;
 import org.junit.Before;

@@ -17,7 +17,7 @@ import static org.junit.Assert.assertThat;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
-import org.eclipselabs.emongo.MongoProvider;
+import org.eclipselabs.emongo.client.MongoProvider;
 import org.eclipselabs.eunit.junit.utils.ServiceConfigurator;
 import org.eclipselabs.eunit.junit.utils.ServiceLocator;
 import org.junit.Before;

@@ -5,10 +5,9 @@ import java.util.Collections;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.bson.Document;
-import org.eclipselabs.emongo.MongoProvider;
-import org.eclipselabs.emongo.MongoServerStatsPublisher;
-import org.eclipselabs.emongo.admin.MongoAdmin;
+import org.eclipselabs.emongo.client.MongoProvider;
 import org.eclipselabs.emongo.comp.AbstractComponent;
+import org.eclipselabs.emongo.stats.MongoServerStatsPublisher;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
@@ -18,7 +17,7 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.log.LogService;
 
-@Component(immediate = true, configurationPolicy = ConfigurationPolicy.REQUIRE, configurationPid = MongoAdmin.MONITOR_PID)
+@Component(immediate = true, configurationPolicy = ConfigurationPolicy.REQUIRE)
 public class MongoDatabaseMonitorComponent extends AbstractComponent implements Runnable
 {
   public @interface MonitorConfig

@@ -12,7 +12,7 @@
 package org.eclipselabs.emongo.example;
 
 import org.bson.Document;
-import org.eclipselabs.emongo.MongoProvider;
+import org.eclipselabs.emongo.client.MongoProvider;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;

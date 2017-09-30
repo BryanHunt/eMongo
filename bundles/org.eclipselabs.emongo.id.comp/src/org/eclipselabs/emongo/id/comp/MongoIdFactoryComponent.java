@@ -15,9 +15,10 @@ import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Updates.inc;
 
 import java.io.IOException;
+import java.util.Map;
 
 import org.bson.Document;
-import org.eclipselabs.emongo.MongoProvider;
+import org.eclipselabs.emongo.client.MongoProvider;
 import org.eclipselabs.emongo.comp.AbstractComponent;
 import org.eclipselabs.emongo.id.MongoIdFactory;
 import org.osgi.service.component.annotations.Activate;
@@ -38,11 +39,6 @@ import com.mongodb.client.MongoDatabase;
 @Component(service = MongoIdFactory.class, configurationPolicy = ConfigurationPolicy.REQUIRE, configurationPid = MongoIdFactory.PID)
 public class MongoIdFactoryComponent extends AbstractComponent implements MongoIdFactory
 {
-  public @interface IdConfig
-  {
-    String collectionName();
-  }
-
 	private volatile String collectionName;
 
 	private volatile MongoCollection<Document> collection;
@@ -52,9 +48,9 @@ public class MongoIdFactoryComponent extends AbstractComponent implements MongoI
 	private static final String NEXT_ID = "_nextId";
 
 	@Activate
-	public void activate(IdConfig config)
+	public void activate(Map<String, Object> config)
 	{
-		collectionName = config.collectionName();
+		collectionName = (String) config.get(MongoIdFactory.PROP_COLLECTION);
 		handleIllegalConfiguration(validateCollectionName(collectionName));
 
 		MongoDatabase db = mongoProvider.getMongoDatabase();

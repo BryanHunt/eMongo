@@ -14,7 +14,7 @@ package org.eclipselabs.emongo.id.comp;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -24,10 +24,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bson.Document;
-import org.eclipselabs.emongo.MongoProvider;
+import org.eclipselabs.emongo.client.MongoProvider;
 import org.eclipselabs.emongo.id.MongoIdFactory;
-import org.eclipselabs.emongo.id.comp.MongoIdFactoryComponent;
-import org.eclipselabs.emongo.id.comp.MongoIdFactoryComponent.IdConfig;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -42,7 +40,6 @@ import com.mongodb.client.MongoDatabase;
  * @author bhunt
  * 
  */
-@SuppressWarnings("restriction")
 public class TestMongoIdFactoryComponent
 {
 	private MongoProvider mongoClientProvider;
@@ -70,7 +67,7 @@ public class TestMongoIdFactoryComponent
 		mongoClientProvider = mock(MongoProvider.class);
 		cursor = mock(FindIterable.class);
 		
-		when(mongoClientProvider.getURIs()).thenReturn(new String[] {"mongodb://localhost/junit"});
+//		when(mongoClientProvider.getURIs()).thenReturn(new String[] {"mongodb://localhost/junit"});
 		when(mongoClientProvider.getMongoDatabase()).thenReturn(db);
 		when(db.getCollection("elements")).thenReturn(collection);
 		when(collection.withWriteConcern(any(WriteConcern.class))).thenReturn(collection);
@@ -85,7 +82,7 @@ public class TestMongoIdFactoryComponent
 	public void testActivate() throws Exception
 	{
 		mongoIdFactoryComponent.bindMongoClientProvider(mongoClientProvider);
-		mongoIdFactoryComponent.activate(aQute.lib.converter.Converter.cnv(IdConfig.class, properties));
+		mongoIdFactoryComponent.activate(properties);
 
 		ArgumentCaptor<Document> argument = ArgumentCaptor.forClass(Document.class);
 		verify(collection).find(any(Document.class));
@@ -99,7 +96,7 @@ public class TestMongoIdFactoryComponent
 	{
 		when(cursor.first()).thenReturn(new Document());
 		mongoIdFactoryComponent.bindMongoClientProvider(mongoClientProvider);
-		mongoIdFactoryComponent.activate(aQute.lib.converter.Converter.cnv(IdConfig.class, properties));
+		mongoIdFactoryComponent.activate(properties);
 
 		verify(collection).find(any(Document.class));
 		verify(collection).withWriteConcern(any(WriteConcern.class));
@@ -111,21 +108,21 @@ public class TestMongoIdFactoryComponent
 	public void testActivateWithNullCollectionName() throws Exception
 	{
 		properties.put(MongoIdFactory.PROP_COLLECTION, null);
-		mongoIdFactoryComponent.activate(aQute.lib.converter.Converter.cnv(IdConfig.class, properties));
+		mongoIdFactoryComponent.activate(properties);
 	}
 
 	@Test(expected = IllegalStateException.class)
 	public void testActivateWithEmptyCollectionName() throws Exception
 	{
 		properties.put(MongoIdFactory.PROP_COLLECTION, "");
-		mongoIdFactoryComponent.activate(aQute.lib.converter.Converter.cnv(IdConfig.class, properties));
+		mongoIdFactoryComponent.activate(properties);
 	}
 
 	@Test
 	public void testGetNextId() throws Exception
 	{
 		mongoIdFactoryComponent.bindMongoClientProvider(mongoClientProvider);
-		mongoIdFactoryComponent.activate(aQute.lib.converter.Converter.cnv(IdConfig.class, properties));
+		mongoIdFactoryComponent.activate(properties);
 
 		Document result = new Document("_nextId", Long.valueOf(1));
 		when(collection.findOneAndUpdate(any(Document.class), any(Document.class))).thenReturn(result);
@@ -134,7 +131,7 @@ public class TestMongoIdFactoryComponent
 
 	public void testGetNextIdWithoutInit() throws Exception
 	{
-		mongoIdFactoryComponent.activate(aQute.lib.converter.Converter.cnv(IdConfig.class, properties));
+		mongoIdFactoryComponent.activate(properties);
 		assertThat(mongoIdFactoryComponent.getNextId(), is(nullValue()));
 	}
 }

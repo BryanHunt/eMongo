@@ -84,7 +84,7 @@
 			<version>3.3.0</version>
 		</dependency>
 	</dependencies>
-	<groupId>org.apache.felix</groupId>
-	<artifactId>org.apache.felix.bnd</artifactId>
+	<groupId>org.apache</groupId>
+	<artifactId>org.apache.felix</artifactId>
 	<version>1.0.0</version>
 </project>

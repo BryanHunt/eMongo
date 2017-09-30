@@ -1,8 +1,8 @@
 -buildpath: \
-	org.eclipselabs.emongo.api;version=latest,\
-	org.mongodb.mongo-java-driver;version=3.1,\
+	org.eclipselabs.emongo.client.api;version=latest,\
 	osgi.cmpn;version=6.0,\
-	osgi.core;version=6.0
+	osgi.core;version=6.0,\
+	org.mongodb.mongo-java-driver;version=3.5
 -dsannotations: *
 Private-Package: org.eclipselabs.emongo.log
-Bundle-Version: 2.0.0.${tstamp}
+Bundle-Version: 3.0.0.${tstamp}

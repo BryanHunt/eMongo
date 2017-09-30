@@ -1,0 +1,17 @@
+-buildpath: \
+	osgi.annotation;version=6.0.1,\
+	osgi.core;version=6.0,\
+	osgi.cmpn;version=6.0,\
+	org.eclipselabs.emeta.api;version=1.0,\
+	org.eclipselabs.emongo.id.api;version=latest,\
+	org.eclipselabs.emongo.client.api;version=latest,\
+	org.eclipselabs.emongo.meta.api;version=latest
+
+-testpath: \
+	${junit}
+
+javac.source: 1.8
+javac.target: 1.8
+
+Bundle-Version: 3.0.0.${tstamp}
+Private-Package: org.eclipselabs.emongo.id.meta

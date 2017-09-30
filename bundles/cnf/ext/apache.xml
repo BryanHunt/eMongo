@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<dependencies>
+		<dependency>
+			<groupId>org.eclipse.ecf</groupId>
+			<artifactId>org.apache.httpcomponents.httpclient</artifactId>
+			<version>4.5.2.v20170210-0925</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.ecf</groupId>
+			<artifactId>org.apache.httpcomponents.httpcore</artifactId>
+			<version>4.4.6.v20170210-0925</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.ecf</groupId>
+			<artifactId>org.json</artifactId>
+			<version>1.0.0.v201011060100</version>
+		</dependency>
+	</dependencies>
+	<groupId>org.apache</groupId>
+	<artifactId>org.apache.dependencies</artifactId>
+	<version>1.0.0</version>
+</project>

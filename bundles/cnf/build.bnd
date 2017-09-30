@@ -23,18 +23,34 @@
 	  releaseUrls=https://repo.maven.apache.org/maven2/; \
 	  pom=${build}/ext/felix.xml
 
--plugin.04.Test: \
+-plugin.05.Apache: \
+	aQute.bnd.repository.maven.pom.provider.BndPomRepository; \
+	  name = "Apache"; \
+	  releaseUrls=https://repo.maven.apache.org/maven2/; \
+	  pom=${build}/ext/apache.xml
+
+-plugin.06.Test: \
 	aQute.bnd.repository.maven.pom.provider.BndPomRepository; \
 	  name = "Test"; \
 	  releaseUrls=https://repo.maven.apache.org/maven2/; \
 	  pom=${build}/ext/test.xml
 
--plugin.06.Libs: \
+-plugin.07.Libs: \
 	aQute.bnd.deployer.repository.FixedIndexedRepo; \
 	  name          = Libs; \
 	  locations     = http://bryanhunt.github.io/releases/libs/index.xml
 
--plugin.07.MongoDB: \
+-plugin.08.eUnit: \
+	aQute.bnd.deployer.repository.FixedIndexedRepo; \
+	  name          = eUnit; \
+	  locations     = http://bryanhunt.github.io/releases/eUnit/index.xml.gz
+
+-plugin.09.eMeta: \
+	aQute.bnd.deployer.repository.FixedIndexedRepo; \
+	  name          = eMeta; \
+	  locations     = http://bryanhunt.github.io/releases/eMeta/index.xml.gz
+
+-plugin.10.MongoDB: \
 	aQute.bnd.repository.maven.pom.provider.BndPomRepository; \
 	  name = "MongoDB"; \
 	  releaseUrls=https://repo.maven.apache.org/maven2/; \

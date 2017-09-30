@@ -4,7 +4,7 @@
 	org.mongodb.mongo-java-driver;version=3.5
 Private-Package: org.eclipselabs.emongo.example
 -dsannotations: *
-Bundle-Version: 2.0.0.${tstamp}
+Bundle-Version: 3.0.0.${tstamp}
 
 -runrequires: \
 	osgi.identity;filter:='(osgi.identity=org.eclipselabs.emongo.client.comp)',\

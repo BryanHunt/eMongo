@@ -4,5 +4,5 @@
 	org.eclipselabs.emongo.client.api;version=latest,\
 	org.eclipselabs.emongo.admin.api;version=latest
 Private-Package: org.eclipselabs.emongo.configurator
-Bundle-Version: 2.0.0.${tstamp}
+Bundle-Version: 3.0.0.${tstamp}
 -dsannotations: *

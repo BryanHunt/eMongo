@@ -1,7 +1,7 @@
 package org.eclipselabs.emongo.stats.example;
 
 import org.bson.Document;
-import org.eclipselabs.emongo.MongoServerStatsPublisher;
+import org.eclipselabs.emongo.stats.MongoServerStatsPublisher;
 import org.osgi.service.component.annotations.Component;
 
 @Component(service = MongoServerStatsPublisher.class)

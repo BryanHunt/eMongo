@@ -3,10 +3,10 @@ eMongo
 
 MongoDB services for OSGi Environments
 
-* [Install Guide](https://github.com/BryanHunt/eMongo/wiki/Install-Guide)
-* [User Guide](https://github.com/BryanHunt/eMongo/wiki/User-Guide)
-* [API Javadoc](http://bryanhunt.github.com/eMongo/releases/2.0.0/api)
+* [Bndtools Repository](http://BryanHunt.github.io/releases/eMongo/index.xml)
 * [License](http://www.eclipse.org/legal/epl-v10.html)
+
+If you can't use [Bndtools](http://bndtools.org), then download the bundles from the [Releases](https://github.com/BryanHunt/eMongo/releases/)
 
 ### Donating
 

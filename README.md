@@ -8,6 +8,8 @@ MongoDB services for OSGi Environments
 
 If you can't use [Bndtools](http://bndtools.org), then download the bundles from the [Releases](https://github.com/BryanHunt/eMongo/releases/)
 
+**Warning:** The v3.0 bundles are still experimental.  Do not use in production just yet.
+
 ### Donating
 
 All donations will support this project and keep the developer supplied with Reese's Minis.

@@ -11,11 +11,7 @@
 
 package org.eclipselabs.emongo.client.comp;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -32,9 +28,8 @@ import org.osgi.service.log.LogService;
 
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions;
-import com.mongodb.MongoCredential;
+import com.mongodb.MongoClientURI;
 import com.mongodb.ReadPreference;
-import com.mongodb.ServerAddress;
 import com.mongodb.Tag;
 import com.mongodb.TagSet;
 import com.mongodb.WriteConcern;
@@ -47,15 +42,9 @@ import com.mongodb.client.MongoDatabase;
 @Component(service = MongoProvider.class, configurationPolicy = ConfigurationPolicy.REQUIRE)
 public class MongoProviderComponent extends AbstractComponent implements MongoProvider
 {
-  private volatile String databaseName;
-  private volatile Collection<String> uris;
-  private volatile MongoClient mongoClient;
+  private String databaseName;
+  private MongoClient mongoClient;
 
-  public String[] getURIs()
-  {
-    return uris.toArray(new String[0]);
-  }
-  
   @Override
   public MongoClient getMongoClient()
   {
@@ -72,16 +61,8 @@ public class MongoProviderComponent extends AbstractComponent implements MongoPr
   public void activate(Map<String, Object> config)
   {
     databaseName = (String) config.getOrDefault(MongoProvider.PROP_DEATABASE_NAME, "");
-
-    // The uriProperty is a single string containing one or more server URIs.
-    // When more than one URI is specified, it denotes a replica set and the
-    // URIs must be separated by a comma (CSV).
-
-    uris = new ArrayList<String>();
-    handleIllegalConfiguration(validateURI((String) config.get(MongoProvider.PROP_URI), uris));
-
-    MongoClientOptions options = createMongoClientOptions(config);
-    mongoClient = createMongoClient(uris, options);
+    String uri = (String) config.get(MongoProvider.PROP_URI);
+    mongoClient = createMongoClient(uri, createMongoClientOptions(config));
   }
 
   @Deactivate
@@ -102,78 +83,12 @@ public class MongoProviderComponent extends AbstractComponent implements MongoPr
     super.unbindLogService(logService);
   }
 
-  protected MongoClient createMongoClient(Collection<String> uris, MongoClientOptions options)
+  protected MongoClient createMongoClient(String uri, MongoClientOptions.Builder optionsBuilder)
   {
-    String currentURI = null;
-
-    try
-    {
-      List<ServerAddress> serverAddresses = new ArrayList<>(uris.size());
-      List<MongoCredential> mongoCredentials = new ArrayList<>();
-      
-      for (String uri : uris)
-      {
-        currentURI = uri;
-        serverAddresses.add(createServerAddress(currentURI));
-        String[] segments = currentURI.split("/");
-        String host = segments[2];
-        int authIndex = host.indexOf('@');
-        
-        if (segments.length == 4)
-          databaseName = segments[3];
-
-        if(authIndex > 0)
-        {
-          String[] credentials = host.substring(0, authIndex).split(":");
-          mongoCredentials.add(MongoCredential.createCredential(credentials[0], databaseName, credentials[1].toCharArray()));
-        }
-      }
-      
-      if(serverAddresses.size() == 1)
-        return new MongoClient(serverAddresses.get(0), mongoCredentials, options);
-      else
-        return new MongoClient(serverAddresses, mongoCredentials, options);
-        
-    }
-    catch (UnknownHostException e)
-    {
-      handleConfigurationException("The URI: '" + currentURI + "' has a bad hostname", e);
-    }
-    catch (URISyntaxException e)
-    {
-      handleConfigurationException("The URI: '" + currentURI + "' is not a proper URI", e);
-    }
-    
-    return null;
+    return new MongoClient(new MongoClientURI(uri, optionsBuilder));
   }
 
-  private String validateURI(String value, Collection<String> uris)
-  {
-    if (value == null || value.isEmpty())
-      return "The MongoDB URI was not found in the configuration properties";
-
-    // The regex \s matches whitepsace. The extra \ is needed because of how
-    // it's treated in java
-    // strings. The split is done on any number of whitespace chars followed by
-    // a comma followed by
-    // any number of whitespace chars. What is left is the URI(s).
-
-    for (String targetURI : value.split("\\s*,\\s*"))
-    {
-      String uri = targetURI.trim();
-      String[] segments = uri.split("/");
-
-      if (!uri.startsWith("mongodb://") || uri.endsWith("/") || segments.length < 3 || segments.length > 5)
-        return "The uri: '" + uri + "' does not have the form 'mongodb://host[:port]/[database]'";
-
-      if (uris != null)
-        uris.add(uri);
-    }
-
-    return null;
-  }
-
-  private MongoClientOptions createMongoClientOptions(Map<String, Object> config)
+  private MongoClientOptions.Builder createMongoClientOptions(Map<String, Object> config)
   {
     MongoClientOptions.Builder optionsBuilder = new MongoClientOptions.Builder();
 
@@ -234,14 +149,6 @@ public class MongoProviderComponent extends AbstractComponent implements MongoPr
       break;
     }
 
-    return optionsBuilder.build();
-  }
-
-  private ServerAddress createServerAddress(String uriProperty) throws URISyntaxException, UnknownHostException
-  {
-    URI uri = new URI(uriProperty);
-    int port = uri.getPort();
-    ServerAddress serverAddress = port == -1 ? new ServerAddress(uri.getHost()) : new ServerAddress(uri.getHost(), uri.getPort());
-    return serverAddress;
+    return optionsBuilder;
   }
 }

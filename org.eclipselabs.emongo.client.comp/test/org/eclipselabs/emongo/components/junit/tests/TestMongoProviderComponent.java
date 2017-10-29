@@ -11,10 +11,6 @@
 
 package org.eclipselabs.emongo.components.junit.tests;
 
-import static org.hamcrest.Matchers.arrayContainingInAnyOrder;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 
 import java.util.HashMap;
@@ -36,7 +32,6 @@ public class TestMongoProviderComponent
 {
   private MongoClient mongoClient;
   private MongoProviderComponentTestHarness mongoClientProviderComponent;
-  private String[] uris = new String[] { "mongodb://localhost", "mongodb://www.google.com", "mongodb://www.apple.com" };
   private Map<String, Object> properties;
 
   @Before
@@ -57,23 +52,17 @@ public class TestMongoProviderComponent
   }
 
   @Test
-  @SuppressWarnings("unchecked")
   public void testActivateWithSingleURI() throws Exception
   {
     properties.put(MongoProvider.PROP_URI, "mongodb://localhost");
 
     mongoClientProviderComponent.activate(properties);
-
-    assertThat(mongoClientProviderComponent.getURIs(), is(arrayContainingInAnyOrder(equalTo(uris[0]))));
   }
 
   @Test
-  @SuppressWarnings("unchecked")
   public void testActivateWithMultipleURI() throws Exception
   {
     mongoClientProviderComponent.activate(properties);
-
-    assertThat(mongoClientProviderComponent.getURIs(), is(arrayContainingInAnyOrder(equalTo(uris[0]), equalTo(uris[1]), equalTo(uris[2]))));
   }
 
   @Test(expected = IllegalStateException.class)
